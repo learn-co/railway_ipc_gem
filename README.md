@@ -14,7 +14,7 @@ And then execute:
 
 ## Usage
 
-Configure the `RailwayIpc` logger in an initializer:
+* Configure the `RailwayIpc` logger in an initializer:
 
 ```ruby
 # config/initializers/railway_ipc.rb
@@ -22,12 +22,20 @@ Configure the `RailwayIpc` logger in an initializer:
 RailwayIpc.configure(logger: Rails.logger)
 ```
 
-Load the rake tasks in your Rakefile
+* Load the rake tasks in your Rakefile
 
 ```ruby
 # Rakefile
 require "railway_ipc"
 ```
+
+* Create RabbitMQ connection credentials for Railway and set the environment variable:
+
+```
+RABBITMQ_CONNECTION_URL=amqp://<railway_user>:<railway_password>@localhost:5672
+```
+
+
 
 # Publish/Consume
 
