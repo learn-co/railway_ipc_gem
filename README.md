@@ -1,12 +1,11 @@
 # Railway IPC
 
 ## Installation
-**NOTE: At this time, this gem has NOT been released. It is ONLY available in Ironboard via inclusion in Ironboard's `Gemfile`. If we want to re-use this gem in other Rails apps, we will need to first package and release it.**
 
-Add this line to Ironboard's `Gemfile`:
+Add this line to your `Gemfile`:
 
 ```ruby
-gem 'railway-ipc', path: "lib/gems/railway_ipc"
+gem 'railway-ipc'
 ```
 
 And then execute:
