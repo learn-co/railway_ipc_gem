@@ -28,7 +28,8 @@ module RailwayIpc
     end
 
     def message_header(message)
-      "message type: #{message.class}, uuid: #{message.uuid}, correlation_id: #{message.correlation_id},  user_uuid: #{message.user_uuid}"
+      log_statement = "message type: #{message.class}, uuid: #{message.uuid}, correlation_id: #{message.correlation_id}"
+      message.respond_to?(:user_uuid) ? "#{log_statement}, user_uuid: #{message.user_uuid}" : log_statement
     end
   end
 end
