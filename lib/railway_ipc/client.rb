@@ -36,8 +36,8 @@ module RailwayIpc
     private
 
     def setup_exchange
-      @exchange = Bunny::Exchange.new(channel, :fanout, self.class.exchange_name)
-      channel.queue(self.class.queue_name, auto_delete: true).bind(exchange)
+      @exchange = Bunny::Exchange.new(channel, :fanout, self.class.exchange_name, durable: true)
+      channel.queue(self.class.queue_name, durable: true).bind(exchange)
     end
 
     def setup_reply_queue

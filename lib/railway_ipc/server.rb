@@ -16,7 +16,7 @@ module RailwayIpc
     end
 
     def run
-      @queue = channel.queue(self.class.queue_name, auto_delete: true)
+      @queue = channel.queue(self.class.queue_name, durable: true)
       subscribe_to_queue
     end
 
