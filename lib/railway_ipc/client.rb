@@ -42,6 +42,7 @@ module RailwayIpc
 
     def setup_reply_queue
       @reply_queue = channel.queue('', auto_delete: true, exclusive: true)
+      request_message.correlation_id = SecureRandom.uuid if request_message.correlation_id.empty?
       @call_id = request_message.correlation_id
       request_message.reply_to = reply_queue.name
     end

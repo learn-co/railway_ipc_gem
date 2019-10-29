@@ -37,9 +37,11 @@ module RailwayIpc
       begin
         response = work(payload)
       rescue StandardError => e
-        RailwayIpc.logger.error(message, "Error responding to message. Error: #{e.class}, #{e.message}")
+        RailwayIpc.logger.error(message, "Error responding to request. Error: #{e.class}, #{e.message}")
         response = self.rpc_error_adapter.error_message(e, message)
       ensure
+        response.correlation_id = message.correlation_id
+        RailwayIpc.logger.info(response, "Publishing response")
         exchange.publish(
           RailwayIpc::Rabbitmq::Payload.encode(response),
           routing_key: message.reply_to

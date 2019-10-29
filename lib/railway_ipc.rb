@@ -1,7 +1,7 @@
 require "railway_ipc/version"
 require "sneakers"
 require "bunny"
-require "railway_ipc/version"
+require "securerandom"
 require "railway_ipc/logger"
 require "railway_ipc/unhandled_message_error"
 require "railway_ipc/response"
