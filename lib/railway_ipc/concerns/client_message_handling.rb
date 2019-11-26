@@ -1,6 +1,6 @@
 module RailwayIpc
   module Concerns
-    module MessageHandling
+    module ClientMessageHandling
 
       HANDLERS = {}
 
@@ -15,21 +15,14 @@ module RailwayIpc
         # can fail
         decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
         # Conditional here probably due to Message handling being used in multiple cases
-
-        # check for handler for current message
-        # if not found, no-op
-        # if found, decode message and call the handler
-        if @handler = handler_class(decoded_payload.type).new
-          message_klass = message_class(decoded_payload.type)
-          if !message_klass
-            @message = self.rpc_error_message.decode(decoded_payload.message)
-            raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
-          else
-
-            @message = message_klass.decode(decoded_payload.message)
-          end
+        @handler = handler_class(decoded_payload.type).new if handler_class(decoded_payload.type)
+        message_klass = message_class(decoded_payload.type)
+        if !message_klass
+          @message = self.rpc_error_message.decode(decoded_payload.message)
+          raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
         else
-          RailwayIpc::NullHandler.new
+
+          @message = message_klass.decode(decoded_payload.message)
         end
       rescue StandardError => e
         RailwayIpc.logger.log_exception({
@@ -75,7 +68,7 @@ module RailwayIpc
 
       def null_message
         self.class.ancestors
-          .grep(RailwayIpc::Concerns::MessageHandling::ClassMethods)
+          .grep(RailwayIpc::Concerns::ClientMessageHandling::ClassMethods)
           .reverse
           .first
           .null_message_class
@@ -84,7 +77,7 @@ module RailwayIpc
 
       def null_handler
         self.class.ancestors
-          .grep(RailwayIpc::Concerns::MessageHandling::ClassMethods)
+          .grep(RailwayIpc::Concerns::ClientMessageHandling::ClassMethods)
           .reverse
           .first
           .null_handler_class

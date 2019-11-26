@@ -5,7 +5,11 @@ module RailwayIpc
 
       def self.encode(message)
         type = message.class.to_s
-        message = Base64.encode64(message.class.encode(message))
+        begin
+          message = Base64.encode64(message.class.encode(message))
+        rescue NoMethodError
+          raise RailwayIpc::InvalidProtobuf.new("Message #{message} is not a valid protobuf")
+        end
         new(type, message).to_json
       end
 
@@ -23,8 +27,8 @@ module RailwayIpc
 
       def to_json
         {
-          type: type,
-          encoded_message: message
+            type: type,
+            encoded_message: message
         }.to_json
       end
     end

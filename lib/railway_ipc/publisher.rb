@@ -18,8 +18,12 @@ module RailwayIpc
     end
 
     def publish(message)
-      RailwayIpc.logger.info(message, "Publishing message")
+      RailwayIpc.logger.info(message, 'Publishing message')
       super(RailwayIpc::Rabbitmq::Payload.encode(message))
+      # persist
+      # What to persist? Match hex package
+    rescue RailwayIpc::InvalidProtobuf
+      RailwayIpc.logger.error(message, 'Invalid protobuf')
     end
   end
 end

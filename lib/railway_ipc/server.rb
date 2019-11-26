@@ -1,10 +1,10 @@
 require "railway_ipc/rabbitmq/connection"
-require "railway_ipc/concerns/message_handling"
+require "railway_ipc/concerns/server_message_handling"
 
 module RailwayIpc
   class Server
     include RailwayIpc::Rabbitmq::Connection
-    include RailwayIpc::Concerns::MessageHandling
+    include RailwayIpc::Concerns::ServerMessageHandling
 
     def self.listen_to(queue:)
       queue(queue)

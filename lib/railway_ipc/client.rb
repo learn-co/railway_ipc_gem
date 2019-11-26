@@ -1,10 +1,10 @@
 require "railway_ipc/rabbitmq/connection"
-require "railway_ipc/concerns/message_handling"
+require "railway_ipc/concerns/client_message_handling"
 
 module RailwayIpc
   class Client
     include RailwayIpc::Rabbitmq::Connection
-    include RailwayIpc::Concerns::MessageHandling
+    include RailwayIpc::Concerns::ClientMessageHandling
 
     class TimeoutError < StandardError; end
 
