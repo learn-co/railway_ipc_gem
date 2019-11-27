@@ -15,8 +15,7 @@ require "railway_ipc/consumer"
 require "railway_ipc/publisher"
 require "railway_ipc/null_handler"
 require "railway_ipc/responder"
-require "railway_ipc/client"
-require "railway_ipc/server"
+require 'railway_ipc/rpc/rpc'
 require "railway_ipc/railtie" if defined?(Rails)
 
 module RailwayIpc
