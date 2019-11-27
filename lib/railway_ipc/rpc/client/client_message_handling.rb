@@ -39,12 +39,12 @@ module RailwayIpc
       private
 
       def responder_class(payload)
-        RPC::ResponceHandlers.instance.get(payload)
+        RPC::ResponseHandlers.instance.get(payload)
       end
 
       module ClassMethods
         def handle_response(message_type)
-          RPC::ResponceHandlers.instance.register(message_type)
+          RPC::ResponseHandlers.instance.register(message_type)
         end
 
         def rpc_error_message(rpc_error_message_class)

@@ -1,6 +1,6 @@
 module RailwayIpc
   module RPC
-    class ResponceHandlers
+    class ResponseHandlers
       include Singleton
 
       def register(message)
