@@ -1,7 +1,7 @@
+require 'railway_ipc/rpc/server/server_response_handlers'
 module RailwayIpc
   module RPC
     module ServerMessageHandling
-      HANDLERS = {}
 
       def self.included(klass)
         klass.extend(ClassMethods)
@@ -10,7 +10,7 @@ module RailwayIpc
       attr_reader :message, :responder
 
       def registered_handlers
-        HANDLERS.keys
+        ServerResponseHandlers.instance.registered
       end
 
       def work(payload)
@@ -45,15 +45,15 @@ module RailwayIpc
       private
 
       def handler_for(message_type)
-        HANDLERS[message_type]
+        ServerResponseHandlers.instance.get(message_type)
       end
 
       def handler_class(message_type)
-        handler_for(message_type).handler_class
+        handler_for(message_type).handler
       end
 
       def message_class(message_type)
-        handler_for(message_type).message_class
+        handler_for(message_type).message
       end
 
       module ClassMethods
@@ -74,10 +74,8 @@ module RailwayIpc
         end
 
         def respond_to(message_type, with:)
-          HANDLERS[message_type.to_s] = ServerHandlerManifest.new(with, message_type)
+          ServerResponseHandlers.instance.register(handler: with, message: message_type)
         end
-
-        RailwayIpc::ServerHandlerManifest = Struct.new(:handler_class, :message_class)
       end
     end
   end

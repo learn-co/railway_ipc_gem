@@ -1,6 +1,6 @@
 require 'railway_ipc/rabbitmq/connection'
 require 'railway_ipc/rpc/client/client_message_handling'
-require 'railway_ipc/rpc/client/response_handlers'
+require 'railway_ipc/rpc/client/client_response_handlers'
 
 module RailwayIpc
   class Client

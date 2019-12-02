@@ -1,7 +1,6 @@
 require 'railway_ipc/consumer/consumer_response_handlers'
 module RailwayIpc
   module ConsumerMessageHandling
-    HANDLERS = {}
 
     def self.included(klass)
       klass.extend(ClassMethods)
@@ -10,7 +9,7 @@ module RailwayIpc
     attr_reader :message, :handler
 
     def registered_handlers
-      HANDLERS.keys
+      ConsumerResponseHandlers.instance.registered
     end
 
     def work(payload)
@@ -45,13 +44,12 @@ module RailwayIpc
     end
 
     def handler_for(message_type)
-      HANDLERS[message_type]
       ConsumerResponseHandlers.instance.get(message_type)
     end
 
     module ClassMethods
       def handle(message_type, with:)
-        ConsumerResponseHandlers.instance.register(message_type, handler: with)
+        ConsumerResponseHandlers.instance.register(message: message_type, handler: with)
       end
     end
   end
