@@ -6,8 +6,7 @@ module RailwayIpc
         klass.extend(ClassMethods)
       end
 
-      attr_reader :message, :handler
-      alias_method :responder, :handler
+      attr_reader :message, :responder
 
       def registered_handlers
         ClientResponseHandlers.instance.registered
