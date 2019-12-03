@@ -1,13 +1,14 @@
 require 'railway_ipc/rabbitmq/connection'
-require 'railway_ipc/rpc/client/client_message_handling'
 require 'railway_ipc/rpc/client/client_response_handlers'
 
 module RailwayIpc
   class Client
     include RailwayIpc::Rabbitmq::Connection
-    include RailwayIpc::RPC::ClientMessageHandling
 
-    class TimeoutError < StandardError; end
+    attr_reader :message, :responder
+
+    class TimeoutError < StandardError;
+    end
 
     attr_accessor :call_id, :response, :lock, :condition, :reply_queue, :request_message
 
@@ -20,12 +21,52 @@ module RailwayIpc
       exchange(exchange)
     end
 
-    def initialize(queue=nil, pool=nil, opts={automatic_recovery: false})
+    def self.handle_response(response_type)
+      RPC::ClientResponseHandlers.instance.register(response_type)
+    end
+
+    def self.rpc_error_message(rpc_error_message_class)
+      @rpc_error_message_class = rpc_error_message_class
+    end
+
+    def self.rpc_error_message_class
+      @rpc_error_message_class
+    end
+
+    def self.rpc_error_adapter(rpc_error_adapter)
+      @rpc_error_adapter_class = rpc_error_adapter
+    end
+
+    def self.rpc_error_adapter_class
+      @rpc_error_adapter_class
+    end
+
+    def initialize(queue = nil, pool = nil, opts = {automatic_recovery: false})
       super
       setup_exchange
     end
 
-    def request(request_message, timeout=10)
+    def work(payload)
+      decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
+      case decoded_payload.type
+      when *::RailwayIpc::RPC::ClientResponseHandlers.instance.registered
+        @response_handler = RPC::ClientResponseHandlers.instance.get(decoded_payload.type)
+        @message = @response_handler.decode(decoded_payload.message)
+      else
+        @message = self.class.rpc_error_message_class.decode(decoded_payload.message)
+        raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
+      end
+    rescue StandardError => e
+      RailwayIpc.logger.log_exception(
+          feature: 'railway_consumer',
+          error: e.class,
+          error_message: e.message,
+          payload: payload
+      )
+      raise e
+    end
+
+    def request(request_message, timeout = 10)
       @request_message = request_message
       setup_reply_queue
       publish_message
@@ -57,14 +98,14 @@ module RailwayIpc
       until response || count >= timeout do
         _delivery_info, _properties, payload = reply_queue.pop
         handle_response(payload) if payload
-        count+= 1
+        count += 1
         sleep(1)
       end
     end
 
     def build_timeout_response
       error = TimeoutError.new('Client timed out')
-      response_message = rpc_error_adapter.error_message(error, request_message)
+      response_message = self.class.rpc_error_adapter_class.error_message(error, request_message)
       self.response = RailwayIpc::Response.new(response_message, success: false)
       self.stop
     end
@@ -79,7 +120,7 @@ module RailwayIpc
         end
       rescue StandardError => e
         RailwayIpc.logger.error(message, "Error handling response. Error #{e.class}, message: #{e.message}")
-        response_message = rpc_error_adapter.error_message(e, message)
+        response_message = self.class.rpc_error_adapter_class.error_message(e, message)
         self.response = RailwayIpc::Response.new(response_message, success: false)
         self.stop
       end

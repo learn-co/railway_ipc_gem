@@ -1,5 +1,6 @@
 require 'json'
 require 'base64'
+require 'railway_ipc/consumer/consumer_response_handlers'
 
 module RailwayIpc
   class Consumer
