@@ -45,7 +45,6 @@ module RailwayIpc
       RPC::ClientResponseHandlers.instance.register(response_type)
     end
 
-
     def initialize(queue = nil, pool = nil, opts = {automatic_recovery: false})
       super
       setup_exchange
