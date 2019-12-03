@@ -36,11 +36,11 @@ module RailwayIpc
     private
 
     def handler_class(message_type)
-      handler_for(message_type).handler_class
+      handler_for(message_type).handler
     end
 
     def message_class(message_type)
-      handler_for(message_type).message_class
+      handler_for(message_type).message
     end
 
     def handler_for(message_type)

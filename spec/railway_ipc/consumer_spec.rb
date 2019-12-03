@@ -29,13 +29,13 @@ RSpec.describe RailwayIpc::Consumer do
         .to include("LearnIpc::Commands::TestMessage")
   end
 
-  xit "routes the message to the correct handler" do
+  it "routes the message to the correct handler" do
     allow(RailwayIpc::TestHandler).to receive(:new).and_return(handler_instance)
     expect(handler_instance).to receive(:handle).with(instance_of(LearnIpc::Commands::TestMessage))
     consumer.work(payload)
   end
 
-  xit "acks the message" do
+  it "acks the message" do
     allow(RailwayIpc::TestHandler).to receive(:new).and_return(handler_instance)
     expect(handler_instance).to receive(:ack!)
     consumer.work(payload)
