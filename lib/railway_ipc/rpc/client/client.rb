@@ -2,19 +2,39 @@ require 'railway_ipc/rabbitmq/connection'
 require 'railway_ipc/rpc/client/client_response_handlers'
 
 module RailwayIpc
+  module RPC
+    class ErrorHandler
+      attr_accessor :adapter_class
+    end
+  end
+end
+module RailwayIpc
   class Client
     include RailwayIpc::Rabbitmq::Connection
-
     attr_reader :message, :responder
+
+    def self.error_handler
+      @error_handler ||= RailwayIpc::RPC::ErrorHandler.new
+    end
+
+    def self.rpc_error_message(_rpc_error_message_class); end
+
+    def self.rpc_error_adapter(rpc_error_adapter)
+      error_handler.adapter_class = rpc_error_adapter
+    end
+
+    def self.rpc_error_adapter_class
+      error_handler.adapter_class
+    end
 
     class TimeoutError < StandardError;
     end
 
-    attr_accessor :call_id, :response, :lock, :condition, :reply_queue, :request_message
-
     def self.request(message)
       new.request(message)
     end
+
+    attr_accessor :call_id, :response, :lock, :condition, :reply_queue, :request_message
 
     def self.publish_to(queue:, exchange:)
       queue(queue)
@@ -25,21 +45,6 @@ module RailwayIpc
       RPC::ClientResponseHandlers.instance.register(response_type)
     end
 
-    def self.rpc_error_message(rpc_error_message_class)
-      @rpc_error_message_class = rpc_error_message_class
-    end
-
-    def self.rpc_error_message_class
-      @rpc_error_message_class
-    end
-
-    def self.rpc_error_adapter(rpc_error_adapter)
-      @rpc_error_adapter_class = rpc_error_adapter
-    end
-
-    def self.rpc_error_adapter_class
-      @rpc_error_adapter_class
-    end
 
     def initialize(queue = nil, pool = nil, opts = {automatic_recovery: false})
       super
@@ -53,7 +58,6 @@ module RailwayIpc
         @response_handler = RPC::ClientResponseHandlers.instance.get(decoded_payload.type)
         @message = @response_handler.decode(decoded_payload.message)
       else
-        @message = self.class.rpc_error_message_class.decode(decoded_payload.message)
         raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
       end
     rescue StandardError => e
