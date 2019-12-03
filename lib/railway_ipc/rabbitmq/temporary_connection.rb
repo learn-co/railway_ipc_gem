@@ -14,17 +14,8 @@ module RailwayIpc
 
     class TemporaryConnection
       attr_reader :rabbit_connection
-      def create_bunny_connection(connection_options)
-        amqp_url = connection_options.amqp_url
-        rabbit_adapter_class = connection_options.rabbit_adapter
-        settings = AMQ::Settings.parse_amqp_url(amqp_url)
-        rabbit_adapter_class.new(
-            host: settings[:host],
-            user: settings[:user],
-            pass: settings[:pass],
-            port: settings[:port],
-            automatic_recovery: false,
-            logger: RailwayIpc.bunny_logger)
+      def create_rabbit_connection(connection_options)
+        RailwayIpc::Rabbitmq::Adapter.new(connection_options)
       end
 
       def default_connection_options
@@ -32,7 +23,7 @@ module RailwayIpc
       end
 
       def initialize(connection_options: default_connection_options)
-        @rabbit_connection = create_bunny_connection(connection_options)
+        @rabbit_connection = create_rabbit_connection(connection_options)
         @rabbit_connection_options = connection_options
       end
 
