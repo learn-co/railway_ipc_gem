@@ -50,6 +50,12 @@ module RailwayIpc
         self
       end
 
+      def disconnect
+        channel.close
+        connection.close
+        self
+      end
+
       def create_exchange(strategy: :fanout, options: {durable: true})
         @exchange = Bunny::Exchange.new(connection.channel, :fanout, exchange_name, options)
         self

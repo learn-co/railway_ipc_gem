@@ -12,6 +12,7 @@ module RailwayIpc
   class Client
     include RailwayIpc::Rabbitmq::Connection
     attr_reader :message, :responder
+    attr_accessor :call_id, :response, :request_message
 
     def self.error_handler
       @error_handler ||= RailwayIpc::RPC::ErrorHandler.new
@@ -29,14 +30,9 @@ module RailwayIpc
       error_handler.adapter_class
     end
 
-    class TimeoutError < StandardError;
-    end
-
     def self.request(message)
       new.request(message)
     end
-
-    attr_accessor :call_id, :response, :request_message
 
     def self.publish_to(exchange:)
       exchange(exchange)
@@ -48,6 +44,7 @@ module RailwayIpc
 
     def initialize(opts = {automatic_recovery: false}, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
       super
+      @rabbit_adapter
       @rabbit_connection = rabbit_adapter.new(exchange_name: self.class.exchange_name, options: opts)
     end
 
@@ -81,22 +78,9 @@ module RailwayIpc
 
     def await_response(timeout)
       @rabbit_connection.check_for_message(timeout: timeout) do |_, _, payload|
-        response_message = work(payload)
-        decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
-        case decoded_payload.type
-        when *::RailwayIpc::RPC::ClientResponseHandlers.instance.registered
-          @response_handler = RPC::ClientResponseHandlers.instance.get(decoded_payload.type)
-          @message = @response_handler.decode(decoded_payload.message)
-        else
-          raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
-        end
-        if response_message.correlation_id == self.call_id
-          RailwayIpc.logger.info(response_message, 'Handling response')
-          self.response = RailwayIpc::Response.new(response_message, success: true)
-          @rabbit_connection.disconnect
-        end
+        process_response(payload)
       end
-    rescue RailwayIpc::Rabbitmq::Adapter::Timeout => error
+    rescue RailwayIpc::Rabbitmq::Adapter::TimeoutError => error
       error.message = "Client timed out"
       response_message = self.class.rpc_error_adapter_class.error_message(error, request_message)
       self.response = RailwayIpc::Response.new(response_message, success: false)
@@ -111,6 +95,22 @@ module RailwayIpc
       response_message = self.class.rpc_error_adapter_class.error_message(e, message)
       self.response = RailwayIpc::Response.new(response_message, success: false)
       @rabbit_connection.disconnect
+    end
+
+    def process_response(response)
+      decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
+      case decoded_payload.type
+      when *::RailwayIpc::RPC::ClientResponseHandlers.instance.registered
+        @response_handler = RPC::ClientResponseHandlers.instance.get(decoded_payload.type)
+        @message = @response_handler.decode(decoded_payload.message)
+        if @message.correlation_id == self.call_id
+          RailwayIpc.logger.info(decoded_payload, 'Handling response')
+          self.response = RailwayIpc::Response.new(decoded_payload, success: true)
+          @rabbit_connection.disconnect
+        end
+      else
+        raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
+      end
     end
   end
 end
