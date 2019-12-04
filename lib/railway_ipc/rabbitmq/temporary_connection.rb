@@ -1,14 +1,13 @@
 require 'bunny'
 module RailwayIpc
   module Rabbitmq
-    RabbitConnectionOptions = Struct.new(:amqp_url, :rabbit_adapter_class, :options)
     class RabbitConnectionOptions
-      attr_reader :amqp_url, :rabbit_adapter, :exchange, :queue
-      def initialize(amqp_url:, rabbit_adapter:, exchange: nil, queue: nil)
+      attr_reader :amqp_url, :exchange, :queue, :options
+      def initialize(amqp_url: ENV["RAILWAY_RABBITMQ_CONNECTION_URL"], exchange:, queue:, options: {})
         @amqp_url = amqp_url
-        @rabbit_adapter = rabbit_adapter
         @exchange = exchange
         @queue = queue
+        @options = options
       end
     end
 
@@ -33,6 +32,7 @@ module RailwayIpc
         @exchange = Bunny::Exchange.new(channel, :fanout, @rabbit_connection_options.options[:exchange_name], durable: true)
         @channel.queue(self.class.queue_name, durable: true).bind(exchange)
       end
+
 
       def stop
         channel.close

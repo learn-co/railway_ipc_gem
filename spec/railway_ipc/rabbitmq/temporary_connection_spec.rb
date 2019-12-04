@@ -1,6 +1,6 @@
 RSpec.describe RailwayIpc::Rabbitmq::TemporaryConnection do
   xit 'connects to rabbit with provided credentials' do
-    options = RailwayIpc::Rabbitmq::RabbitConnectionOptions.new(amqp_url: "amqp://me:my_server@localhost:5672", rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
+    options = RailwayIpc::Rabbitmq::RabbitConnectionOptions.new(amqp_url: "amqp://me:my_server@localhost:5672")
     connection = RailwayIpc::Rabbitmq::TemporaryConnection.new(connection_options: options)
 
     expect(connection.rabbit_connection).to be_a(RailwayIpc::Rabbitmq::Adapter)
