@@ -10,7 +10,14 @@ module RailwayIpc
 end
 module RailwayIpc
   class Client
-    include RailwayIpc::Rabbitmq::Connection
+    #include RailwayIpc::Rabbitmq::Connection
+    def self.exchange(exchange)
+      @exchange_name = exchange
+    end
+
+    def self.exchange_name
+      @exchange_name
+    end
     attr_reader :message, :responder
     attr_accessor :call_id, :response, :request_message
 
@@ -43,8 +50,6 @@ module RailwayIpc
     end
 
     def initialize(opts = {automatic_recovery: false}, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
-      super
-      @rabbit_adapter
       @rabbit_connection = rabbit_adapter.new(exchange_name: self.class.exchange_name, options: opts)
     end
 
