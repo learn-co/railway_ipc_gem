@@ -7,7 +7,7 @@ require_relative "./error_message_pb"
 
 module RailwayIpc
   class TestClient < RailwayIpc::Client
-    publish_to queue: "ipc:test:requests", exchange: "ipc:test:requests"
+    publish_to exchange: "ipc:test:requests"
     handle_response LearnIpc::Documents::TestDocument
     rpc_error_adapter RailwayIpc::RpcAdapter
     rpc_error_message LearnIpc::ErrorMessage

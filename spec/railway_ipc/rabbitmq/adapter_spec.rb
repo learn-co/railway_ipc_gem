@@ -1,8 +1,7 @@
 RSpec.describe RailwayIpc::Rabbitmq::Adapter do
 
   let(:connection) do
-      options = RailwayIpc::Rabbitmq::RabbitConnectionOptions.new(amqp_url: "amqp://guest:guest@localhost:5672", queue: "test_queue", exchange: "test_exchange")
-      RailwayIpc::Rabbitmq::Adapter.new(connection_options: options)
+    RailwayIpc::Rabbitmq::Adapter.new(queue_name: "test_queue", exchange_name: "test_exchange")
   end
 
   after(:each) do
@@ -11,10 +10,16 @@ RSpec.describe RailwayIpc::Rabbitmq::Adapter do
     connection.delete_queue
   end
 
-  it "connects to rabbit" do
-    connection.connect
-    expect(connection.connected?).to be_truthy
-    expect(connection.automatically_recover?).to be_falsey
+  context "connecting" do
+    it "connects to rabbit" do
+      connection.connect
+      expect(connection.connected?).to be_truthy
+      expect(connection.automatically_recover?).to be_falsey
+    end
+    it "accepts options" do
+      diff_connection = RailwayIpc::Rabbitmq::Adapter.new(queue_name: "test_queue", exchange_name: "test_exchange", options: {automatic_recovery: true})
+      expect(diff_connection).to be_automatically_recover
+    end
   end
 
   context "creating an exchange" do
@@ -43,6 +48,7 @@ RSpec.describe RailwayIpc::Rabbitmq::Adapter do
           .connect
           .create_exchange
           .create_queue
+          .bind_queue_to_exchange
       expect(connection.queue.name).to eq("test_queue")
       connection.publish("hello there", routing_key: "my_key")
       connection.check_for_message do |delivery_info, _properties, payload|
@@ -55,7 +61,15 @@ RSpec.describe RailwayIpc::Rabbitmq::Adapter do
       connection
           .connect
           .create_exchange
-          .create_queue
+          .create_queue(auto_delete: true, exclusive: true)
+      expect(connection.queue.auto_delete?).to eq(true)
+      expect(connection.queue.exclusive?).to eq(true)
+    end
+    it "creates queue name if none provided" do
+      temp_conn = RailwayIpc::Rabbitmq::Adapter.new(exchange_name: "test_exchange")
+          .connect
+          .create_queue(auto_delete: true, exclusive: true)
+      expect(temp_conn.queue.name).to match(/^amq.gen/)
     end
   end
 end

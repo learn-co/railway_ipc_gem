@@ -1,6 +1,7 @@
 module RailwayIpc
   module Rabbitmq
     class Adapter
+      class TimeoutError < StandardError; end
       extend Forwardable
       attr_reader :connection, :exchange, :exchange_name, :queue, :queue_name
       def_delegators :connection,
@@ -12,18 +13,18 @@ module RailwayIpc
                      :port,
                      :user
 
-      def initialize(connection_options:)
-        amqp_url = connection_options.amqp_url
-        @queue_name = connection_options.queue
-        @exchange_name = connection_options.exchange
+      def initialize(amqp_url: ENV["RAILWAY_RABBITMQ_CONNECTION_URL"], exchange_name:, queue_name: '', options: {})
+        amqp_url = amqp_url
+        @queue_name = queue_name
+        @exchange_name = exchange_name
         settings = AMQ::Settings.parse_amqp_url(amqp_url)
-        @connection = Bunny.new(
+        @connection = Bunny.new({
             host: settings[:host],
             user: settings[:user],
             pass: settings[:pass],
             port: settings[:port],
             automatic_recovery: false,
-            logger: RailwayIpc.bunny_logger
+            logger: RailwayIpc.bunny_logger}.merge(options)
         )
       end
 
@@ -32,7 +33,7 @@ module RailwayIpc
       end
 
       def check_for_message(timeout: 10, time_elapsed: 0, &block)
-        raise "timeout" if time_elapsed >= timeout
+        raise TimeoutError.new if time_elapsed >= timeout
 
         block ||= ->(result) { result }
 
@@ -59,8 +60,13 @@ module RailwayIpc
         self
       end
 
-      def create_queue
-        @queue = @channel.queue(queue_name, durable: true).bind(exchange)
+      def create_queue(options={durable: true})
+        @queue = @channel.queue(queue_name, options)
+        self
+      end
+
+      def bind_queue_to_exchange
+        queue.bind(exchange)
         self
       end
 

@@ -17,17 +17,13 @@ module RailwayIpc
         RailwayIpc::Rabbitmq::Adapter.new(connection_options)
       end
 
-      def default_connection_options
-        RabbitConnectionOptions.new(amqp_url: ENV["RAILWAY_RABBITMQ_CONNECTION_URL"], rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
-      end
-
-      def initialize(connection_options: default_connection_options)
-        @rabbit_connection = create_rabbit_connection(connection_options)
-        @rabbit_connection_options = connection_options
+      def initialize(rabbit_adapter: RailwayIpc::Rabbitmq::Adapter, queue_name:, exchange_name:)
+        @rabbit_connection = rabbit_adapter.new(queue_name: queue_name, exchange_name: exchange_name)
       end
 
       def start
-        rabbit_connection.start
+        rabbit_connection
+            .connect
         @channel = rabbit_connection.create_channel
         @exchange = Bunny::Exchange.new(channel, :fanout, @rabbit_connection_options.options[:exchange_name], durable: true)
         @channel.queue(self.class.queue_name, durable: true).bind(exchange)
