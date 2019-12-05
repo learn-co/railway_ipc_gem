@@ -1,34 +1,26 @@
-require 'railway_ipc/rabbitmq/connection'
 require 'railway_ipc/rpc/server/server_response_handlers'
+require 'railway_ipc/rpc/concerns/error_adapter_configurable'
+require 'railway_ipc/rpc/concerns/message_observation_configurable'
 
 module RailwayIpc
   class Server
-    include RailwayIpc::Rabbitmq::Connection
+    extend RailwayIpc::RPC::ErrorAdapterConfigurable
+    extend RailwayIpc::RPC::MessageObservationConfigurable
     attr_reader :message, :responder
-
-    def self.rpc_error_adapter(rpc_error_adapter)
-      @rpc_error_adapter = rpc_error_adapter
-    end
-
-    def self.rpc_error_adapter_class
-      @rpc_error_adapter
-    end
-
-    def self.listen_to(queue:)
-      queue(queue)
-    end
 
     def self.respond_to(message_type, with:)
       RailwayIpc::RPC::ServerResponseHandlers.instance.register(handler: with, message: message_type)
     end
 
-    def initialize(queue = nil, pool = nil, opts = {automatic_recovery: true})
-      super
-      @exchange = channel.default_exchange
+    def initialize(opts = {automatic_recovery: true}, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
+      @rabbit_connection = rabbit_adapter.new(queue_name: self.class.queue_name, exchange_name: "default", options: opts)
     end
 
     def run
-      @queue = channel.queue(self.class.queue_name, durable: true)
+      @rabbit_connection
+          .connect
+          .create_exchange
+          .create_queue(durable: true)
       subscribe_to_queue
     end
 
@@ -56,23 +48,21 @@ module RailwayIpc
     private
 
     def subscribe_to_queue
-      queue.subscribe do |_delivery_info, metadata, payload|
+      @rabbit_connection.subscribe do |_delivery_info, _metadata, payload|
         handle_request(payload)
       end
     end
 
     def handle_request(payload)
-      begin
-        response = work(payload)
-      rescue StandardError => e
-        RailwayIpc.logger.error(message, "Error responding to message. Error: #{e.class}, #{e.message}")
-        response = self.class.rpc_error_adapter_class.error_message(e, message)
-      ensure
-        exchange.publish(
-            RailwayIpc::Rabbitmq::Payload.encode(response),
-            routing_key: message.reply_to
-        ) if response
-      end
+      response = work(payload)
+    rescue StandardError => e
+      RailwayIpc.logger.error(message, "Error responding to message. Error: #{e.class}, #{e.message}")
+      response = self.class.rpc_error_adapter_class.error_message(e, message)
+    ensure
+      @rabbit_connection.publish(
+          RailwayIpc::Rabbitmq::Payload.encode(response),
+          routing_key: message.reply_to
+      ) if response
     end
   end
 end

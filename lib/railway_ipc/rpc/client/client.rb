@@ -1,12 +1,11 @@
-require 'railway_ipc/rabbitmq/connection'
 require 'railway_ipc/rpc/client/client_response_handlers'
-require 'railway_ipc/rpc/concerns/exchange_configurable'
+require 'railway_ipc/rpc/concerns/publish_location_configurable'
 require 'railway_ipc/rpc/concerns/error_adapter_configurable'
 module RailwayIpc
   class Client
     attr_accessor :response_message, :request_message
-    attr_reader :rabbit_adapter, :rabbit_connection
-    extend RailwayIpc::RPC::ExchangeConfigurable
+    attr_reader :rabbit_connection
+    extend RailwayIpc::RPC::PublishLocationConfigurable
     extend RailwayIpc::RPC::ErrorAdapterConfigurable
 
     def self.request(message)
@@ -19,7 +18,6 @@ module RailwayIpc
 
     def initialize(request_message, opts = {automatic_recovery: false}, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
       @rabbit_connection = rabbit_adapter.new(exchange_name: self.class.exchange_name, options: opts)
-      @rabbit_adapter = rabbit_adapter
       @request_message = request_message
     end
 

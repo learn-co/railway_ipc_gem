@@ -1,6 +1,6 @@
 module RailwayIpc
   module RPC
-    module ExchangeConfigurable
+    module PublishLocationConfigurable
       def publish_to(exchange:)
         @exchange_name = exchange
       end

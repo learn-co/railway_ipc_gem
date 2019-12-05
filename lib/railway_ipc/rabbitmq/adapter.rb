@@ -3,7 +3,7 @@ module RailwayIpc
     class Adapter
       class TimeoutError < StandardError; end
       extend Forwardable
-      attr_reader :connection, :exchange, :exchange_name, :queue, :queue_name
+      attr_reader :connection, :exchange, :exchange_name, :queue, :queue_name, :channel
       def_delegators :connection,
                      :automatically_recover?,
                      :connected?,
@@ -32,6 +32,10 @@ module RailwayIpc
         exchange.publish(message, options) if exchange
       end
 
+      def subscribe(&block)
+        queue.subscribe(&block)
+      end
+
       def check_for_message(timeout: 10, time_elapsed: 0, &block)
         raise TimeoutError.new if time_elapsed >= timeout
 
@@ -57,7 +61,12 @@ module RailwayIpc
       end
 
       def create_exchange(strategy: :fanout, options: {durable: true})
-        @exchange = Bunny::Exchange.new(connection.channel, :fanout, exchange_name, options)
+        case exchange_name
+        when "default"
+          @exchange = channel.default_exchange
+        else
+          @exchange = Bunny::Exchange.new(connection.channel, :fanout, exchange_name, options)
+        end
         self
       end
 
