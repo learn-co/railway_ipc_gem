@@ -4,7 +4,7 @@ require 'railway_ipc/rpc/concerns/error_adapter_configurable'
 module RailwayIpc
   class Client
     attr_accessor :response_message, :request_message
-    attr_reader :rabbit_connection
+    attr_reader :rabbit_connection, :message
     extend RailwayIpc::RPC::PublishLocationConfigurable
     extend RailwayIpc::RPC::ErrorAdapterConfigurable
 
@@ -37,10 +37,11 @@ module RailwayIpc
       decoded_payload = decode_payload(response)
       case decoded_payload.type
       when *registered_handlers
-        message = get_message_class(decoded_payload).decode(decoded_payload.message)
+        @message = get_message_class(decoded_payload).decode(decoded_payload.message)
         RailwayIpc.logger.info(message, 'Handling response')
         RailwayIpc::Response.new(message, success: true)
       else
+        @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
         raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
       end
     end
@@ -53,13 +54,14 @@ module RailwayIpc
     end
 
     def await_response(timeout)
-      payload = nil
       rabbit_connection.check_for_message(timeout: timeout) do |_, _, payload|
         self.response_message = process_payload(payload)
       end
+    rescue RailwayIpc::Rabbitmq::Adapter::TimeoutError => e
+      error = self.class.rpc_error_adapter_class.error_message(e, self.request_message)
+      self.response_message = RailwayIpc::Response.new(error, success: false)
     rescue StandardError => e
-      log_exception(e, payload)
-      self.response_message = RailwayIpc::Response.new(decode_for_error(e, payload), success: false)
+      self.response_message = RailwayIpc::Response.new(message, success: false)
     ensure
       rabbit_connection.disconnect
     end
