@@ -1,7 +1,8 @@
 module RailwayIpc
   module Rabbitmq
     class Adapter
-      class TimeoutError < StandardError; end
+      class TimeoutError < StandardError;
+      end
       extend Forwardable
       attr_reader :connection, :exchange, :exchange_name, :queue, :queue_name, :channel
       def_delegators :connection,
@@ -14,22 +15,25 @@ module RailwayIpc
                      :user
 
       def initialize(amqp_url: ENV["RAILWAY_RABBITMQ_CONNECTION_URL"], exchange_name:, queue_name: '', options: {})
-        amqp_url = amqp_url
         @queue_name = queue_name
         @exchange_name = exchange_name
         settings = AMQ::Settings.parse_amqp_url(amqp_url)
         @connection = Bunny.new({
-            host: settings[:host],
-            user: settings[:user],
-            pass: settings[:pass],
-            port: settings[:port],
-            automatic_recovery: false,
-            logger: RailwayIpc.bunny_logger}.merge(options)
+                                    host: settings[:host],
+                                    user: settings[:user],
+                                    pass: settings[:pass],
+                                    port: settings[:port],
+                                    automatic_recovery: false,
+                                    logger: RailwayIpc.bunny_logger}.merge(options)
         )
       end
 
-      def publish(message, options={})
+      def publish(message, options = {})
         exchange.publish(message, options) if exchange
+      end
+
+      def reply(message, from)
+        channel.default_exchange.publish(message, routing_key: from)
       end
 
       def subscribe(&block)
@@ -61,12 +65,7 @@ module RailwayIpc
       end
 
       def create_exchange(strategy: :fanout, options: {durable: true})
-        case exchange_name
-        when "default"
-          @exchange = channel.default_exchange
-        else
-          @exchange = Bunny::Exchange.new(connection.channel, :fanout, exchange_name, options)
-        end
+        @exchange = Bunny::Exchange.new(connection.channel, :fanout, exchange_name, options)
         self
       end
 
@@ -75,7 +74,7 @@ module RailwayIpc
         self
       end
 
-      def create_queue(options={durable: true})
+      def create_queue(options = {durable: true})
         @queue = @channel.queue(queue_name, options)
         self
       end

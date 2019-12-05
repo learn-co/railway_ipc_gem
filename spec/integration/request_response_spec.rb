@@ -16,6 +16,7 @@ ISpec.describe "Request Response Cycle" do
   ISpec.context "when the server receives and unhandled message" do
     ISpec.it "returns the unhandled message error message" do
       response = RailwayIpc::TestClient.unhandled_message("1234")
+      p response
       response.body.is_a?(LearnIpc::ErrorMessage) && response.body.data.error == "RailwayIpc::UnhandledMessageError"
     end
   end
@@ -23,6 +24,7 @@ ISpec.describe "Request Response Cycle" do
   ISpec.context "when the server times out" do
     ISpec.it "returns the timeout error message" do
       response = RailwayIpc::TestClient.timeout_message("1234")
+      p response
       response.body.is_a?(LearnIpc::ErrorMessage) && response.body.data.error == "RailwayIpc::Client::TimeoutError"
     end
   end

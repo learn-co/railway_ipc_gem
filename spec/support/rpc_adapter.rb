@@ -9,6 +9,7 @@ module RailwayIpc
       LearnIpc::ErrorMessage.new(
         correlation_id: message.correlation_id,
         user_uuid: message.user_uuid,
+        reply_to: message.reply_to,
         data: data
       )
     end

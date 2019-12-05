@@ -32,7 +32,7 @@ RSpec.describe RailwayIpc::Client do
   describe "handling server response" do
     context 'server sends garbage' do
       let(:message) { LearnIpc::Requests::UnhandledRequest.new(user_uuid: '1234', correlation_id: '1234') }
-      it 'raises an error' do
+      it 'returns correct response object' do
         payload = RailwayIpc::Rabbitmq::Payload.encode(message)
         allow(adapter_instance).to receive(:connect).and_return(adapter_instance)
         allow(adapter_instance).to receive(:create_exchange).and_return(adapter_instance)
@@ -41,7 +41,9 @@ RSpec.describe RailwayIpc::Client do
         allow(adapter_instance).to receive(:disconnect).and_return(adapter_instance)
         client = RailwayIpc::TestClient.new(nil, rabbit_adapter: rabbit_adapter)
         client.setup_rabbit_connection
-        expect { client.await_response(10) }.to raise_error(RailwayIpc::UnhandledMessageError)
+        response = client.await_response(10)
+        expect(response.success).to be_falsey
+        expect(response.body).to eq("RailwayIpc::TestClient does not know how to handle LearnIpc::Requests::UnhandledRequest")
       end
     end
   end

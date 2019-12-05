@@ -37,8 +37,8 @@ module RailwayIpc
       decoded_payload = decode_payload(response)
       case decoded_payload.type
       when *registered_handlers
-        message = get_handler_for_message(decoded_payload).decode(decoded_payload.message)
-        RailwayIpc.logger.info(decoded_payload, 'Handling response')
+        message = get_message_class(decoded_payload).decode(decoded_payload.message)
+        RailwayIpc.logger.info(message, 'Handling response')
         RailwayIpc::Response.new(message, success: true)
       else
         raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
@@ -57,17 +57,25 @@ module RailwayIpc
       rabbit_connection.check_for_message(timeout: timeout) do |_, _, payload|
         self.response_message = process_payload(payload)
       end
-    rescue RailwayIpc::Rabbitmq::Adapter::TimeoutError, RailwayIpc::UnhandledMessageError => e
-      log_exception(e, decode_for_error(payload))
-      self.response_message = RailwayIpc::Response.new(decode_for_error(payload), success: false)
-      raise e
+    rescue StandardError => e
+      log_exception(e, payload)
+      self.response_message = RailwayIpc::Response.new(decode_for_error(e, payload), success: false)
     ensure
       rabbit_connection.disconnect
     end
 
     private
 
-    def get_handler_for_message(decoded_payload)
+    def log_exception(e, payload)
+      RailwayIpc.logger.log_exception(
+        feature: 'railway_consumer',
+        error: e.class,
+        error_message: e.message,
+        payload: decode_for_error(e, payload)
+      )
+    end
+
+    def get_message_class(decoded_payload)
       RailwayIpc::RPC::ClientResponseHandlers.instance.get(decoded_payload.type)
     end
 
@@ -84,18 +92,10 @@ module RailwayIpc
       rabbit_connection.publish(RailwayIpc::Rabbitmq::Payload.encode(request_message), routing_key: '')
     end
 
-    def decode_for_error(payload)
-      return "Payload not available" unless payload
+    def decode_for_error(e, payload)
+      return e.message unless payload
       self.class.rpc_error_adapter_class.error_message(payload, self.request_message)
     end
 
-    def log_exception(error, payload)
-      RailwayIpc.logger.log_exception(
-          feature: 'railway_consumer',
-          error: error.class,
-          error_message: error.message,
-          payload: payload
-      )
-    end
   end
 end
