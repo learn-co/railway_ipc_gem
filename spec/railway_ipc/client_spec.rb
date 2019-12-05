@@ -3,46 +3,45 @@ RSpec.describe RailwayIpc::Client do
     double = class_double(RailwayIpc::Rabbitmq::Adapter)
     expect(double)
         .to receive(:new)
-        .with({:exchange_name => "ipc:test:requests", :options => {:automatic_recovery => false}})
-        .and_return(adapter_instance)
+                .with({:exchange_name => "ipc:test:requests", :options => {:automatic_recovery => false}})
+                .and_return(adapter_instance)
     double
   end
 
   let(:adapter_instance) do
     instance_double(RailwayIpc::Rabbitmq::Adapter, queue: double("queue", name: "My queue"))
   end
-
-  before do
-    @client = RailwayIpc::TestClient.new(rabbit_adapter: rabbit_adapter)
-  end
   describe '#request' do
-    context 'when the client does not know how to handle the message' do
-      let(:message) { LearnIpc::Requests::UnhandledRequest.new(user_uuid: '1234', correlation_id: '1234') }
-      before do
-        @payload = message
-      end
-      it 'raises an error' do
-        expect { @client.request(@payload) }.to raise_error(RailwayIpc::UnhandledMessageError)
-      end
-    end
-    context 'when the server knows how to handle the message' do
-      let(:message) { LearnIpc::Documents::TestDocument.new(user_uuid: '1234', correlation_id: '1234') }
-      before do
-        @payload = message
-      end
+    context 'completing the request out to the server' do
+      let(:message) { LearnIpc::Requests::TestRequest.new(user_uuid: '1234', correlation_id: '1234') }
       it 'sets up connection correctly' do
-        mutated_payload = @payload.clone
-        mutated_payload.reply_to = "My queue"
+        client = RailwayIpc::TestClient.new(message, rabbit_adapter: rabbit_adapter)
+        mutated_payload = message.clone
+        mutated_payload.reply_to = adapter_instance.queue.name
         expect(adapter_instance).to receive(:connect).and_return(adapter_instance)
         expect(adapter_instance).to receive(:create_exchange).and_return(adapter_instance)
         expect(adapter_instance).to receive(:create_queue).and_return(adapter_instance)
         expect(adapter_instance).to receive(:publish).with(RailwayIpc::Rabbitmq::Payload.encode(mutated_payload), routing_key: "")
         expect(adapter_instance).to receive(:check_for_message).with(timeout: 10)
-        @client.request(@payload)
-        expect(response).to be_a(LearnIpc::Documents::TestDocument)
+        expect(adapter_instance).to receive(:disconnect)
+        client.request
       end
-      it 'processes response payload' do
+    end
+  end
 
+  describe "handling server response" do
+    context 'server sends garbage' do
+      let(:message) { LearnIpc::Requests::UnhandledRequest.new(user_uuid: '1234', correlation_id: '1234') }
+      it 'raises an error' do
+        payload = RailwayIpc::Rabbitmq::Payload.encode(message)
+        allow(adapter_instance).to receive(:connect).and_return(adapter_instance)
+        allow(adapter_instance).to receive(:create_exchange).and_return(adapter_instance)
+        allow(adapter_instance).to receive(:create_queue).and_return(adapter_instance)
+        allow(adapter_instance).to receive(:check_for_message).and_yield(nil, nil, payload)
+        allow(adapter_instance).to receive(:disconnect).and_return(adapter_instance)
+        client = RailwayIpc::TestClient.new(nil, rabbit_adapter: rabbit_adapter)
+        client.setup_rabbit_connection
+        expect { client.await_response(10) }.to raise_error(RailwayIpc::UnhandledMessageError)
       end
     end
   end

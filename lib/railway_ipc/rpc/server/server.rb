@@ -6,22 +6,12 @@ module RailwayIpc
     include RailwayIpc::Rabbitmq::Connection
     attr_reader :message, :responder
 
-    def self.decode_for_error(message)
-      error_handler.decode_for_error(message)
-    end
-    def self.error_handler
-      @error_handler ||= RailwayIpc::RPC::ErrorHandler.new
-    end
-
-    def self.rpc_error_message(_rpc_error_message_class)
-    end
-
     def self.rpc_error_adapter(rpc_error_adapter)
-      error_handler.adapter_class = rpc_error_adapter
+      @rpc_error_adapter = rpc_error_adapter
     end
 
     def self.rpc_error_adapter_class
-      error_handler.adapter_class
+      @rpc_error_adapter
     end
 
     def self.listen_to(queue:)

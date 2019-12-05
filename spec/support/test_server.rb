@@ -11,6 +11,5 @@ module RailwayIpc
     respond_to LearnIpc::Requests::TestRequest, with: RailwayIpc::TestResponder
     respond_to LearnIpc::Requests::TimeoutRequest, with: RailwayIpc::TimeoutResponder
     rpc_error_adapter RailwayIpc::RpcAdapter
-    rpc_error_message LearnIpc::ErrorMessage
   end
 end
