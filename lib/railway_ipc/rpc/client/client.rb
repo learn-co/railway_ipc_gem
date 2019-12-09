@@ -1,6 +1,8 @@
-require 'railway_ipc/rpc/client/client_response_handlers'
-require 'railway_ipc/rpc/concerns/publish_location_configurable'
-require 'railway_ipc/rpc/concerns/error_adapter_configurable'
+require "railway_ipc/rpc/client/client_response_handlers"
+require "railway_ipc/rpc/concerns/publish_location_configurable"
+require "railway_ipc/rpc/concerns/error_adapter_configurable"
+require "railway_ipc/rpc/client/errors/timeout_error"
+
 module RailwayIpc
   class Client
     attr_accessor :response_message, :request_message
@@ -16,7 +18,7 @@ module RailwayIpc
       RPC::ClientResponseHandlers.instance.register(response_type)
     end
 
-    def initialize(request_message, opts = {automatic_recovery: false}, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
+    def initialize(request_message, opts = { automatic_recovery: false }, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
       @rabbit_connection = rabbit_adapter.new(exchange_name: self.class.exchange_name, options: opts)
       @request_message = request_message
     end
@@ -38,7 +40,7 @@ module RailwayIpc
       case decoded_payload.type
       when *registered_handlers
         @message = get_message_class(decoded_payload).decode(decoded_payload.message)
-        RailwayIpc.logger.info(message, 'Handling response')
+        RailwayIpc.logger.info(message, "Handling response")
         RailwayIpc::Response.new(message, success: true)
       else
         @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
@@ -48,19 +50,19 @@ module RailwayIpc
 
     def setup_rabbit_connection
       rabbit_connection
-          .connect
-          .create_exchange
-          .create_queue(auto_delete: true, exclusive: true)
+        .connect
+        .create_exchange
+        .create_queue(auto_delete: true, exclusive: true)
     end
 
     def await_response(timeout)
       rabbit_connection.check_for_message(timeout: timeout) do |_, _, payload|
         self.response_message = process_payload(payload)
       end
-    rescue RailwayIpc::Rabbitmq::Adapter::TimeoutError => e
-      error = self.class.rpc_error_adapter_class.error_message(e, self.request_message)
+    rescue RailwayIpc::Rabbitmq::Adapter::TimeoutError
+      error = self.class.rpc_error_adapter_class.error_message(TimeoutError.new, self.request_message)
       self.response_message = RailwayIpc::Response.new(error, success: false)
-    rescue StandardError => e
+    rescue StandardError
       self.response_message = RailwayIpc::Response.new(message, success: false)
     ensure
       rabbit_connection.disconnect
@@ -70,10 +72,10 @@ module RailwayIpc
 
     def log_exception(e, payload)
       RailwayIpc.logger.log_exception(
-        feature: 'railway_consumer',
+        feature: "railway_consumer",
         error: e.class,
         error_message: e.message,
-        payload: decode_for_error(e, payload)
+        payload: decode_for_error(e, payload),
       )
     end
 
@@ -90,14 +92,13 @@ module RailwayIpc
     end
 
     def publish_message
-      RailwayIpc.logger.info(request_message, 'Sending request')
-      rabbit_connection.publish(RailwayIpc::Rabbitmq::Payload.encode(request_message), routing_key: '')
+      RailwayIpc.logger.info(request_message, "Sending request")
+      rabbit_connection.publish(RailwayIpc::Rabbitmq::Payload.encode(request_message), routing_key: "")
     end
 
     def decode_for_error(e, payload)
       return e.message unless payload
       self.class.rpc_error_adapter_class.error_message(payload, self.request_message)
     end
-
   end
 end

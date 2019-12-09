@@ -23,8 +23,6 @@ ISpec.describe "Request Response Cycle" do
   ISpec.context "when the server times out" do
     ISpec.it "returns the timeout error message" do
       response = RailwayIpc::TestClient.timeout_message("1234")
-      p response
-      # Currently "RailwayIpc::Rabbitmq::Adapter::TimeoutError"
       response.is_a?(RailwayIpc::Response) && response.body.data.error == "RailwayIpc::Client::TimeoutError"
     end
   end

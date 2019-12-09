@@ -1,6 +1,6 @@
-require 'json'
-require 'base64'
-require 'railway_ipc/consumer/consumer_response_handlers'
+require "json"
+require "base64"
+require "railway_ipc/consumer/consumer_response_handlers"
 
 module RailwayIpc
   class Consumer
@@ -19,12 +19,16 @@ module RailwayIpc
       ConsumerResponseHandlers.instance.register(message: message_type, handler: with)
     end
 
+    def registered_handlers
+      ConsumerResponseHandlers.instance.registered
+    end
+
     def work(payload)
       decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
       case decoded_payload.type
-      when *ConsumerResponseHandlers.instance.registered
-        @handler = ConsumerResponseHandlers.instance.get(decoded_payload.type).handler.new
-        message_klass = ConsumerResponseHandlers.instance.get(decoded_payload.type).message
+      when *registered_handlers
+        @handler = handler_for(decoded_payload)
+        message_klass = message_handler_for(decoded_payload)
       else
         @handler = RailwayIpc::NullHandler.new
         message_klass = RailwayIpc::NullMessage
@@ -33,12 +37,22 @@ module RailwayIpc
       handler.handle(message)
     rescue StandardError => e
       RailwayIpc.logger.log_exception(
-          feature: 'railway_consumer',
-          error: e.class,
-          error_message: e.message,
-          payload: payload
+        feature: "railway_consumer",
+        error: e.class,
+        error_message: e.message,
+        payload: payload,
       )
       raise e
+    end
+
+    private
+
+    def message_handler_for(decoded_payload)
+      ConsumerResponseHandlers.instance.get(decoded_payload.type).message
+    end
+
+    def handler_for(decoded_payload)
+      ConsumerResponseHandlers.instance.get(decoded_payload.type).handler.new
     end
   end
 end
