@@ -1,4 +1,4 @@
-require "singleton"
+require 'singleton'
 
 module RailwayIpc
   class Publisher < Sneakers::Publisher
@@ -9,7 +9,7 @@ module RailwayIpc
     end
 
     def self.exchange_name
-      raise "Subclass must set the exchange" unless @exchange_name
+      raise 'Subclass must set the exchange' unless @exchange_name
       @exchange_name
     end
 
@@ -18,10 +18,10 @@ module RailwayIpc
     end
 
     def publish(message)
-      RailwayIpc.logger.info(message, "Publishing message")
+      RailwayIpc.logger.info(message, 'Publishing message')
       super(RailwayIpc::Rabbitmq::Payload.encode(message))
     rescue RailwayIpc::InvalidProtobuf => e
-      RailwayIpc.logger.error(message, "Invalid protobuf")
+      RailwayIpc.logger.error(message, 'Invalid protobuf')
       raise e
     end
   end

@@ -62,8 +62,8 @@ module RailwayIpc
     rescue RailwayIpc::Rabbitmq::Adapter::TimeoutError
       error = self.class.rpc_error_adapter_class.error_message(TimeoutError.new, self.request_message)
       self.response_message = RailwayIpc::Response.new(error, success: false)
-    rescue StandardError => e
-      self.response_message = RailwayIpc::Response.new(self.message, success: false)
+    rescue StandardError
+      self.response_message = RailwayIpc::Response.new(message, success: false)
     ensure
       rabbit_connection.disconnect
     end
