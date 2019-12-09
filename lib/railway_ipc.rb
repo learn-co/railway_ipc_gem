@@ -9,7 +9,6 @@ require 'railway_ipc/response'
 require 'railway_ipc/rabbitmq/payload'
 require 'railway_ipc/null_message'
 require 'railway_ipc/rabbitmq/adapter'
-require 'railway_ipc/rabbitmq/connection'
 require 'railway_ipc/handler'
 require 'railway_ipc/handler_store'
 require 'railway_ipc/publisher'
@@ -37,6 +36,9 @@ module RailwayIpc
   end
 
   def self.bunny_connection
-    @bunny_connection ||= RailwayIpc::Rabbitmq::Connection.create_bunny_connection
+    @bunny_connection ||= RailwayIpc::Rabbitmq::Adapter.new(
+      exchange_name: 'default',
+      options: { automatic_recovery: true }
+    ).connection
   end
 end

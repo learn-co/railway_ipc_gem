@@ -42,10 +42,10 @@ module RailwayIpc
       end
     rescue StandardError => e
       RailwayIpc.logger.log_exception(
-          feature: 'railway_consumer',
-          error: e.class,
-          error_message: e.message,
-          payload: payload
+        feature: 'railway_consumer',
+        error: e.class,
+        error_message: e.message,
+        payload: payload
       )
       raise e
     end
@@ -56,14 +56,17 @@ module RailwayIpc
       RailwayIpc.logger.error(message, "Error responding to message. Error: #{e.class}, #{e.message}")
       response = self.class.rpc_error_adapter_class.error_message(e, message)
     ensure
-      rabbit_connection.reply(
+      if response
+        rabbit_connection.reply(
           RailwayIpc::Rabbitmq::Payload.encode(response), message.reply_to
-      ) if response
+        )
+      end
     end
 
     private
 
     attr_reader :rabbit_connection
+
     def get_message_class(decoded_payload)
       RailwayIpc::RPC::ServerResponseHandlers.instance.get(decoded_payload.type).message
     end
