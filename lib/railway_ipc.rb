@@ -1,26 +1,26 @@
-require "railway_ipc/version"
-require "sneakers"
-require "bunny"
-require "railway_ipc/version"
-require "railway_ipc/logger"
-require "railway_ipc/unhandled_message_error"
-require "railway_ipc/response"
-require "railway_ipc/rabbitmq/payload"
-require "railway_ipc/null_message"
-require "railway_ipc/concerns/message_handling"
-require "railway_ipc/rabbitmq/connection"
-require "railway_ipc/handler"
-require "railway_ipc/consumer"
-require "railway_ipc/publisher"
-require "railway_ipc/null_handler"
-require "railway_ipc/responder"
-require "railway_ipc/client"
-require "railway_ipc/server"
-require "railway_ipc/railtie" if defined?(Rails)
+require 'railway_ipc/version'
+require 'sneakers'
+require 'bunny'
+require 'railway_ipc/version'
+require 'railway_ipc/errors'
+require 'railway_ipc/logger'
+require 'railway_ipc/unhandled_message_error'
+require 'railway_ipc/response'
+require 'railway_ipc/rabbitmq/payload'
+require 'railway_ipc/null_message'
+require 'railway_ipc/rabbitmq/adapter'
+require 'railway_ipc/handler'
+require 'railway_ipc/handler_store'
+require 'railway_ipc/publisher'
+require 'railway_ipc/null_handler'
+require 'railway_ipc/responder'
+require 'railway_ipc/rpc/rpc'
+require 'railway_ipc/consumer/consumer'
+require 'railway_ipc/railtie' if defined?(Rails)
 
 module RailwayIpc
   def self.start
-    Rake::Task["sneakers:run"].invoke
+    Rake::Task['sneakers:run'].invoke
   end
 
   def self.configure(logger: ::Logger.new(STDOUT))
@@ -36,6 +36,9 @@ module RailwayIpc
   end
 
   def self.bunny_connection
-    @bunny_connection ||= RailwayIpc::Rabbitmq::Connection.create_bunny_connection
+    @bunny_connection ||= RailwayIpc::Rabbitmq::Adapter.new(
+      exchange_name: 'default',
+      options: { automatic_recovery: true }
+    ).connection
   end
 end

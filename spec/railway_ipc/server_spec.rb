@@ -5,7 +5,6 @@ RSpec.describe RailwayIpc::Server do
     let(:connection) { double('connection', {start: true, create_channel: channel}) }
 
     before do
-      allow(RailwayIpc::Rabbitmq::Connection).to receive(:create_bunny_connection).and_return(connection)
       @server = RailwayIpc::TestServer.new
     end
     context "when the server does not know how to handle the message" do
