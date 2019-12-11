@@ -1,7 +1,7 @@
 class AddIpcMessages < ActiveRecord::Migration
   def change
-    create_table :railway_ipc_published_messages do | t |
-      t.uuid :uuid, null: false, default: "uuid_generate_v4()"
+    create_table :railway_ipc_published_messages, id: false do | t |
+      t.uuid :uuid, null: false
       t.string :message_type, null: false
       t.uuid :user_uuid
       t.uuid :correlation_id
@@ -13,5 +13,7 @@ class AddIpcMessages < ActiveRecord::Migration
       t.datetime :updated_at
       t.datetime :inserted_at
     end
+
+    add_index :railway_ipc_published_messages, :uuid, unique: true
   end
 end
