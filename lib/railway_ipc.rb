@@ -1,6 +1,7 @@
 require 'railway_ipc/version'
 require 'sneakers'
 require 'bunny'
+require 'active_record'
 require 'railway_ipc/version'
 require 'railway_ipc/errors'
 require 'railway_ipc/logger'
@@ -16,6 +17,7 @@ require 'railway_ipc/null_handler'
 require 'railway_ipc/responder'
 require 'railway_ipc/rpc/rpc'
 require 'railway_ipc/consumer/consumer'
+require 'railway_ipc/models/published_message'
 require 'railway_ipc/railtie' if defined?(Rails)
 
 module RailwayIpc
