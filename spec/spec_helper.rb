@@ -4,7 +4,11 @@ require 'rake'
 
 ENV["RAILWAY_RABBITMQ_CONNECTION_URL"] = "amqp://guest:guest@localhost:5672"
 
-Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f }
+Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each do |file|
+  next if file.include?('support/rails_app')
+
+  require file
+end
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
