@@ -9,3 +9,11 @@
 
 # rspec failure tracking
 .rspec_status
+
+# rails support app files
+/spec/support/rails_app/.bundle
+/spec/support/rails_app/log/*
+/spec/support/rails_app/tmp/*
+/spec/support/rails_app!/log/.keep
+/spec/support/rails_app!/tmp/.keep
+/spec/support/rails_app.byebug_history
