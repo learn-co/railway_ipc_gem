@@ -4,5 +4,6 @@ IFS=$'\n\t'
 set -vx
 
 bundle install
+cd spec/support/rails_app/ && bundle exec rake db:migrate RAILS_ENV=test && cd ../../../
 
 # Do any other automated setup that you need to do here
