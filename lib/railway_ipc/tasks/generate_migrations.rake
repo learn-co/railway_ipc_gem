@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'pry'
 
 namespace :railway_ipc do
   namespace :generate do
