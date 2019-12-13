@@ -7,9 +7,6 @@ Rails.application.configure do
   # and recreated between test runs. Don't rely on the data there!
   config.cache_classes = true
 
-  # Use migration files in RailwayIpc gem
-  config.paths['db/migrate'] << File.join(root.parent.parent.parent, '/priv/migrations')
-
   # Do not eager load code on boot. This avoids loading your whole application
   # just for the purpose of running a single test. If you are using a tool that
   # preloads Rails for running tests, you may have to set it to true.
