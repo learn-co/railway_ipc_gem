@@ -8,5 +8,3 @@ ActiveRecord::Schema.verbose = false
 
 # Load support rails app for testing ActiveRecord models
 load 'support/rails_app/db/schema.rb'
-
-require 'spec_helper'
