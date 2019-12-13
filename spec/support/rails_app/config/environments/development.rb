@@ -6,9 +6,6 @@ Rails.application.configure do
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
 
-  # Use migration files in RailwayIpc gem
-  config.paths['db/migrate'] << File.join(root.parent.parent.parent, '/priv/migrations')
-
   # Do not eager load code on boot.
   config.eager_load = false
 
