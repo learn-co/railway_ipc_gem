@@ -2,6 +2,7 @@ require 'fileutils'
 
 namespace :railway_ipc do
   namespace :generate do
+    desc "Generates migrations to store Railway messages"
     task :migrations do
       if defined?(ActiveRecord::Base)
         puts "generating Railway IPC table migrations"
@@ -9,6 +10,7 @@ namespace :railway_ipc do
         seconds = 0
         gem_path = Gem.loaded_specs['railway-ipc'].full_gem_path
         folder_dest = "#{Rails.root.to_s}/db/migrate"
+        FileUtils.mkdir_p(folder_dest)
 
         Dir.glob("#{gem_path}/priv/migrations/*.rb").each do |file_path|
           file_name = File.basename(file_path)
