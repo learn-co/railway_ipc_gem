@@ -1,5 +1,5 @@
 module RailwayIpc
   class TestPublisher < RailwayIpc::Publisher
-    exchange 'test:commands'
+    exchange 'test:events'
   end
 end
