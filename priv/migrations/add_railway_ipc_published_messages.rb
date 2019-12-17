@@ -7,7 +7,6 @@ class AddRailwayIpcPublishedMessages < ActiveRecord::Migration
       t.uuid :correlation_id
       t.text :encoded_message, null: false
       t.string :status, null: false
-      t.string :queue
       t.string :exchange
 
       t.datetime :updated_at
