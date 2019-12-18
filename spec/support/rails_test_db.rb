@@ -3,20 +3,24 @@ module RailwayIpc
     GEM_PATH = Gem.loaded_specs['railway-ipc'].full_gem_path
 
     def self.create
-      visit_rails_support_app_dir { db_cleanup }
-      copy_migration_files
-      visit_rails_support_app_dir { db_setup }
+      visit_rails_support_app_dir do |_dir|
+        db_cleanup
+        generate_migrations
+        db_setup
+      end
     end
 
     def self.destroy
-      visit_rails_support_app_dir { db_cleanup }
+      visit_rails_support_app_dir do |_dir|
+        db_cleanup
+      end
     end
 
     class << self
       private
 
       def visit_rails_support_app_dir(&block)
-        Dir.chdir("#{GEM_PATH}/spec/support/rails_app") { yield }
+        Dir.chdir("#{GEM_PATH}/spec/support/rails_app", &block)
       end
 
       def db_setup
@@ -47,16 +51,8 @@ module RailwayIpc
         system("bundle exec rails db:drop RAILS_ENV=test", out: File::NULL)
       end
 
-      def copy_migration_files
-        seconds = 0
-        migration_folder = "#{Rails.root.to_s}/db/migrate"
-
-        Dir.glob("#{GEM_PATH}/priv/migrations/*.rb").each do |file_path|
-          file_name = File.basename(file_path)
-          new_file_name = "#{migration_timestamp(seconds)}_#{file_name}"
-          FileUtils.copy_file(file_path, "#{migration_folder}/#{new_file_name}")
-          seconds += 1
-        end
+      def generate_migrations
+        system("bundle exec rails railway_ipc:generate:migrations RAILS_ENV=test", out: File::NULL)
       end
 
       def remove_migration_files

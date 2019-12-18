@@ -1,4 +1,4 @@
-class AddIpcMessages < ActiveRecord::Migration
+class AddRailwayIpcConsumedMessages < ActiveRecord::Migration
   def change
     create_table :railway_ipc_consumed_messages, id: false do | t |
       t.uuid :uuid, null: false
