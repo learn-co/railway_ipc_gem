@@ -18,6 +18,7 @@ require 'railway_ipc/responder'
 require 'railway_ipc/rpc/rpc'
 require 'railway_ipc/consumer/consumer'
 require 'railway_ipc/models/published_message'
+require 'railway_ipc/models/consumed_message'
 require 'railway_ipc/railtie' if defined?(Rails)
 
 module RailwayIpc
