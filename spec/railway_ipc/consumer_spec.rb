@@ -1,13 +1,28 @@
 RSpec.describe RailwayIpc::Consumer do
+  let(:user_uuid) { SecureRandom.uuid }
+  let(:correlation_id) { SecureRandom.uuid }
+  let(:uuid) { SecureRandom.uuid }
+  let(:message) do
+    LearnIpc::Commands::TestMessage.new(
+        uuid: uuid,
+        user_uuid: user_uuid,
+        correlation_id: correlation_id,
+        type: "LearnIpc::Commands::TestMessage",
+        data: LearnIpc::Commands::TestMessage::Data.new(
+            iteration: "bk-001"
+        )
+    )
+  end
+
   let(:consumer) { RailwayIpc::TestConsumer.new }
-  let(:message) { LearnIpc::Commands::TestMessage.new }
   let(:encoded_message) { LearnIpc::Commands::TestMessage.encode(message) }
 
-  let(:payload) { {
-      type: message.class.to_s,
-      encoded_message: Base64.encode64(encoded_message)
-  }.to_json
-  }
+  let(:payload) do
+    {
+        type: message.class.to_s,
+        encoded_message: Base64.encode64(encoded_message)
+    }.to_json
+  end
   let(:handler_instance) { RailwayIpc::TestHandler.new }
 
   describe ".listen_to" do
