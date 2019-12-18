@@ -35,7 +35,12 @@ require "railway_ipc"
 RABBITMQ_CONNECTION_URL=amqp://<railway_user>:<railway_password>@localhost:5672
 ```
 
+* Load table migrations and migrate by executing:
 
+```bash
+bundle exec rake railway_ipc:generate:migrations
+bundle exec rake db:migrate
+```
 
 # Publish/Consume
 
