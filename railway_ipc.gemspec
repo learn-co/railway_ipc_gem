@@ -36,6 +36,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "pry-byebug", "3.4.2"
   spec.add_development_dependency "google-protobuf", "~> 3.9"
+  spec.add_dependency "sneakers", "~> 2.3.5"
+  spec.add_dependency "bunny", "~> 2.2.0"
 
   # Setup for testing Rails type code within mock Rails app
   spec.add_development_dependency "rails", "~> 5.0.7"
