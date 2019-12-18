@@ -26,6 +26,7 @@ module RailwayIpc
       def db_setup
         set_correct_migration_version
         run_migrations
+        load_schema
       end
 
       def set_correct_migration_version
@@ -43,9 +44,14 @@ module RailwayIpc
         ', out: File::NULL)
       end
 
+      def load_schema
+        load 'db/schema.rb'
+      end
+
       def db_cleanup
         drop_db
         remove_migration_files
+        clear_schema_file
       end
 
       def drop_db
@@ -58,6 +64,10 @@ module RailwayIpc
 
       def remove_migration_files
         FileUtils.rm_rf(Dir.glob('db/migrate/*'))
+      end
+
+      def clear_schema_file
+        File.truncate('db/schema.rb', 0)
       end
 
       def migration_timestamp(seconds = 0)
