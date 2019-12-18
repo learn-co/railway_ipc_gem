@@ -21,8 +21,6 @@ require 'railway_ipc/models/published_message'
 require 'railway_ipc/models/consumed_message'
 require 'railway_ipc/railtie' if defined?(Rails)
 
-Sneakers.configure
-
 module RailwayIpc
   def self.start
     Rake::Task['sneakers:run'].invoke
