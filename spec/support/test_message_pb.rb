@@ -8,7 +8,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :user_uuid, :string, 1
     optional :correlation_id, :string, 2
     optional :uuid, :string, 3
-    optional :type, :string, 4
+    map :context, :string, :string, 4
     optional :data, :message, 5, "learn_ipc.commands.TestMessage.Data"
   end
   add_message "learn_ipc.commands.TestMessage.Data" do

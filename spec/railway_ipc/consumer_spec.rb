@@ -7,7 +7,6 @@ RSpec.describe RailwayIpc::Consumer do
         uuid: uuid,
         user_uuid: user_uuid,
         correlation_id: correlation_id,
-        type: "LearnIpc::Commands::TestMessage",
         data: LearnIpc::Commands::TestMessage::Data.new(
             iteration: "bk-001"
         )
