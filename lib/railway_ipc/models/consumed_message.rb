@@ -5,6 +5,30 @@ module RailwayIpc
     self.table_name = 'railway_ipc_consumed_messages'
     self.primary_key = 'uuid'
 
+    def self.persist(decoded_message, &handler)
+      message = self.find_by(uuid: decoded_message.uuid)
+
+      if message
+        # do stuff
+        # lock the db row
+        # handle the message
+        # save the message status
+        # unlock the db row
+        # return the value of the message
+        response = handler.call
+        # if response.success?
+
+      else
+        # create the record
+        # lock the db row
+        # handle the message
+        # save the message status
+        # unlock the db row
+        # return the value of the message
+      end
+
+    end
+
     def processed?
       COMPLETED_STATUSES.exclude?(self.status)
     end

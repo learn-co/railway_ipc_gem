@@ -24,7 +24,13 @@ module RailwayIpc
     end
 
     def work(payload)
+      # find of create a consumed message record
+      # lock the database row
+      # call the handler
+      # record the status response from the handled message
+      # unlock the database row
       decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
+
       case decoded_payload.type
       when *registered_handlers
         @handler = handler_for(decoded_payload)
@@ -34,16 +40,22 @@ module RailwayIpc
         message_klass = RailwayIpc::NullMessage
       end
       message = message_klass.decode(decoded_payload.message)
-      handler.handle(message)
-    rescue StandardError => e
-      RailwayIpc.logger.log_exception(
-        feature: "railway_consumer",
-        error: e.class,
-        error_message: e.message,
-        payload: payload,
-      )
-      raise e
+
+      ConsumedMessage.persist(decoded_payload) do
+        handler.handle(message)
+      end
+
+      rescue StandardError => e
+        RailwayIpc.logger.log_exception(
+          feature: "railway_consumer",
+          error: e.class,
+          error_message: e.message,
+          payload: payload,
+        )
+        raise e
+      end
     end
+
 
     private
 
