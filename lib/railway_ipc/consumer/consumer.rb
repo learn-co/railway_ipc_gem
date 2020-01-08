@@ -36,12 +36,14 @@ module RailwayIpc
       when *registered_handlers
         @handler = handler_for(decoded_payload)
         message_klass = message_handler_for(decoded_payload)
+        decoded_message = message_klass.decode(decoded_payload.message)
+        # decoded_payload.message is the base64 encoded message
+        # can be potentially used for future replay if handler didn't process or couldn't
+        ConsumedMessage.persist_with_lock!(encoded_message: decoded_payload.message, decoded_message: decoded_message, type: message_klass) { handler.handle(message) }
       else
-        @handler = RailwayIpc::NullHandler.new
-        message_klass = RailwayIpc::NullMessage
+        message = RailwayIpc::BaseMessage.decode(decoded_payload.message)
+        ConsumedMessage.persist_unknown_message_type(encoded_message: decoded_payload.message, decoded_message: decoded_message) # auto use type: RailwayIpc::NullMessage in method definition
       end
-      message = message_klass.decode(decoded_payload.message)
-      handler.handle(message)
 
       rescue StandardError => e
         RailwayIpc.logger.log_exception(

@@ -24,3 +24,6 @@ namespace :railway_ipc do
     end
   end
 end
+
+
+rake railway_ipc:generate:migrations
