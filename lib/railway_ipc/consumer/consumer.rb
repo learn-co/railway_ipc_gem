@@ -23,7 +23,8 @@ module RailwayIpc
       ConsumerResponseHandlers.instance.registered
     end
 
-    def work(payload)
+    def work_with_params(payload, delivery_info, metadata)
+      binding.pry
       # find of create a consumed message record
       # lock the database row
       # call the handler
@@ -40,10 +41,7 @@ module RailwayIpc
         message_klass = RailwayIpc::NullMessage
       end
       message = message_klass.decode(decoded_payload.message)
-
-      ConsumedMessage.persist(decoded_payload) do
-        handler.handle(message)
-      end
+      handler.handle(message)
 
       rescue StandardError => e
         RailwayIpc.logger.log_exception(
@@ -53,7 +51,6 @@ module RailwayIpc
           payload: payload,
         )
         raise e
-      end
     end
 
 
