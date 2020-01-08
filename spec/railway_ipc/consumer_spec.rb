@@ -36,7 +36,6 @@ RSpec.describe RailwayIpc::Consumer do
     end
   end
 
-
   it "registers the handler for the message" do
     RailwayIpc::Consumer.handle(LearnIpc::Commands::TestMessage, with: RailwayIpc::TestHandler)
     expect(RailwayIpc::ConsumerResponseHandlers.instance.registered)
@@ -70,6 +69,72 @@ RSpec.describe RailwayIpc::Consumer do
       allow(RailwayIpc::NullHandler).to receive(:new).and_return(handler_instance)
       expect(handler_instance).to receive(:ack!)
       consumer.work(payload)
+    end
+  end
+
+  describe '#work_with_params' do
+    let(:user_uuid) { SecureRandom.uuid }
+    let(:correlation_id) { SecureRandom.uuid }
+    let(:uuid) { SecureRandom.uuid }
+    let(:message) do
+      LearnIpc::Commands::TestMessage.new(
+          uuid: uuid,
+          user_uuid: user_uuid,
+          correlation_id: correlation_id,
+          data: LearnIpc::Commands::TestMessage::Data.new(
+              iteration: "bk-001"
+          )
+      )
+    end
+    let(:consumer) { RailwayIpc::TestConsumer.new }
+    let(:encoded_message) { LearnIpc::Commands::TestMessage.encode(message) }
+    let(:payload) do
+      {
+        type: message.class.to_s,
+        encoded_message: Base64.encode64(encoded_message)
+      }.to_json
+    end
+    # let(:test_handler) { RailwayIpc::TestHandler.new }
+
+    context 'when message is successfully decoded with known message type' do
+      context 'when consumed message record with matching UUID exits' do
+        context 'when message has a status of "success"' do
+          it 'does not update the consumed message record' do
+            consumer.work_with_params(payload, )
+          end
+          it 'does not process the message'
+          it 'acks the message'
+        end
+
+        context 'when message has status of "processing" or "unknown_message_type"' do
+          it 'adds a persistance db lock to the consumed message record, processes it, and updates the message with a status of "success"'
+          it 'acks the message'
+        end
+      end
+
+      context 'when consumed message record with matching UUID does not exits' do
+        context 'when persistance is successful' do
+          it 'created the record with a status of "processing", added a persistance db lock to the record while processing the the message and updated the message status to "success" after being handled'
+        end
+
+        context 'when persistance fails' do
+          it 'logs an errors'
+          it 'acks the message'
+        end
+      end
+    end
+
+    context 'when message is not successfully decoded with unknown message type' do
+      context 'when persistance is successful' do
+        it 'creates the record with a status of "unknown_message_type"'
+        it 'does not process the message'
+        it 'acks the message'
+      end
+
+      context 'when persistance fails' do
+        it 'logs and error'
+        it 'acks the message'
+      end
     end
   end
 end
