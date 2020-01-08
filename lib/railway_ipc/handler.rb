@@ -19,6 +19,8 @@ module RailwayIpc
         RailwayIpc.logger.error(message, "Failed to handle message")
         ack!
       end
+
+      response
     end
   end
 end
