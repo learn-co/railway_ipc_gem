@@ -1,5 +1,6 @@
 module RailwayIpc
   class ConsumedMessage < ActiveRecord::Base
+    SUCCESS_STATUS = "success"
     COMPLETED_STATUSES = %w(success ignore)
     attr_reader :decoded_message
     self.table_name = 'railway_ipc_consumed_messages'

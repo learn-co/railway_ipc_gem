@@ -1,6 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe RailwayIpc::ConsumedMessage do
+  describe '#succeeded?' do
+    it 'returns true when message has a status of success'
+    it 'returns false otherwise'
+  end
+
   describe 'initial save to DB' do
     it 'saves an inserted_at date for the current time' do
       msg = RailwayIpc::ConsumedMessage.create({

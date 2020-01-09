@@ -111,7 +111,12 @@ RSpec.describe RailwayIpc::Consumer do
         let!(:consumed_message) { create(:consumed_message) }
         context 'when message has a status of "success"' do
           it 'does not update the consumed message record' do
+            prework_message = consumed_message.update(status: RailwayIpc::ConsumedMessage::SUCCESS_STATUS)
+            prework_message.freeze
             consumer.work_with_params(payload, delivery_info, nil)
+
+            message_from_db = RailwayIpc::ConsumedMessage.find! prework_message.uuid
+            expect(message_from_db).to eq prework_message
           end
           it 'does not process the message'
           it 'acks the message'
