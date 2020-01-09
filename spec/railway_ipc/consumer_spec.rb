@@ -108,9 +108,10 @@ RSpec.describe RailwayIpc::Consumer do
 
     context 'when message is successfully decoded with known message type' do
       context 'when consumed message record with matching UUID exits' do
+        let!(:consumed_message) { create(:consumed_message) }
         context 'when message has a status of "success"' do
           it 'does not update the consumed message record' do
-            consumer.work_with_params(payload, )
+            consumer.work_with_params(payload, delivery_info, nil)
           end
           it 'does not process the message'
           it 'acks the message'

@@ -3,6 +3,7 @@ require "railway_ipc"
 require 'rake'
 require 'fileutils'
 require 'rails_helper'
+require 'factory_bot'
 
 ENV["RAILWAY_RABBITMQ_CONNECTION_URL"] = "amqp://guest:guest@localhost:5672"
 
@@ -25,4 +26,10 @@ RSpec.configure do |config|
   # Setup Test DB to use with support Rails app
   config.before(:suite) { RailwayIpc::RailsTestDB.create }
   config.after(:suite) { RailwayIpc::RailsTestDB.destroy }
+
+  config.include FactoryBot::Syntax::Methods
+
+  config.before(:suite) do
+    FactoryBot.find_definitions
+  end
 end
