@@ -94,7 +94,17 @@ RSpec.describe RailwayIpc::Consumer do
         encoded_message: Base64.encode64(encoded_message)
       }.to_json
     end
-    # let(:test_handler) { RailwayIpc::TestHandler.new }
+    let(:test_handler) { RailwayIpc::TestHandler.new }
+    let(:delivery_info) do
+      OpenStruct.new(
+        exchange: 'ipc:location:events',
+        consumer: OpenStruct.new(
+          queue: OpenStruct.new(
+            name: 'source:location:events'
+          )
+        )
+      )
+    end
 
     context 'when message is successfully decoded with known message type' do
       context 'when consumed message record with matching UUID exits' do
