@@ -1,9 +1,22 @@
 require 'rails_helper'
 
 RSpec.describe RailwayIpc::ConsumedMessage do
-  describe '#succeeded?' do
-    it 'returns true when message has a status of success'
-    it 'returns false otherwise'
+  describe '#processed?' do
+    context 'when status is "success"' do
+      it 'returns true' do
+        msg = create(:consumed_message, status: RailwayIpc::ConsumedMessage::SUCCESS_STATUS)
+
+        expect(msg.processed?).to eq(true)
+      end
+    end
+
+    context 'when status is anything but "success"' do
+      it 'returns false' do
+        msg = create(:consumed_message, status: 'processing')
+
+        expect(msg.processed?).to eq(false)
+      end
+    end
   end
 
   describe 'initial save to DB' do

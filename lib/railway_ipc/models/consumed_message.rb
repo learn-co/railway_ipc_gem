@@ -1,13 +1,12 @@
 module RailwayIpc
   class ConsumedMessage < ActiveRecord::Base
     SUCCESS_STATUS = "success"
-    COMPLETED_STATUSES = %w(success ignore)
     attr_reader :decoded_message
     self.table_name = 'railway_ipc_consumed_messages'
     self.primary_key = 'uuid'
 
     def processed?
-      COMPLETED_STATUSES.exclude?(self.status)
+      self.status == SUCCESS_STATUS
     end
 
     def encoded_protobuf=(encoded_protobuf)
