@@ -53,27 +53,13 @@ module RailwayIpc
     private
 
     def process(decoded_payload:, protobuff_message:, delivery_info:)
-      # find or create
-      # consumed_message = ConsumedMessage.find_by(uuid: protobuff_message.uuid)
+      consumed_message = RailwayIpc::ConsumedMessage.find_by(uuid: protobuff_message.uuid)
 
-      # # lock
-      # return if consumed_message && consumed_message.succeeded? # need to write that function
-      # consumed_message.with_lock("FOR UPDATE NOWAIT") do
-      #   message.update(
-      #     message_type: message_klass,
-      #     user_uuid: protobuff_message.user_uuid,
-      #     correlation_id: protobuff_message.correlation_id,
-      #     encoded_message: encoded_message,
-      #     status: 'pending',
-      #     queue: delivery_info.queue,
-      #     exchange: delivery_info.exchange
-      #   )
-      #   # handle
-      #   results = handler.handle_message(protobuff_message)
-      #   # update status
-      #   message.update(status: results.status)
-      # end
-      # ConsumedMessage.persist_with_lock!(encoded_message: decoded_payload.message, protobuff_message: protobuff_message, type: message_klass) { handler.handle(message) }
+      if consumed_message && consumed_message.processed?
+        handler.ack!
+        return
+      end
+
       handler.handle(protobuff_message)
     end
 
