@@ -1,29 +1,4 @@
 RSpec.describe RailwayIpc::Consumer do
-  let(:user_uuid) { SecureRandom.uuid }
-  let(:correlation_id) { SecureRandom.uuid }
-  let(:uuid) { SecureRandom.uuid }
-  let(:message) do
-    LearnIpc::Commands::TestMessage.new(
-        uuid: uuid,
-        user_uuid: user_uuid,
-        correlation_id: correlation_id,
-        data: LearnIpc::Commands::TestMessage::Data.new(
-            iteration: "bk-001"
-        )
-    )
-  end
-
-  let(:consumer) { RailwayIpc::TestConsumer.new }
-  let(:encoded_message) { LearnIpc::Commands::TestMessage.encode(message) }
-
-  let(:payload) do
-    {
-        type: message.class.to_s,
-        encoded_message: Base64.encode64(encoded_message)
-    }.to_json
-  end
-  let(:handler_instance) { RailwayIpc::TestHandler.new }
-
   describe ".listen_to" do
     it "specifies the queue and exchange" do
       expect(RailwayIpc::TestConsumer).to receive(:from_queue).with("test_queue", {
@@ -42,81 +17,40 @@ RSpec.describe RailwayIpc::Consumer do
         .to include("LearnIpc::Commands::TestMessage")
   end
 
-  it "routes the message to the correct handler" do
-    allow(RailwayIpc::TestHandler).to receive(:new).and_return(handler_instance)
-    expect(handler_instance).to receive(:handle).with(instance_of(LearnIpc::Commands::TestMessage))
-    consumer.work(payload)
-  end
-
-  it "acks the message" do
-    allow(RailwayIpc::TestHandler).to receive(:new).and_return(handler_instance)
-    expect(handler_instance).to receive(:ack!)
-    consumer.work(payload)
-  end
-
-  context "consumer does not have a handler for the message" do
-    let(:message) { LearnIpc::Commands::UnhandledMessage.new }
-    let(:payload) { RailwayIpc::Rabbitmq::Payload.encode(message) }
-
-    let(:handler_instance) { RailwayIpc::NullHandler.new }
-    it "routes the message to the correct handler" do
-      allow(RailwayIpc::NullHandler).to receive(:new).and_return(handler_instance)
-      expect(handler_instance).to receive(:handle).with(instance_of(RailwayIpc::NullMessage))
-      consumer.work(payload)
-    end
-
-    it "acks the message" do
-      allow(RailwayIpc::NullHandler).to receive(:new).and_return(handler_instance)
-      expect(handler_instance).to receive(:ack!)
-      consumer.work(payload)
-    end
-  end
-
   describe '#work_with_params' do
-    let(:user_uuid) { SecureRandom.uuid }
-    let(:correlation_id) { SecureRandom.uuid }
-    let(:uuid) { SecureRandom.uuid }
-    let(:message) do
-      LearnIpc::Commands::TestMessage.new(
-          uuid: uuid,
-          user_uuid: user_uuid,
-          correlation_id: correlation_id,
-          data: LearnIpc::Commands::TestMessage::Data.new(
-              iteration: "bk-001"
-          )
-      )
-    end
-    let(:consumer) { RailwayIpc::TestConsumer.new }
-    let(:encoded_message) { LearnIpc::Commands::TestMessage.encode(message) }
-    let(:payload) do
-      {
-        type: message.class.to_s,
-        encoded_message: Base64.encode64(encoded_message)
-      }.to_json
-    end
-    let(:test_handler) { RailwayIpc::TestHandler.new }
-    let(:delivery_info) do
-      OpenStruct.new(
-        exchange: 'ipc:location:events',
-        consumer: OpenStruct.new(
-          queue: OpenStruct.new(
-            name: 'source:location:events'
-          )
-        )
-      )
+    context "consumer does not have a handler for the message" do
+      let(:payload) { RailwayIpc::Rabbitmq::Payload.encode(LearnIpc::Commands::UnhandledMessage.new) }
+      let(:null_handler) { RailwayIpc::NullHandler.new }
+
+      it "routes the message to the correct handler" do
+        allow(RailwayIpc::NullHandler).to receive(:new).and_return(null_handler)
+        expect(null_handler).to receive(:handle).with(instance_of(RailwayIpc::BaseMessage))
+        RailwayIpc::TestConsumer.new.work_with_params(payload, nil, nil)
+      end
+
+      it "acks the message" do
+        allow(RailwayIpc::NullHandler).to receive(:new).and_return(null_handler)
+        expect(null_handler).to receive(:ack!)
+        RailwayIpc::TestConsumer.new.work_with_params(payload, nil, nil)
+      end
     end
 
     context 'when message is successfully decoded with known message type' do
       context 'when consumed message record with matching UUID exits' do
-        let!(:consumed_message) { create(:consumed_message) }
         context 'when message has a status of "success"' do
           it 'does not update the consumed message record' do
-            prework_message = consumed_message.update(status: RailwayIpc::ConsumedMessage::SUCCESS_STATUS)
-            prework_message.freeze
-            consumer.work_with_params(payload, delivery_info, nil)
+            # consumed_message_record = create(
+            #   :consumed_message,
+            #   user_uuid: user_uuid,
+            #   correlation_id: correlation_id,
+            #   uuid: uuid,
+            #   updated_at: 5.minutes.ago,
+            #   status: RailwayIpc::ConsumedMessage::SUCCESS_STATUS
+            # )
 
-            message_from_db = RailwayIpc::ConsumedMessage.find! prework_message.uuid
-            expect(message_from_db).to eq prework_message
+            # expect {
+            #   consumer.work_with_params(payload, delivery_info, nil)
+            # }.to_not change { consumed_message_record.updated_at }
           end
           it 'does not process the message'
           it 'acks the message'
@@ -152,5 +86,27 @@ RSpec.describe RailwayIpc::Consumer do
         it 'acks the message'
       end
     end
+  end
+
+  private
+
+  def payload_stub(message = create(:test_message))
+    {
+      type: message.class.to_s,
+      encoded_message: Base64.encode64(
+        LearnIpc::Commands::TestMessage.encode(message)
+      )
+    }.to_json
+  end
+
+  def deliver_info_stub
+    OpenStruct.new(
+      exchange: 'ipc:location:events',
+      consumer: OpenStruct.new(
+        queue: OpenStruct.new(
+          name: 'source:location:events'
+        )
+      )
+    )
   end
 end
