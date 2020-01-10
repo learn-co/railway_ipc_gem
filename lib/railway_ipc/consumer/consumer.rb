@@ -34,10 +34,7 @@ module RailwayIpc
         process(decoded_payload: decoded_payload, protobuff_message: protobuff_message, delivery_info: delivery_info)
       else
         protobuff_message = RailwayIpc::BaseMessage.decode(decoded_payload.message)
-         # TODO call process w/wo handler arg
-         # auto use type: RailwayIpc::NullMessage in method definition
-         # ConsumedMessage.persist_unknown_message_type(encoded_message: decoded_payload.message, decoded_message: decoded_message)
-        RailwayIpc::NullHandler.new.handle(protobuff_message)
+        process_unknown_message_type(decoded_payload: decoded_payload, protobuff_message: protobuff_message)
       end
 
       rescue StandardError => e
@@ -53,14 +50,22 @@ module RailwayIpc
     private
 
     def process(decoded_payload:, protobuff_message:, delivery_info:)
-      consumed_message = RailwayIpc::ConsumedMessage.find_by(uuid: protobuff_message.uuid)
+      existing_record = RailwayIpc::ConsumedMessage.find_by(uuid: protobuff_message.uuid)
 
-      if consumed_message && consumed_message.processed?
+      if existing_record && existing_record.processed?
         handler.ack!
         return
       end
 
       handler.handle(protobuff_message)
+    end
+
+    def process_unknown_message_type(decoded_payload:, protobuff_message:)
+      existing_record = RailwayIpc::ConsumedMessage.find_by(uuid: protobuff_message.uuid)
+
+      if existing_record
+        RailwayIpc::NullHandler.new.ack!
+      end
     end
 
     def message_handler_for(decoded_payload)
