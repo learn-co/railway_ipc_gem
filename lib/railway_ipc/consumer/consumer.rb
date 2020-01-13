@@ -57,7 +57,21 @@ module RailwayIpc
         return
       end
 
-      handler.handle(protobuff_message)
+      if existing_record
+        existing_record.with_lock("FOR UPDATE NOWAIT") do
+          response = handler.handle(protobuff_message)
+
+          if response.success?
+            existing_record.status = RailwayIpc::ConsumedMessage::STATUSES[:success]
+          else
+            existing_record.status = RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
+          end
+
+          existing_record.save!
+        end
+
+        return
+      end
     end
 
     def process_unknown_message_type(decoded_payload:, protobuff_message:)

@@ -3,8 +3,10 @@ module RailwayIpc
     STATUSES = {
       success: 'success',
       processing: 'processing',
-      unknown_message_type: 'unknown_message_type'
+      unknown_message_type: 'unknown_message_type',
+      failed_to_process: 'failed_to_process'
     }
+
     attr_reader :decoded_message
     self.table_name = 'railway_ipc_consumed_messages'
     self.primary_key = 'uuid'
