@@ -72,6 +72,31 @@ module RailwayIpc
 
         return
       end
+
+      new_record = RailwayIpc::ConsumedMessage.create!(
+        uuid: protobuff_message.uuid,
+        status: RailwayIpc::ConsumedMessage::STATUSES[:processing],
+        message_type: decoded_payload.type,
+        user_uuid: protobuff_message.user_uuid,
+        correlation_id: protobuff_message.correlation_id,
+        queue: delivery_info.consumer.queue.name,
+        exchange: delivery_info.exchange,
+        encoded_message: decoded_payload.message
+      )
+
+      new_record.with_lock("FOR UPDATE NOWAIT") do
+        response = handler.handle(protobuff_message)
+
+        if response.success?
+          new_record.status = RailwayIpc::ConsumedMessage::STATUSES[:success]
+        else
+          new_record.status = RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
+        end
+
+        new_record.save!
+      end
+
+      return
     end
 
     def process_unknown_message_type(decoded_payload:, protobuff_message:)
