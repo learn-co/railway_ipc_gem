@@ -1,12 +1,16 @@
 module RailwayIpc
   class ConsumedMessage < ActiveRecord::Base
-    SUCCESS_STATUS = "success"
+    STATUSES = {
+      success: 'success',
+      processing: 'processing',
+      unknown_message_type: 'unknown_message_type'
+    }
     attr_reader :decoded_message
     self.table_name = 'railway_ipc_consumed_messages'
     self.primary_key = 'uuid'
 
     def processed?
-      self.status == SUCCESS_STATUS
+      self.status == STATUSES[:success]
     end
 
     def encoded_protobuf=(encoded_protobuf)

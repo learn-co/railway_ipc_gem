@@ -4,7 +4,7 @@ RSpec.describe RailwayIpc::ConsumedMessage do
   describe '#processed?' do
     context 'when status is "success"' do
       it 'returns true' do
-        msg = create(:consumed_message, status: RailwayIpc::ConsumedMessage::SUCCESS_STATUS)
+        msg = create(:consumed_message, status: RailwayIpc::ConsumedMessage::STATUSES[:success])
 
         expect(msg.processed?).to eq(true)
       end

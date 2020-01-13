@@ -70,7 +70,7 @@ RSpec.describe RailwayIpc::Consumer do
 
         context 'when message has status of "unknown_message_type"' do
           let!(:test_message) { base_message_stub }
-          let!(:payload) { payload_stub(message: test_message, message_klass: RailwayIpc::BaseMessage) }
+          let!(:payload) { payload_stub(message: test_message, message_klass: RailwayIpc::BaseMessage, message_type: "LearnIpc::Commands::Unknown") }
           let!(:delivery_info) { delivery_info_stub }
           let!(:consumed_message) { consumed_message_stub(message: test_message, message_type: "LearnIpc::Commands::Unknown") }
           let!(:test_handler) { RailwayIpc::NullHandler.new }
@@ -97,7 +97,15 @@ RSpec.describe RailwayIpc::Consumer do
         end
 
         context 'when message has status of "processing"' do
-          it 'adds a persistance db lock to the consumed message record, processes it, and updates the message with a status of "success"'
+          let!(:test_message) { test_message_stub }
+          let!(:payload) { payload_stub(message: test_message, message_klass: RailwayIpc::BaseMessage, message_type: "LearnIpc::Commands::Unknown") }
+          let!(:delivery_info) { delivery_info_stub }
+          let!(:consumed_message) { consumed_message_stub(message: test_message, message_type: "LearnIpc::Commands::Unknown") }
+          let!(:test_handler) { RailwayIpc::NullHandler.new }
+
+          it 'adds a persistance db lock to the consumed message record, processes it, and updates the message with a status of "success"' do
+
+          end
           it 'acks the message'
         end
       end
@@ -130,9 +138,9 @@ RSpec.describe RailwayIpc::Consumer do
 
   private
 
-  def payload_stub(message: create(:test_message), message_klass: LearnIpc::Commands::TestMessage)
+  def payload_stub(message: create(:test_message), message_klass: LearnIpc::Commands::TestMessage, message_type:)
     {
-      type: message.class.to_s,
+      type: message_type || message.class.to_s,
       encoded_message: Base64.encode64(
         message_klass.encode(message)
       )
@@ -169,7 +177,7 @@ RSpec.describe RailwayIpc::Consumer do
 
   def consumed_message_stub(
     message: test_message_stub,
-    status: RailwayIpc::ConsumedMessage::SUCCESS_STATUS,
+    status: RailwayIpc::ConsumedMessage::STATUSES[:success],
     message_type: "LearnIpc::Commands::TestMessage"
   )
     create(
