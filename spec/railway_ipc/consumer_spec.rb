@@ -1,4 +1,8 @@
 RSpec.describe RailwayIpc::Consumer do
+  before(:each) do
+    allow(RailwayIpc.logger).to receive(:info).and_return(nil)
+  end
+
   describe ".listen_to" do
     it "specifies the queue and exchange" do
       expect(RailwayIpc::TestConsumer).to receive(:from_queue).with("test_queue", {
@@ -41,11 +45,11 @@ RSpec.describe RailwayIpc::Consumer do
     context 'when message is successfully decoded with known message type' do
       context 'when a consumed message records alreadys exists' do
         context 'when message has a status of "success"' do
-          let(:test_message) { test_message_stub }
-          let(:payload) { payload_stub(message: test_message) }
-          let(:delivery_info) { delivery_info_stub }
-          let(:consumed_message) { consumed_message_stub(message: test_message, status: RailwayIpc::ConsumedMessage::STATUSES[:success]) }
-          let(:test_handler) { RailwayIpc::TestHandler.new }
+          let!(:test_message) { test_message_stub }
+          let!(:payload) { payload_stub(message: test_message) }
+          let!(:delivery_info) { delivery_info_stub }
+          let!(:consumed_message) { consumed_message_stub(message: test_message, status: RailwayIpc::ConsumedMessage::STATUSES[:success]) }
+          let!(:test_handler) { RailwayIpc::TestHandler.new }
 
           it 'does not update the record' do
             expect {
@@ -69,11 +73,11 @@ RSpec.describe RailwayIpc::Consumer do
         end
 
         context 'when message has status of "unknown_message_type"' do
-          let(:test_message) { base_message_stub }
-          let(:payload) { payload_stub(message: test_message, message_klass: RailwayIpc::BaseMessage, message_type: "LearnIpc::Commands::Unknown") }
-          let(:delivery_info) { delivery_info_stub }
-          let(:consumed_message) { consumed_message_stub(message: test_message, message_type: "LearnIpc::Commands::Unknown") }
-          let(:test_handler) { RailwayIpc::NullHandler.new }
+          let!(:test_message) { base_message_stub }
+          let!(:payload) { payload_stub(message: test_message, message_klass: RailwayIpc::BaseMessage, message_type: "LearnIpc::Commands::Unknown") }
+          let!(:delivery_info) { delivery_info_stub }
+          let!(:consumed_message) { consumed_message_stub(message: test_message, message_type: "LearnIpc::Commands::Unknown") }
+          let!(:test_handler) { RailwayIpc::NullHandler.new }
 
           it 'does not update the record' do
             expect {
@@ -97,16 +101,16 @@ RSpec.describe RailwayIpc::Consumer do
         end
 
         context 'when message has status of "processing"' do
-          let(:test_message) { test_message_stub }
-          let(:payload) { payload_stub(message: test_message) }
-          let(:delivery_info) { delivery_info_stub }
-          let(:consumed_message) { consumed_message_stub(message: test_message, status: RailwayIpc::ConsumedMessage::STATUSES[:processing]) }
-          let(:test_handler) { RailwayIpc::TestHandler.new }
+          let!(:test_message) { test_message_stub }
+          let!(:payload) { payload_stub(message: test_message) }
+          let!(:delivery_info) { delivery_info_stub }
+          let!(:consumed_message) { consumed_message_stub(message: test_message, status: RailwayIpc::ConsumedMessage::STATUSES[:processing]) }
+          let!(:test_handler) { RailwayIpc::TestHandler.new }
 
           context 'when message is handled successfully' do
             it 'adds a persistance db lock to the consumed message record, processes it, and updates the message with a status of "success"' do
               allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
-              allow(test_handler).to receive(:handle).and_return(OpenStruct.new(success?: true))
+              allow(test_handler.class.block).to receive(:call).and_return(OpenStruct.new(success?: true))
               expect_any_instance_of(RailwayIpc::ConsumedMessage).to receive(:with_lock).with("FOR UPDATE NOWAIT") do |*_args, &block|
                 block.call
                 expect(consumed_message.reload.status).to eq(RailwayIpc::ConsumedMessage::STATUSES[:success])
@@ -119,7 +123,7 @@ RSpec.describe RailwayIpc::Consumer do
           context 'when message fails being handled' do
             it 'adds a persistance db lock to the consumed message record, processes it, and updates the message with a status of "failed_to_process"' do
               allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
-              allow(test_handler).to receive(:handle).and_return(OpenStruct.new(success?: false))
+              allow(test_handler.class.block).to receive(:call).and_return(OpenStruct.new(success?: false))
               expect_any_instance_of(RailwayIpc::ConsumedMessage).to receive(:with_lock).with("FOR UPDATE NOWAIT") do |*_args, &block|
                 block.call
                 expect(consumed_message.reload.status).to eq(RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process])
@@ -131,7 +135,7 @@ RSpec.describe RailwayIpc::Consumer do
 
           it 'acks the message' do
             allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
-            allow(test_handler).to receive(:handle).and_return(OpenStruct.new(success?: false))
+            allow(test_handler.class.block).to receive(:call).and_return(OpenStruct.new(success?: false))
             expect(test_handler).to receive(:ack!)
 
             consumer.work_with_params(payload, delivery_info, nil)
@@ -140,15 +144,15 @@ RSpec.describe RailwayIpc::Consumer do
       end
 
       context 'when consumed message record with matching UUID does not exits' do
-        let(:test_message) { test_message_stub }
-        let(:payload) { payload_stub(message: test_message) }
-        let(:delivery_info) { delivery_info_stub }
-        let(:test_handler) { RailwayIpc::TestHandler.new }
+        let!(:test_message) { test_message_stub }
+        let!(:payload) { payload_stub(message: test_message) }
+        let!(:delivery_info) { delivery_info_stub }
+        let!(:test_handler) { RailwayIpc::TestHandler.new }
 
         context 'when message is handled successfuly' do
           it 'created the record with a status of "processing", added a persistance db lock to the record while processing the the message and updated the message status to "success" after being handled' do
             allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
-            allow(test_handler).to receive(:handle).and_return(OpenStruct.new(success?: true))
+            allow(test_handler.class.block).to receive(:call).and_return(OpenStruct.new(success?: true))
 
             expect_any_instance_of(RailwayIpc::ConsumedMessage).to receive(:with_lock).with("FOR UPDATE NOWAIT") do |*_args, &block|
               consumed_message = RailwayIpc::ConsumedMessage.find(test_message.uuid)
@@ -159,7 +163,7 @@ RSpec.describe RailwayIpc::Consumer do
             end
             expect {
               consumer.work_with_params(payload, delivery_info, nil)
-            }.to change { RailwayIpc::ConsumedMessage.count }.from(0).to(1)
+            }.to change { RailwayIpc::ConsumedMessage.count }.by(1)
           end
 
           it 'acks the message' do
@@ -173,7 +177,7 @@ RSpec.describe RailwayIpc::Consumer do
         context 'when message fails being handled' do
           it 'acks the message' do
             allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
-            allow(test_handler).to receive(:handle).and_return(OpenStruct.new(success?: false))
+            allow(test_handler.class.block).to receive(:call).and_return(OpenStruct.new(success?: false))
             expect(test_handler).to receive(:ack!)
 
             consumer.work_with_params(payload, delivery_info, nil)
