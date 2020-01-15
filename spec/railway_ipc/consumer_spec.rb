@@ -145,7 +145,7 @@ RSpec.describe RailwayIpc::Consumer do
             end
             expect {
               consumer.work_with_params(payload, delivery_info, nil)
-            }.to change { RailwayIpc::ConsumedMessage.count }.by(1)
+            }.to change { RailwayIpc::ConsumedMessage.count }.from(0).to(1)
           end
 
           it 'acks the message' do
