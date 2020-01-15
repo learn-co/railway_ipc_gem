@@ -44,5 +44,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rails", "~> 5.0.7"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "pg", "~> 0.18"
+  spec.add_development_dependency "shoulda-matchers", "~> 4.2"
   spec.add_development_dependency "listen", "~> 3.0.5"
 end
