@@ -212,7 +212,9 @@ RSpec.describe RailwayIpc::Consumer do
         let!(:test_handler) { RailwayIpc::NullHandler.new }
 
         it 'raises error' do
-          expect { consumer.work_with_params(payload, delivery_info, nil) }.to raise_error
+          expect {
+            consumer.work_with_params(payload, delivery_info, nil)
+          }.to raise_error(ActiveRecord::RecordInvalid)
         end
 
         it 'acks the message' do
