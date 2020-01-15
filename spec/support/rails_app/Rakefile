@@ -3,4 +3,5 @@
 
 require_relative 'config/application'
 require 'railway_ipc'
+
 Rails.application.load_tasks

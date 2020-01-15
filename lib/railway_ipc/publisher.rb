@@ -17,9 +17,11 @@ module RailwayIpc
       super(exchange: self.class.exchange_name, exchange_type: :fanout)
     end
 
-    def publish(message)
+    def publish(message, published_message_store=RailwayIpc::PublishedMessage)
       RailwayIpc.logger.info(message, 'Publishing message')
-      super(RailwayIpc::Rabbitmq::Payload.encode(message))
+      result = super(RailwayIpc::Rabbitmq::Payload.encode(message))
+      published_message_store.store_message(self.class.exchange_name, message)
+      result
     rescue RailwayIpc::InvalidProtobuf => e
       RailwayIpc.logger.error(message, 'Invalid protobuf')
       raise e

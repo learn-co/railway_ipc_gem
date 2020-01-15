@@ -6,7 +6,6 @@ namespace :railway_ipc do
     task :migrations do
       if defined?(ActiveRecord::Base)
         puts "generating Railway IPC table migrations"
-
         seconds = 0
         gem_path = Gem.loaded_specs['railway-ipc'].full_gem_path
         folder_dest = "#{Rails.root.to_s}/db/migrate"
