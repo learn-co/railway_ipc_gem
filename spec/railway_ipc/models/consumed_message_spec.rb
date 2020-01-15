@@ -1,6 +1,16 @@
 require 'rails_helper'
 
-RSpec.describe RailwayIpc::ConsumedMessage do
+RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
+  describe 'validations' do
+    it { should validate_presence_of(:uuid) }
+    it { should validate_presence_of(:encoded_message) }
+    it { should validate_presence_of(:status) }
+    it do
+      should validate_inclusion_of(:status)
+        .in_array(RailwayIpc::ConsumedMessage::STATUSES.values)
+    end
+  end
+
   describe '#processed?' do
     context 'when status is "success"' do
       it 'returns true' do
@@ -13,7 +23,6 @@ RSpec.describe RailwayIpc::ConsumedMessage do
     context 'when status is anything but "success"' do
       it 'returns false' do
         msg = create(:consumed_message, status: 'processing')
-
         expect(msg.processed?).to eq(false)
       end
     end
@@ -21,13 +30,7 @@ RSpec.describe RailwayIpc::ConsumedMessage do
 
   describe 'initial save to DB' do
     it 'saves an inserted_at date for the current time' do
-      msg = RailwayIpc::ConsumedMessage.create({
-        uuid: SecureRandom.uuid,
-        message_type: 'LearnIpc::Commands::TestMessage',
-        encoded_message: '',
-        status: 'success'
-      })
-
+      msg = create(:consumed_message, status: RailwayIpc::ConsumedMessage::STATUSES[:success])
       expect(msg.inserted_at.utc).to be_within(1.second).of(Time.current)
     end
   end

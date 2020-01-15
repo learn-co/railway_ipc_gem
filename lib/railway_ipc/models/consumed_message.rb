@@ -11,6 +11,9 @@ module RailwayIpc
     self.table_name = 'railway_ipc_consumed_messages'
     self.primary_key = 'uuid'
 
+    validates :uuid, :status, :encoded_message, presence: true
+    validates :status, inclusion: { in: STATUSES.values }
+
     def processed?
       self.status == STATUSES[:success]
     end
