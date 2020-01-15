@@ -5,6 +5,7 @@ RSpec.describe "Publishing a message" do
   let(:message)   { LearnIpc::Commands::TestMessage.new }
   let(:encoded_message) { Base64.encode64(LearnIpc::Commands::TestMessage.encode(message)) }
 
+  # TODO: add testing once Sneakers GEM is updated
   xit "persists the requested document" do
     user_uuid =  SecureRandom.uuid
     correlation_id =  SecureRandom.uuid
