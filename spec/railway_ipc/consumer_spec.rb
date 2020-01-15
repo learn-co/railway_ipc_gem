@@ -23,24 +23,6 @@ RSpec.describe RailwayIpc::Consumer do
 
   describe '#work_with_params' do
     let(:consumer) { RailwayIpc::TestConsumer.new }
-    context "consumer does not have a handler for the message" do
-      let(:payload) { RailwayIpc::Rabbitmq::Payload.encode(LearnIpc::Commands::UnhandledMessage.new) }
-      let(:null_handler) { RailwayIpc::NullHandler.new }
-
-      it "routes the message to the correct handler" do
-        allow(RailwayIpc::NullHandler).to receive(:new).and_return(null_handler)
-        expect(null_handler).to receive(:handle).with(instance_of(RailwayIpc::BaseMessage))
-
-        consumer.work_with_params(payload, nil, nil)
-      end
-
-      it "acks the message" do
-        allow(RailwayIpc::NullHandler).to receive(:new).and_return(null_handler)
-        expect(null_handler).to receive(:ack!)
-
-        consumer.work_with_params(payload, nil, nil)
-      end
-    end
 
     context 'when message is successfully decoded with known message type' do
       context 'when a consumed message records alreadys exists' do
@@ -186,16 +168,60 @@ RSpec.describe RailwayIpc::Consumer do
       end
     end
 
-    context 'when message is not successfully decoded with unknown message type' do
+    context 'when message is decoded with unknown message type' do
       context 'when persistance is successful' do
-        it 'creates the record with a status of "unknown_message_type"'
-        it 'does not process the message'
-        it 'acks the message'
+        let!(:test_message) { base_message_stub }
+        let!(:payload) { payload_stub(message: test_message) }
+        let!(:delivery_info) { delivery_info_stub }
+        let!(:payload) { RailwayIpc::Rabbitmq::Payload.encode(test_message) }
+        let!(:test_handler) { RailwayIpc::NullHandler.new }
+
+        it 'creates the record with a status of "unknown_message_type"' do
+          consumer.work_with_params(payload, delivery_info, nil)
+          consumed_message = RailwayIpc::ConsumedMessage.find(test_message.uuid)
+
+          expect(consumed_message.status).to eq(RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type])
+        end
+
+        it 'does not process the message' do
+          allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
+          expect(test_handler).not_to receive(:handle)
+
+          consumer.work_with_params(payload, delivery_info, nil)
+        end
+
+        it 'acks the message' do
+          allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
+          expect(test_handler).to receive(:ack!)
+
+          consumer.work_with_params(payload, delivery_info, nil)
+        end
       end
 
       context 'when persistance fails' do
-        it 'logs and error'
-        it 'acks the message'
+        let!(:test_message) do
+          RailwayIpc::BaseMessage.new(
+            uuid: nil,
+            correlation_id: nil,
+            user_uuid: nil
+          )
+        end
+        let!(:payload) { payload_stub(message: test_message) }
+        let!(:delivery_info) { delivery_info_stub }
+        let!(:payload) { RailwayIpc::Rabbitmq::Payload.encode(test_message) }
+        let!(:test_handler) { RailwayIpc::NullHandler.new }
+
+        it 'raises error' do
+          expect { consumer.work_with_params(payload, delivery_info, nil) }.to raise_error
+        end
+
+        it 'acks the message' do
+          allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
+          allow(RailwayIpc::ConsumedMessage).to receive(:create!).and_return(nil)
+          expect(test_handler).to receive(:ack!)
+
+          consumer.work_with_params(payload, delivery_info, nil)
+        end
       end
     end
   end

@@ -5,7 +5,7 @@ require "railway_ipc/consumer/consumer_response_handlers"
 module RailwayIpc
   class Consumer
     include Sneakers::Worker
-    attr_reader :message, :handler
+    attr_reader :message, :handler, :protobuff_message, :delivery_info, :decoded_payload
 
     def self.listen_to(queue:, exchange:)
       from_queue queue,
@@ -24,17 +24,19 @@ module RailwayIpc
     end
 
     def work_with_params(payload, delivery_info, _metadata)
-      decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
+      @delivery_info = delivery_info
+      @decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
 
       case decoded_payload.type
       when *registered_handlers
         @handler = handler_for(decoded_payload)
         message_klass = message_handler_for(decoded_payload)
-        protobuff_message = message_klass.decode(decoded_payload.message)
-        process(decoded_payload: decoded_payload, protobuff_message: protobuff_message, delivery_info: delivery_info)
+        @protobuff_message = message_klass.decode(decoded_payload.message)
+        process_known_message_type
       else
-        protobuff_message = RailwayIpc::BaseMessage.decode(decoded_payload.message)
-        process_unknown_message_type(decoded_payload: decoded_payload, protobuff_message: protobuff_message)
+        @handler = RailwayIpc::NullHandler.new
+        @protobuff_message = RailwayIpc::BaseMessage.decode(decoded_payload.message)
+        process_unknown_message_type
       end
 
       rescue StandardError => e
@@ -49,33 +51,50 @@ module RailwayIpc
 
     private
 
-    def process(decoded_payload:, protobuff_message:, delivery_info:)
-      existing_record = RailwayIpc::ConsumedMessage.find_by(uuid: protobuff_message.uuid)
+    def process_protobuff
+      if handler.handle(protobuff_message).success?
+        RailwayIpc::ConsumedMessage::STATUSES[:success]
+      else
+        RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
+      end
+    end
 
-      if existing_record && existing_record.processed?
+    def update_message_status!(message)
+      message.status = process_protobuff
+      message.save!
+    end
+
+    def process_known_message_type
+      message = RailwayIpc::ConsumedMessage.find_by(uuid: protobuff_message.uuid)
+
+      if message && message.processed?
         handler.ack!
-        return
+      elsif message && !message.processed?
+        message.with_lock("FOR UPDATE NOWAIT") { update_message_status!(message) }
+      else
+        message = create_message_with_status!(RailwayIpc::ConsumedMessage::STATUSES[:processing])
+        message.with_lock("FOR UPDATE NOWAIT") { update_message_status!(message) }
       end
 
-      if existing_record
-        existing_record.with_lock("FOR UPDATE NOWAIT") do
-          response = handler.handle(protobuff_message)
+      nil
+    end
 
-          if response.success?
-            existing_record.status = RailwayIpc::ConsumedMessage::STATUSES[:success]
-          else
-            existing_record.status = RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
-          end
+    def process_unknown_message_type
+      handler.ack!
 
-          existing_record.save!
-        end
-
+      if RailwayIpc::ConsumedMessage.exists?(uuid: protobuff_message.uuid)
         return
+      else
+        create_message_with_status!(RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type])
       end
 
-      new_record = RailwayIpc::ConsumedMessage.create!(
+      nil
+    end
+
+    def create_message_with_status!(status)
+      RailwayIpc::ConsumedMessage.create!(
         uuid: protobuff_message.uuid,
-        status: RailwayIpc::ConsumedMessage::STATUSES[:processing],
+        status: status,
         message_type: decoded_payload.type,
         user_uuid: protobuff_message.user_uuid,
         correlation_id: protobuff_message.correlation_id,
@@ -83,28 +102,6 @@ module RailwayIpc
         exchange: delivery_info.exchange,
         encoded_message: decoded_payload.message
       )
-
-      new_record.with_lock("FOR UPDATE NOWAIT") do
-        response = handler.handle(protobuff_message)
-
-        if response.success?
-          new_record.status = RailwayIpc::ConsumedMessage::STATUSES[:success]
-        else
-          new_record.status = RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
-        end
-
-        new_record.save!
-      end
-
-      return
-    end
-
-    def process_unknown_message_type(decoded_payload:, protobuff_message:)
-      existing_record = RailwayIpc::ConsumedMessage.find_by(uuid: protobuff_message.uuid)
-
-      if existing_record
-        RailwayIpc::NullHandler.new.ack!
-      end
     end
 
     def message_handler_for(decoded_payload)
