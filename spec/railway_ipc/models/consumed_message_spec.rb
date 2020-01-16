@@ -27,7 +27,7 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
     end
   end
 
-  describe 'initial save to DB' do
+  describe '#create' do
     it 'saves an inserted_at date for the current time' do
       msg = create(:consumed_message, status: RailwayIpc::ConsumedMessage::STATUSES[:success])
       expect(msg.inserted_at.utc).to be_within(1.second).of(Time.current)
@@ -35,7 +35,7 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
   end
 
   describe "#decoded_message" do
-    describe "when message type is know to the system" do
+    context "when message type is know to the system" do
       it "decodes message using the defined message type" do
         test_msg_data = test_msg_data_stub
         decoded_message = RailwayIpc::ConsumedMessage.create!({
@@ -52,7 +52,7 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
       end
     end
 
-    describe "when message type is not known to the system" do
+    context "when message type is not known to the system" do
       it "decodes message as RailwayIpc::BaseMessage" do
         test_msg_data = test_msg_data_stub
         decoded_message = RailwayIpc::ConsumedMessage.create!({
@@ -69,7 +69,7 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
       end
     end
 
-    describe "when data field has value in encoded protobuf" do
+    context "when data field has value in encoded protobuf" do
       it "decodes message" do
         # Message => <LearnIpc::Commands::TestMessage: user_uuid: "b5797a84-7ef5-44a7-ac90-0aad7284f0b7", correlation_id: "de2c778f-0db5-4cfb-acbf-fc759c967d44", uuid: "24b36430-6105-4646-a343-2272078cd90e", context: {}, data: <LearnIpc::Commands::TestMessage::Data: iteration: "test">>
         # Encoded Protobuf => LearnIpc::Commands::TestMessage.encode(Message)
@@ -90,7 +90,7 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
       end
     end
 
-    describe "when data field is nil in encoded protobuf" do
+    context "when data field is nil in encoded protobuf" do
       it "decodes message" do
         # Message => <LearnIpc::Commands::TestMessage: user_uuid: "b5797a84-7ef5-44a7-ac90-0aad7284f0b7", correlation_id: "de2c778f-0db5-4cfb-acbf-fc759c967d44", uuid: "24b36430-6105-4646-a343-2272078cd90e", context: {}, data: nil>
         # Encoded Protobuf => LearnIpc::Commands::TestMessage.encode(Message) =>
