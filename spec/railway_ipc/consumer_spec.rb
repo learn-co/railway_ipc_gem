@@ -25,7 +25,7 @@ RSpec.describe RailwayIpc::Consumer do
     let(:consumer) { RailwayIpc::TestConsumer.new }
 
     context 'when message is successfully decoded with known message type' do
-      context 'when a consumed message records alreadys exists' do
+      context 'when a consumed message records already exists' do
         context 'when message has a status of "success"' do
           let!(:test_message) { test_message_stub }
           let!(:payload) { payload_stub(message: test_message) }
