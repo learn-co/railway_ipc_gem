@@ -55,63 +55,24 @@ RSpec.describe RailwayIpc::Consumer do
         end
 
         context 'when the existing consumed message has an existing status of "unknown_message_type"' do
-          context 'when the message type still has no known handler' do
-            let!(:test_message) { base_message_stub }
-            let!(:payload) { payload_stub(message: test_message, message_klass: RailwayIpc::BaseMessage, message_type: "LearnIpc::Commands::Unknown") }
-            let!(:delivery_info) { delivery_info_stub }
-            let!(:consumed_message) { consumed_message_stub(message: test_message, message_type: "LearnIpc::Commands::Unknown", status: RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type]) }
-            let!(:test_handler) { RailwayIpc::NullHandler.new }
+          let!(:test_message) { test_message_stub }
+          let!(:payload) { payload_stub(message: test_message) }
+          let!(:delivery_info) { delivery_info_stub }
+          let!(:consumed_message) { consumed_message_stub(message: test_message, status: RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type]) }
 
-            it 'does not update the record' do
-              expect {
-                consumer.work_with_params(payload, delivery_info, nil)
-              }.to_not change { consumed_message.updated_at }
-            end
-
-            it 'does not process the message' do
-              allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-              expect(test_handler).not_to receive(:handle)
-
+          it 'update process the message and records success status' do
+            expect {
               consumer.work_with_params(payload, delivery_info, nil)
-            end
-
-            it 'acks the message' do
-              allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-              expect(test_handler).to receive(:ack!)
-
-              consumer.work_with_params(payload, delivery_info, nil)
-            end
+            }.to change {
+              consumed_message.reload.status
+            }.from(RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type])
+            .to(RailwayIpc::ConsumedMessage::STATUSES[:success])
           end
 
-          context 'when the message type now has a known handler' do
-            let!(:test_message) { test_message_stub }
-            let!(:payload) { payload_stub(message: test_message) }
-            let!(:delivery_info) { delivery_info_stub }
-            let!(:consumed_message) { consumed_message_stub(message: test_message, status: RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type]) }
-            let!(:test_handler) { RailwayIpc::TestHandler.new }
+          it 'acks the message' do
+            expect_any_instance_of(RailwayIpc::TestHandler).to receive(:ack!)
 
-            it 'update the record status' do
-              expect {
-                consumer.work_with_params(payload, delivery_info, nil)
-              }.to change {
-                consumed_message.status
-              }.from(RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type])
-              .to(RailwayIpc::ConsumedMessage::STATUSES[:success])
-            end
-
-            it 'process the message' do
-              allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-              expect(test_handler).to receive(:handle)
-
-              consumer.work_with_params(payload, delivery_info, nil)
-            end
-
-            it 'acks the message' do
-              allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-              expect(test_handler).to receive(:ack!)
-
-              consumer.work_with_params(payload, delivery_info, nil)
-            end
+            consumer.work_with_params(payload, delivery_info, nil)
           end
         end
 
@@ -217,7 +178,7 @@ RSpec.describe RailwayIpc::Consumer do
       end
     end
 
-    context 'when message is decoded with unknown message type' do
+    context 'when payload is decoded with unknown message type' do
       context 'when persistence is successful' do
         let!(:test_message) { base_message_stub }
         let!(:payload) { payload_stub(message: test_message) }
