@@ -5,7 +5,7 @@ require "railway_ipc/consumer/consumer_response_handlers"
 module RailwayIpc
   class Consumer
     include Sneakers::Worker
-    attr_reader :message, :handler
+    attr_reader :message, :handler, :protobuff_message, :delivery_info, :decoded_payload
 
     def self.listen_to(queue:, exchange:)
       from_queue queue,
@@ -23,29 +23,83 @@ module RailwayIpc
       ConsumerResponseHandlers.instance.registered
     end
 
-    def work(payload)
-      decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
+    def work_with_params(payload, delivery_info, _metadata)
+      @delivery_info = delivery_info
+      @decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
+
       case decoded_payload.type
       when *registered_handlers
         @handler = handler_for(decoded_payload)
         message_klass = message_handler_for(decoded_payload)
+        @protobuff_message = message_klass.decode(decoded_payload.message)
+        process_known_message_type
       else
         @handler = RailwayIpc::NullHandler.new
-        message_klass = RailwayIpc::NullMessage
+        @protobuff_message = RailwayIpc::BaseMessage.decode(decoded_payload.message)
+        process_unknown_message_type
       end
-      message = message_klass.decode(decoded_payload.message)
-      handler.handle(message)
-    rescue StandardError => e
-      RailwayIpc.logger.log_exception(
-        feature: "railway_consumer",
-        error: e.class,
-        error_message: e.message,
-        payload: payload,
-      )
-      raise e
+
+      rescue StandardError => e
+        RailwayIpc.logger.log_exception(
+          feature: "railway_consumer",
+          error: e.class,
+          error_message: e.message,
+          payload: payload,
+        )
+        raise e
     end
 
     private
+
+    def process_protobuff!(message)
+      if handler.handle(protobuff_message).success?
+        message.status = RailwayIpc::ConsumedMessage::STATUSES[:success]
+      else
+        message.status = RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
+      end
+
+      message.save!
+    end
+
+    def process_known_message_type
+      message = RailwayIpc::ConsumedMessage.find_by(uuid: protobuff_message.uuid)
+
+      if message && message.processed?
+        handler.ack!
+      elsif message && !message.processed?
+        message.with_lock("FOR UPDATE NOWAIT") { process_protobuff!(message) }
+      else
+        message = create_message_with_status!(RailwayIpc::ConsumedMessage::STATUSES[:processing])
+        message.with_lock("FOR UPDATE NOWAIT") { process_protobuff!(message) }
+      end
+
+      nil
+    end
+
+    def process_unknown_message_type
+      handler.ack!
+
+      if RailwayIpc::ConsumedMessage.exists?(uuid: protobuff_message.uuid)
+        return
+      else
+        create_message_with_status!(RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type])
+      end
+
+      nil
+    end
+
+    def create_message_with_status!(status)
+      RailwayIpc::ConsumedMessage.create!(
+        uuid: protobuff_message.uuid,
+        status: status,
+        message_type: decoded_payload.type,
+        user_uuid: protobuff_message.user_uuid,
+        correlation_id: protobuff_message.correlation_id,
+        queue: delivery_info.consumer.queue.name,
+        exchange: delivery_info.exchange,
+        encoded_message: decoded_payload.message
+      )
+    end
 
     def message_handler_for(decoded_payload)
       ConsumerResponseHandlers.instance.get(decoded_payload.type).message

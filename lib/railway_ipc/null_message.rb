@@ -1,6 +1,6 @@
 module RailwayIpc
   class NullMessage
-    def self.decode(message)
+    def self.decode(_message)
       self.new
     end
   end
