@@ -69,7 +69,7 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
       end
     end
 
-    describe "when data field has value in encoded protobuf" do
+    context "when data field has value in encoded protobuf" do
       it "decodes message" do
         # Message => <LearnIpc::Commands::TestMessage: user_uuid: "b5797a84-7ef5-44a7-ac90-0aad7284f0b7", correlation_id: "de2c778f-0db5-4cfb-acbf-fc759c967d44", uuid: "24b36430-6105-4646-a343-2272078cd90e", context: {}, data: <LearnIpc::Commands::TestMessage::Data: iteration: "test">>
         # Encoded Protobuf => LearnIpc::Commands::TestMessage.encode(Message)
