@@ -24,9 +24,9 @@ RSpec.describe RailwayIpc::Consumer do
   describe '#work_with_params' do
     let(:consumer) { RailwayIpc::TestConsumer.new }
 
-    context 'when message is successfully decoded with known message type' do
-      context 'when a consumed message records alreadys exists' do
-        context 'when message has a status of "success"' do
+    context 'when a payload is successfully decoded with known message type' do
+      context 'when a consumed message with matching uuid exists' do
+        context 'when the existing consumed message has an existing status of "success"' do
           let!(:test_message) { test_message_stub }
           let!(:payload) { payload_stub(message: test_message) }
           let!(:delivery_info) { delivery_info_stub }
@@ -54,35 +54,68 @@ RSpec.describe RailwayIpc::Consumer do
           end
         end
 
-        context 'when message has status of "unknown_message_type"' do
-          let!(:test_message) { base_message_stub }
-          let!(:payload) { payload_stub(message: test_message, message_klass: RailwayIpc::BaseMessage, message_type: "LearnIpc::Commands::Unknown") }
-          let!(:delivery_info) { delivery_info_stub }
-          let!(:consumed_message) { consumed_message_stub(message: test_message, message_type: "LearnIpc::Commands::Unknown") }
-          let!(:test_handler) { RailwayIpc::NullHandler.new }
+        context 'when the existing consumed message has an existing status of "unknown_message_type"' do
+          context 'when the message type still has no known handler' do
+            let!(:test_message) { base_message_stub }
+            let!(:payload) { payload_stub(message: test_message, message_klass: RailwayIpc::BaseMessage, message_type: "LearnIpc::Commands::Unknown") }
+            let!(:delivery_info) { delivery_info_stub }
+            let!(:consumed_message) { consumed_message_stub(message: test_message, message_type: "LearnIpc::Commands::Unknown", status: RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type]) }
+            let!(:test_handler) { RailwayIpc::NullHandler.new }
 
-          it 'does not update the record' do
-            expect {
+            it 'does not update the record' do
+              expect {
+                consumer.work_with_params(payload, delivery_info, nil)
+              }.to_not change { consumed_message.updated_at }
+            end
+
+            it 'does not process the message' do
+              allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
+              expect(test_handler).not_to receive(:handle)
+
               consumer.work_with_params(payload, delivery_info, nil)
-            }.to_not change { consumed_message.updated_at }
+            end
+
+            it 'acks the message' do
+              allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
+              expect(test_handler).to receive(:ack!)
+
+              consumer.work_with_params(payload, delivery_info, nil)
+            end
           end
 
-          it 'does not process the message' do
-            allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-            expect(test_handler).not_to receive(:handle)
+          context 'when the message type now has a known handler' do
+            let!(:test_message) { test_message_stub }
+            let!(:payload) { payload_stub(message: test_message) }
+            let!(:delivery_info) { delivery_info_stub }
+            let!(:consumed_message) { consumed_message_stub(message: test_message, status: RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type]) }
+            let!(:test_handler) { RailwayIpc::TestHandler.new }
 
-            consumer.work_with_params(payload, delivery_info, nil)
-          end
+            it 'update the record status' do
+              expect {
+                consumer.work_with_params(payload, delivery_info, nil)
+              }.to change {
+                consumed_message.status
+              }.from(RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type])
+              .to(RailwayIpc::ConsumedMessage::STATUSES[:success])
+            end
 
-          it 'acks the message' do
-            allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-            expect(test_handler).to receive(:ack!)
+            it 'process the message' do
+              allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
+              expect(test_handler).to receive(:handle)
 
-            consumer.work_with_params(payload, delivery_info, nil)
+              consumer.work_with_params(payload, delivery_info, nil)
+            end
+
+            it 'acks the message' do
+              allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
+              expect(test_handler).to receive(:ack!)
+
+              consumer.work_with_params(payload, delivery_info, nil)
+            end
           end
         end
 
-        context 'when message has status of "processing"' do
+        context 'when the existing consumed message has an existing status of "processing"' do
           let!(:test_message) { test_message_stub }
           let!(:payload) { payload_stub(message: test_message) }
           let!(:delivery_info) { delivery_info_stub }
@@ -125,7 +158,7 @@ RSpec.describe RailwayIpc::Consumer do
         end
       end
 
-      context 'when consumed message record with matching UUID does not exits' do
+      context 'when a consumed message with matching uuid does not exist' do
         let!(:test_message) { test_message_stub }
         let!(:payload) { payload_stub(message: test_message) }
         let!(:delivery_info) { delivery_info_stub }
