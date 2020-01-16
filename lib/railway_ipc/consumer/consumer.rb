@@ -51,16 +51,13 @@ module RailwayIpc
 
     private
 
-    def process_protobuff
+    def process_protobuff!(message)
       if handler.handle(protobuff_message).success?
-        RailwayIpc::ConsumedMessage::STATUSES[:success]
+        message.status = RailwayIpc::ConsumedMessage::STATUSES[:success]
       else
-        RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
+        message.status = RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
       end
-    end
 
-    def update_message_status!(message)
-      message.status = process_protobuff
       message.save!
     end
 
@@ -70,10 +67,10 @@ module RailwayIpc
       if message && message.processed?
         handler.ack!
       elsif message && !message.processed?
-        message.with_lock("FOR UPDATE NOWAIT") { update_message_status!(message) }
+        message.with_lock("FOR UPDATE NOWAIT") { process_protobuff!(message) }
       else
         message = create_message_with_status!(RailwayIpc::ConsumedMessage::STATUSES[:processing])
-        message.with_lock("FOR UPDATE NOWAIT") { update_message_status!(message) }
+        message.with_lock("FOR UPDATE NOWAIT") { process_protobuff!(message) }
       end
 
       nil
