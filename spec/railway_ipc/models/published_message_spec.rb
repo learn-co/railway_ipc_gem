@@ -1,7 +1,12 @@
 require 'rails_helper'
 
-RSpec.describe RailwayIpc::PublishedMessage do
-  describe 'initial save to DB' do
+RSpec.describe RailwayIpc::PublishedMessage, type: :model do
+  describe 'validations' do
+    it { should validate_presence_of(:uuid) }
+    it { should validate_presence_of(:status) }
+  end
+
+  describe '#create' do
     it 'saves an inserted_at date for the current time' do
       msg = RailwayIpc::PublishedMessage.create({
         uuid: SecureRandom.uuid,
