@@ -3,10 +3,6 @@ module RailwayIpc
     self.table_name = 'railway_ipc_published_messages'
     self.primary_key = "uuid"
 
-    attr_reader :decoded_message
-    self.table_name = 'railway_ipc_consumed_messages'
-    self.primary_key = 'uuid'
-
     validates :uuid, :status, presence: true
 
     def self.store_message(exchange_name, message)
