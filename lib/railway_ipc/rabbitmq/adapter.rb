@@ -23,6 +23,7 @@ module RailwayIpc
                                     user: settings[:user],
                                     pass: settings[:pass],
                                     port: settings[:port],
+                                    vhost: settings[:vhost],
                                     automatic_recovery: false,
                                     logger: RailwayIpc.bunny_logger}.merge(options)
         )
