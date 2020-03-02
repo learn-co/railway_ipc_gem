@@ -26,7 +26,7 @@ module RailwayIpc
     def work_with_params(payload, delivery_info, _metadata)
       @delivery_info = delivery_info
       @decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
-      @encoded_message = payload["encoded_message"]
+      @encoded_message = payload
 
       case decoded_payload.type
       when *registered_handlers
@@ -52,7 +52,7 @@ module RailwayIpc
 
     private
 
-    def process_protobuff!(message)
+    def process_protobuf!(message)
       if handler.handle(protobuf_message).success?
         message.status = RailwayIpc::ConsumedMessage::STATUSES[:success]
       else
@@ -68,10 +68,10 @@ module RailwayIpc
       if message && message.processed?
         handler.ack!
       elsif message && !message.processed?
-        message.with_lock("FOR UPDATE NOWAIT") { process_protobuff!(message) }
+        message.with_lock("FOR UPDATE NOWAIT") { process_protobuf!(message) }
       else
         message = create_message_with_status!(RailwayIpc::ConsumedMessage::STATUSES[:processing])
-        message.with_lock("FOR UPDATE NOWAIT") { process_protobuff!(message) }
+        message.with_lock("FOR UPDATE NOWAIT") { process_protobuf!(message) }
       end
 
       nil
