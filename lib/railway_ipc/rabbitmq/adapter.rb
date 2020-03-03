@@ -18,14 +18,16 @@ module RailwayIpc
         @queue_name = queue_name
         @exchange_name = exchange_name
         settings = AMQ::Settings.parse_amqp_url(amqp_url)
+        vhost = settings[:vhost] || '/'
         @connection = Bunny.new({
                                     host: settings[:host],
                                     user: settings[:user],
                                     pass: settings[:pass],
                                     port: settings[:port],
+                                    vhost: vhost,
                                     automatic_recovery: false,
-                                    logger: RailwayIpc.bunny_logger}.merge(options)
-        )
+                                    logger: RailwayIpc.bunny_logger
+                                }.merge(options))
       end
 
       def publish(message, options = {})
