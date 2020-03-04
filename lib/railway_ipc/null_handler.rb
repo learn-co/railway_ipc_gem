@@ -1,7 +1,7 @@
 module RailwayIpc
   class NullHandler < RailwayIpc::Handler
     def handle(message)
-      ack!
+      nil
     end
   end
 end

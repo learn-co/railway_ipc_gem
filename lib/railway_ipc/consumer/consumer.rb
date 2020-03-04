@@ -35,29 +35,25 @@ module RailwayIpc
         @protobuf_message = message_klass.decode(decoded_payload.message)
         process_known_message_type
       else
-        @handler = RailwayIpc::NullHandler.new
         @protobuf_message = RailwayIpc::BaseMessage.decode(decoded_payload.message)
         process_unknown_message_type
       end
-
-      rescue StandardError => e
-        RailwayIpc.logger.log_exception(
-          feature: "railway_consumer",
-          error: e.class,
-          error_message: e.message,
-          payload: payload,
-        )
-        raise e
+      ack!
+    rescue StandardError => e
+      RailwayIpc.logger.log_exception(
+        feature: "railway_consumer",
+        error: e.class,
+        error_message: e.message,
+        payload: payload,
+      )
+      raise e
     end
 
     private
 
     def process_protobuf!(message)
-      if handler.handle(protobuf_message).success?
-        message.status = RailwayIpc::ConsumedMessage::STATUSES[:success]
-      else
-        message.status = RailwayIpc::ConsumedMessage::STATUSES[:failed_to_process]
-      end
+      response = handler.handle(protobuf_message)
+      message.status = RailwayIpc::ConsumedMessage.response_to_status(response)
 
       message.save!
     end
@@ -65,28 +61,22 @@ module RailwayIpc
     def process_known_message_type
       message = RailwayIpc::ConsumedMessage.find_by(uuid: protobuf_message.uuid)
 
-      if message && message.processed?
-        handler.ack!
-      elsif message && !message.processed?
+      return if message && message.processed?
+
+      if message && !message.processed?
         message.with_lock("FOR UPDATE NOWAIT") { process_protobuf!(message) }
       else
         message = create_message_with_status!(RailwayIpc::ConsumedMessage::STATUSES[:processing])
         message.with_lock("FOR UPDATE NOWAIT") { process_protobuf!(message) }
       end
-
-      nil
     end
 
     def process_unknown_message_type
-      handler.ack!
-
       if RailwayIpc::ConsumedMessage.exists?(uuid: protobuf_message.uuid)
         return
       else
         create_message_with_status!(RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type])
       end
-
-      nil
     end
 
     def create_message_with_status!(status)

@@ -1,6 +1,5 @@
 module RailwayIpc
   class Handler
-    include Sneakers::Worker
     class << self
       attr_reader :block
     end
@@ -10,14 +9,12 @@ module RailwayIpc
     end
 
     def handle(message)
-      RailwayIpc.logger.info(message, "Handling message")
+      RailwayIpc.logger.info(message, 'Handling message')
       response = self.class.block.call(message)
       if response.success?
-        RailwayIpc.logger.info(message, "Successfully handled message")
-        ack!
+        RailwayIpc.logger.info(message, 'Successfully handled message')
       else
-        RailwayIpc.logger.error(message, "Failed to handle message")
-        ack!
+        RailwayIpc.logger.error(message, 'Failed to handle message')
       end
 
       response
