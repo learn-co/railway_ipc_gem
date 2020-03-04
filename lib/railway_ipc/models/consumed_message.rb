@@ -14,6 +14,14 @@ module RailwayIpc
     validates :uuid, :status, presence: true
     validates :status, inclusion: { in: STATUSES.values }
 
+    def self.response_to_status(response)
+      if response.success?
+        STATUSES[:success]
+      else
+        STATUSES[:failed_to_process]
+      end
+    end
+
     def processed?
       self.status == STATUSES[:success]
     end

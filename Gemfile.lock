@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    railway-ipc (0.1.4)
+    railway-ipc (0.1.5)
       bunny (~> 2.2.0)
       sneakers (~> 2.3.5)
 

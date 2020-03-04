@@ -14,10 +14,8 @@ module RailwayIpc
       response = self.class.block.call(message)
       if response.success?
         RailwayIpc.logger.info(message, "Successfully handled message")
-        ack!
       else
         RailwayIpc.logger.error(message, "Failed to handle message")
-        ack!
       end
 
       response

@@ -3,8 +3,9 @@ RSpec.describe RailwayIpc::Handler do
   let(:message) { LearnIpc::Commands::TestMessage.new }
 
   context "when the message is handled successfully" do
-    it "acks the message" do
-      expect(handler).to receive(:ack!)
+    it "logs the message was successful" do
+      expect(RailwayIpc.logger).to receive(:info).with(message, "Handling message")
+      expect(RailwayIpc.logger).to receive(:info).with(message, "Successfully handled message")
       handler.handle(message)
     end
   end
@@ -16,8 +17,9 @@ RSpec.describe RailwayIpc::Handler do
       allow(RailwayIpc::TestHandler).to receive(:block).and_return(block)
     end
 
-    it "acks the message" do
-      expect(handler).to receive(:ack!)
+    it "logs the message failed" do
+      expect(RailwayIpc.logger).to receive(:info).with(message, "Handling message")
+      expect(RailwayIpc.logger).to receive(:error).with(message, "Failed to handle message")
       handler.handle(message)
     end
   end
