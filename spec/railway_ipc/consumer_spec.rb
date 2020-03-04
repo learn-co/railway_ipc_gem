@@ -48,9 +48,9 @@ RSpec.describe RailwayIpc::Consumer do
 
           it 'acks the message' do
             allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
-            expect(test_handler).to receive(:ack!)
 
-            consumer.work_with_params(payload, delivery_info, nil)
+            result =  consumer.work_with_params(payload, delivery_info, nil)
+            expect(result).to eq(:ack)
           end
         end
 
@@ -69,10 +69,9 @@ RSpec.describe RailwayIpc::Consumer do
             .to(RailwayIpc::ConsumedMessage::STATUSES[:success])
           end
 
-          it 'acks the message' do
-            expect_any_instance_of(RailwayIpc::TestHandler).to receive(:ack!)
-
-            consumer.work_with_params(payload, delivery_info, nil)
+          it 'return :ack' do
+            result = consumer.work_with_params(payload, delivery_info, nil)
+            expect(result).to eq(:ack)
           end
         end
 
@@ -109,12 +108,12 @@ RSpec.describe RailwayIpc::Consumer do
             end
           end
 
-          it 'acks the message' do
+          it 'returns :ack' do
             allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
             allow(test_handler.class.block).to receive(:call).and_return(OpenStruct.new(success?: false))
-            expect(test_handler).to receive(:ack!)
 
-            consumer.work_with_params(payload, delivery_info, nil)
+            result = consumer.work_with_params(payload, delivery_info, nil)
+            expect(result).to eq(:ack)
           end
         end
       end
@@ -142,11 +141,11 @@ RSpec.describe RailwayIpc::Consumer do
             }.to change { RailwayIpc::ConsumedMessage.count }.from(0).to(1)
           end
 
-          it 'acks the message' do
+          it 'returns :ack' do
             allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
-            expect(test_handler).to receive(:ack!)
 
-            consumer.work_with_params(payload, delivery_info, nil)
+            result = consumer.work_with_params(payload, delivery_info, nil)
+            expect(result).to eq(:ack)
           end
         end
 
@@ -170,9 +169,9 @@ RSpec.describe RailwayIpc::Consumer do
           it 'acks the message' do
             allow(RailwayIpc::TestHandler).to receive(:new).and_return(test_handler)
             allow(test_handler.class.block).to receive(:call).and_return(OpenStruct.new(success?: false))
-            expect(test_handler).to receive(:ack!)
 
-            consumer.work_with_params(payload, delivery_info, nil)
+            result = consumer.work_with_params(payload, delivery_info, nil)
+            expect(result).to eq(:ack)
           end
         end
       end
@@ -202,9 +201,9 @@ RSpec.describe RailwayIpc::Consumer do
 
         it 'acks the message' do
           allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-          expect(test_handler).to receive(:ack!)
 
-          consumer.work_with_params(payload, delivery_info, nil)
+          result = consumer.work_with_params(payload, delivery_info, nil)
+          expect(result).to eq(:ack)
         end
       end
 
@@ -230,9 +229,9 @@ RSpec.describe RailwayIpc::Consumer do
         it 'acks the message' do
           allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
           allow(RailwayIpc::ConsumedMessage).to receive(:create!).and_return(nil)
-          expect(test_handler).to receive(:ack!)
 
-          consumer.work_with_params(payload, delivery_info, nil)
+          result = consumer.work_with_params(payload, delivery_info, nil)
+          expect(result).to eq(:ack)
         end
       end
     end

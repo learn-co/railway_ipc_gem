@@ -35,11 +35,10 @@ module RailwayIpc
         @protobuf_message = message_klass.decode(decoded_payload.message)
         process_known_message_type
       else
-        @handler = RailwayIpc::NullHandler.new
         @protobuf_message = RailwayIpc::BaseMessage.decode(decoded_payload.message)
         process_unknown_message_type
       end
-      @handler.ack!
+      ack!
     rescue StandardError => e
       RailwayIpc.logger.log_exception(
         feature: "railway_consumer",
