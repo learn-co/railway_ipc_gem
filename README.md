@@ -32,7 +32,7 @@ require "railway_ipc"
 * Create RabbitMQ connection credentials for Railway and set the environment variable:
 
 ```
-RABBITMQ_CONNECTION_URL=amqp://<railway_user>:<railway_password>@localhost:5672
+RAILWAY_RABBITMQ_CONNECTION_URL=amqp://<railway_user>:<railway_password>@localhost:5672
 ```
 
 * Load table migrations and migrate by executing:
