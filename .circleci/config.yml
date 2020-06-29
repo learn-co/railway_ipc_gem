@@ -1,0 +1,58 @@
+version: 2.1
+jobs:
+  test:
+    parallelism: 1
+    docker:
+      - image: circleci/ruby:2.6.5-node-browsers
+        environment: &environment
+          PGHOST: localhost
+          PGUSERNAME: postgres
+          RAILWAY_RABBITMQ_CONNECTION_URL: amqp://guest:guest@localhost:5672
+      - image: circleci/postgres:9.6
+        environment:
+          POSTGRES_HOST_AUTH_METHOD: trust
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            gem install bundler:2.0.1
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+      - run: sudo apt-get update
+      - run: sudo apt install postgresql-client
+      - run:
+          name: Wait for postgresql
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: create database
+          command: |
+            cd spec/support/rails_app/
+            bundle exec rake db:create
+            cd ../../../
+      - run:
+          name: run tests
+          command: |
+            mkdir /tmp/test-results
+            bundle exec rspec # TODO: How do we want to config tests?
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
+workflows:
+  test:
+    jobs:
+      - test
+experimental:
+  notify:
+    branches:
+      only: master
