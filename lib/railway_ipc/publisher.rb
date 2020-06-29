@@ -18,8 +18,8 @@ module RailwayIpc
     end
 
     def publish(message, published_message_store=RailwayIpc::PublishedMessage)
-      message = ensure_message_uuid(message)
-      message = ensure_correlation_id(message)
+      ensure_message_uuid(message)
+      ensure_correlation_id(message)
       RailwayIpc.logger.info(message, 'Publishing message')
 
       result = super(RailwayIpc::Rabbitmq::Payload.encode(message))
