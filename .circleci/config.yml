@@ -36,6 +36,7 @@ jobs:
           name: create database
           command: |
             cd spec/support/rails_app/
+            bundle install
             bundle exec rake db:create
             cd ../../../
       - run:
