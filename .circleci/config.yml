@@ -16,17 +16,17 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          - v1-dependencies-
+          - v2-dependencies-{{ checksum "Gemfile.lock" }}
+          - v2-dependencies-
       - run:
           name: install dependencies
           command: |
             gem install bundler:2.0.1
-            bundle install
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
       - save_cache:
           paths:
             - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+          key: v2-dependencies-{{ checksum "Gemfile.lock" }}
       - run: sudo apt-get update
       - run: sudo apt install postgresql-client
       - run:
@@ -36,12 +36,12 @@ jobs:
           name: create database
           command: |
             cd spec/support/rails_app/
-            bundle install
-            bundle exec rake db:create
+            BUNDLE_IGNORE_CONFIG=true bundle install
+            BUNDLE_IGNORE_CONFIG=true bundle exec rake db:create
             cd ~/repo
       - run:
           name: run tests
-          command: |
+         command: |
             mkdir /tmp/test-results
             bundle exec rake
       - store_test_results:
