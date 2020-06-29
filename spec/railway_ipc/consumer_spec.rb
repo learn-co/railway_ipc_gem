@@ -183,7 +183,6 @@ RSpec.describe RailwayIpc::Consumer do
         let!(:payload) { payload_stub(message: test_message) }
         let!(:delivery_info) { delivery_info_stub }
         let!(:payload) { RailwayIpc::Rabbitmq::Payload.encode(test_message) }
-        let!(:test_handler) { RailwayIpc::NullHandler.new }
 
         it 'creates the record with a status of "unknown_message_type"' do
           consumer.work_with_params(payload, delivery_info, nil)
@@ -192,16 +191,7 @@ RSpec.describe RailwayIpc::Consumer do
           expect(consumed_message.status).to eq(RailwayIpc::ConsumedMessage::STATUSES[:unknown_message_type])
         end
 
-        it 'does not process the message' do
-          allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-          expect(test_handler).not_to receive(:handle)
-
-          consumer.work_with_params(payload, delivery_info, nil)
-        end
-
         it 'acks the message' do
-          allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
-
           result = consumer.work_with_params(payload, delivery_info, nil)
           expect(result).to eq(:ack)
         end
@@ -218,7 +208,6 @@ RSpec.describe RailwayIpc::Consumer do
         let!(:payload) { payload_stub(message: test_message) }
         let!(:delivery_info) { delivery_info_stub }
         let!(:payload) { RailwayIpc::Rabbitmq::Payload.encode(test_message) }
-        let!(:test_handler) { RailwayIpc::NullHandler.new }
 
         it 'raises error' do
           expect {
@@ -227,7 +216,6 @@ RSpec.describe RailwayIpc::Consumer do
         end
 
         it 'acks the message' do
-          allow(RailwayIpc::NullHandler).to receive(:new).and_return(test_handler)
           allow(RailwayIpc::ConsumedMessage).to receive(:create!).and_return(nil)
 
           result = consumer.work_with_params(payload, delivery_info, nil)
