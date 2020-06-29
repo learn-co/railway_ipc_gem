@@ -1,0 +1,23 @@
+Layout/SpaceAroundEqualsInParameterDefault:
+    EnforcedStyle: no_space
+
+Metrics/BlockLength:
+    ExcludedMethods:
+        - describe
+        - context
+        - it
+
+Metrics/ClassLength:
+    Max: 150
+
+Metrics/MethodLength:
+    Max: 15
+
+Metrics/LineLength:
+    Max: 90
+
+Style/BlockDelimiters:
+    EnforcedStyle: braces_for_chaining
+
+Style/YodaCondition:
+    EnforcedStyle: require_for_equality_operators_only
