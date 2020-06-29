@@ -41,7 +41,7 @@ jobs:
             cd ~/repo
       - run:
           name: run tests
-         command: |
+          command: |
             mkdir /tmp/test-results
             bundle exec rake
       - store_test_results:
