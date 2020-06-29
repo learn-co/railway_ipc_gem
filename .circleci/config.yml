@@ -38,7 +38,7 @@ jobs:
             cd spec/support/rails_app/
             bundle install
             bundle exec rake db:create
-            cd ../../../
+            cd ~/repo
       - run:
           name: run tests
           command: |
