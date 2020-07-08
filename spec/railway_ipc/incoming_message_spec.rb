@@ -2,7 +2,7 @@
 
 RSpec.describe RailwayIpc::IncomingMessage, 'initialization' do
   context 'when the message is valid JSON' do
-    let (:incoming_message) { described_class.new(stubbed_payload) }
+    let(:incoming_message) { described_class.new(stubbed_payload) }
 
     it 'extracts the message type' do
       expect(incoming_message.type).to eq('RailwayIpc::Messages::TestMessage')
@@ -29,7 +29,7 @@ RSpec.describe RailwayIpc::IncomingMessage, '#decoded' do
   end
 
   context "when it can't find a decoder class constant" do
-    let (:incoming_message) do
+    let(:incoming_message) do
       message = {
         type: 'Foo',
         encoded_message: Base64.encode64(RailwayIpc::Messages::TestMessage.encode(stubbed_protobuf))
@@ -81,7 +81,7 @@ RSpec.describe RailwayIpc::IncomingMessage, '#valid?' do
 end
 
 RSpec.describe RailwayIpc::IncomingMessage, 'decoded message delegations' do
-  let (:incoming_message) { described_class.new(stubbed_payload) }
+  let(:incoming_message) { described_class.new(stubbed_payload) }
 
   it { expect(incoming_message.uuid).to eq(RailwayIpc::SpecHelpers::DEAD_BEEF_UUID) }
   it { expect(incoming_message.user_uuid).to eq(RailwayIpc::SpecHelpers::BAAD_FOOD_UUID) }

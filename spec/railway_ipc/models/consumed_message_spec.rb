@@ -45,7 +45,7 @@ end
 
 RSpec.describe RailwayIpc::ConsumedMessage, '.create_processing', type: :model do
   context 'with valid parameters' do
-    let (:consumer) do
+    let(:consumer) do
       instance_double(RailwayIpc::Consumer,
                       queue_name: 'some-queue', exchange_name: 'my-exchange')
     end
@@ -57,11 +57,11 @@ RSpec.describe RailwayIpc::ConsumedMessage, '.create_processing', type: :model d
       }.to_json
     end
 
-    let (:incoming_message) do
+    let(:incoming_message) do
       RailwayIpc::IncomingMessage.new(json_message)
     end
 
-    let (:message) { described_class.create_processing(consumer, incoming_message) }
+    let(:message) { described_class.create_processing(consumer, incoming_message) }
 
     it 'extracts the UUID from the incoming message' do
       expect(message.uuid).to eq(RailwayIpc::SpecHelpers::DEAD_BEEF_UUID)
