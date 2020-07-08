@@ -72,7 +72,7 @@ module RailwayIpc
         File.truncate('db/schema.rb', 0)
       end
 
-      def migration_timestamp(seconds = 0)
+      def migration_timestamp(seconds=0)
         (Time.now + seconds).utc.strftime('%Y%m%d%H%M%S') % '%.14d'
       end
     end

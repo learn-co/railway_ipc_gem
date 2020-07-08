@@ -32,7 +32,7 @@ module RailwayIpc
         }.merge(options))
       end
 
-      def publish(message, options = {})
+      def publish(message, options={})
         exchange.publish(message, options) if exchange
       end
 
@@ -78,7 +78,7 @@ module RailwayIpc
         self
       end
 
-      def create_queue(options = { durable: true })
+      def create_queue(options={ durable: true })
         @queue = @channel.queue(queue_name, options)
         self
       end

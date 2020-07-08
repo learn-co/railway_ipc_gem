@@ -14,7 +14,7 @@ module RailwayIpc
       RailwayIpc::RPC::ServerResponseHandlers.instance.register(handler: with, message: message_type)
     end
 
-    def initialize(opts = { automatic_recovery: true }, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
+    def initialize(opts={ automatic_recovery: true }, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
       @rabbit_connection = rabbit_adapter.new(
         queue_name: self.class.queue_name,
         exchange_name: self.class.exchange_name,

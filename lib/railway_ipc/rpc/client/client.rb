@@ -20,12 +20,12 @@ module RailwayIpc
       RPC::ClientResponseHandlers.instance.register(response_type)
     end
 
-    def initialize(request_message, opts = { automatic_recovery: false }, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
+    def initialize(request_message, opts={ automatic_recovery: false }, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
       @rabbit_connection = rabbit_adapter.new(exchange_name: self.class.exchange_name, options: opts)
       @request_message = request_message
     end
 
-    def request(timeout = 10)
+    def request(timeout=10)
       setup_rabbit_connection
       attach_reply_queue_to_message
       publish_message
