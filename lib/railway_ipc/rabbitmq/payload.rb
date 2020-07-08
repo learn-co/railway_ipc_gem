@@ -29,7 +29,7 @@ module RailwayIpc
 
       def to_json
         {
-            type: type,
+          type: type,
             encoded_message: message
         }.to_json
       end
