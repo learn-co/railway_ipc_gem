@@ -4,17 +4,23 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
   describe 'validations' do
     it { should validate_presence_of(:uuid) }
     it { should validate_presence_of(:status) }
+
     it do
       should validate_inclusion_of(:status)
-        .in_array(RailwayIpc::ConsumedMessage::STATUSES.values)
+        .in_array([
+          'success',
+          'processing',
+          'ignored',
+          'unknown_message_type',
+          'failed_to_process'
+      ])
     end
   end
 
   describe '#processed?' do
     context 'when status is "success"' do
       it 'returns true' do
-        msg = create(:consumed_message, status: RailwayIpc::ConsumedMessage::STATUSES[:success])
-
+        msg = create(:consumed_message, status: 'success')
         expect(msg.processed?).to eq(true)
       end
     end
@@ -29,99 +35,81 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
 
   describe '#create' do
     it 'saves an inserted_at date for the current time' do
-      msg = create(:consumed_message, status: RailwayIpc::ConsumedMessage::STATUSES[:success])
+      msg = create(:consumed_message, status: 'success')
       expect(msg.inserted_at.utc).to be_within(1.second).of(Time.current)
     end
   end
+end
 
-  describe "#decoded_message" do
-    context "when message type is know to the system" do
-      it "decodes message using the defined message type" do
-        test_msg_data = test_msg_data_stub
-        decoded_message = RailwayIpc::ConsumedMessage.create!({
-          uuid: SecureRandom.uuid,
-          message_type: 'LearnIpc::Commands::TestMessage',
-          encoded_protobuf: test_msg_data.encoded_protobuf,
-          status: 'success'
-        }).decoded_message
-
-        expect(decoded_message).to be_a(LearnIpc::Commands::TestMessage)
-        expect(decoded_message.uuid).to eq(test_msg_data.uuid)
-        expect(decoded_message.user_uuid).to eq(test_msg_data.user_uuid)
-        expect(decoded_message.correlation_id).to eq(test_msg_data.correlation_id)
-      end
+RSpec.describe RailwayIpc::ConsumedMessage, '.create_processing', type: :model do
+  context 'with valid parameters' do
+    let (:consumer) do
+      instance_double(RailwayIpc::Consumer,
+                      queue_name: 'some-queue', exchange_name: 'my-exchange')
     end
 
-    context "when message type is not known to the system" do
-      it "decodes message as RailwayIpc::BaseMessage" do
-        test_msg_data = test_msg_data_stub
-        decoded_message = RailwayIpc::ConsumedMessage.create!({
-          uuid: SecureRandom.uuid,
-          message_type: 'SURPRISE',
-          encoded_protobuf: test_msg_data.encoded_protobuf,
-          status: 'success'
-        }).decoded_message
-
-        expect(decoded_message).to be_a(RailwayIpc::BaseMessage)
-        expect(decoded_message.uuid).to eq(test_msg_data.uuid)
-        expect(decoded_message.user_uuid).to eq(test_msg_data.user_uuid)
-        expect(decoded_message.correlation_id).to eq(test_msg_data.correlation_id)
-      end
+    let(:json_message) do
+      {
+        type: 'RailwayIpc::Messages::TestMessage',
+        encoded_message: Base64.encode64(RailwayIpc::Messages::TestMessage.encode(stubbed_protobuf))
+      }.to_json
     end
 
-    context "when data field has value in encoded protobuf" do
-      it "decodes message" do
-        # Message => <LearnIpc::Commands::TestMessage: user_uuid: "b5797a84-7ef5-44a7-ac90-0aad7284f0b7", correlation_id: "de2c778f-0db5-4cfb-acbf-fc759c967d44", uuid: "24b36430-6105-4646-a343-2272078cd90e", context: {}, data: <LearnIpc::Commands::TestMessage::Data: iteration: "test">>
-        # Encoded Protobuf => LearnIpc::Commands::TestMessage.encode(Message)
-        encoded_protobuf_with_data =
-          "\n$b5797a84-7ef5-44a7-ac90-0aad7284f0b7\x12$de2c778f-0db5-4cfb-acbf-fc759c967d44\x1A$24b36430-6105-4646-a343-2272078cd90e*\x06\n\x04test"
-        test_msg_data = test_msg_data_stub(encoded_protobuf: encoded_protobuf_with_data)
-        decoded_message = RailwayIpc::ConsumedMessage.create!({
-          uuid: SecureRandom.uuid,
-          message_type: 'LearnIpc::Commands::TestMessage',
-          encoded_protobuf: test_msg_data.encoded_protobuf,
-          status: 'success'
-        }).decoded_message
-
-        expect(decoded_message).to be_a(LearnIpc::Commands::TestMessage)
-        expect(decoded_message.uuid).to eq(test_msg_data.uuid)
-        expect(decoded_message.user_uuid).to eq(test_msg_data.user_uuid)
-        expect(decoded_message.correlation_id).to eq(test_msg_data.correlation_id)
-      end
+    let (:incoming_message) do
+      RailwayIpc::IncomingMessage.new(json_message)
     end
 
-    context "when data field is nil in encoded protobuf" do
-      it "decodes message" do
-        # Message => <LearnIpc::Commands::TestMessage: user_uuid: "b5797a84-7ef5-44a7-ac90-0aad7284f0b7", correlation_id: "de2c778f-0db5-4cfb-acbf-fc759c967d44", uuid: "24b36430-6105-4646-a343-2272078cd90e", context: {}, data: nil>
-        # Encoded Protobuf => LearnIpc::Commands::TestMessage.encode(Message) =>
-        encoded_protobuf_without_data =
-          "\n$b5797a84-7ef5-44a7-ac90-0aad7284f0b7\x12$de2c778f-0db5-4cfb-acbf-fc759c967d44\x1A$24b36430-6105-4646-a343-2272078cd90e"
-        test_msg_data = test_msg_data_stub(encoded_protobuf: encoded_protobuf_without_data)
-        decoded_message = RailwayIpc::ConsumedMessage.create!({
-          uuid: SecureRandom.uuid,
-          message_type: 'LearnIpc::Commands::TestMessage',
-          encoded_protobuf: test_msg_data.encoded_protobuf,
-          status: 'success'
-        }).decoded_message
+    let (:message) { described_class.create_processing(consumer, incoming_message) }
 
-        expect(decoded_message).to be_a(LearnIpc::Commands::TestMessage)
-        expect(decoded_message.uuid).to eq(test_msg_data.uuid)
-        expect(decoded_message.user_uuid).to eq(test_msg_data.user_uuid)
-        expect(decoded_message.correlation_id).to eq(test_msg_data.correlation_id)
-      end
+    it 'extracts the UUID from the incoming message' do
+      expect(message.uuid).to eq(RailwayIpc::SpecHelpers::DEAD_BEEF_UUID)
+    end
+
+    it 'sets the status' do
+      expect(message.status).to eq('processing')
+    end
+
+    it 'extracts the type from the incoming message' do
+      expect(message.message_type).to eq('RailwayIpc::Messages::TestMessage')
+    end
+
+    it 'extracts the user UUID from the incoming message' do
+      expect(message.user_uuid).to eq(RailwayIpc::SpecHelpers::BAAD_FOOD_UUID)
+    end
+
+    it 'extracts the correlation UUID from the incoming message' do
+      expect(message.correlation_id).to eq(RailwayIpc::SpecHelpers::CAFE_FOOD_UUID)
+    end
+
+    it 'extracts the queue from the consumer' do
+      expect(message.queue).to eq('some-queue')
+    end
+
+    it 'extracts the exchange from the consumer' do
+      expect(message.exchange).to eq('my-exchange')
+    end
+
+    it 'extracts the raw message from the consumer' do
+      expect(message.encoded_message).to eq(json_message)
     end
   end
+end
 
-  private
-
-  def test_msg_data_stub(encoded_protobuf: nil)
-    default_encoded_protobuf = "\n$b5797a84-7ef5-44a7-ac90-0aad7284f0b7\x12$de2c778f-0db5-4cfb-acbf-fc759c967d44\x1A$24b36430-6105-4646-a343-2272078cd90e*\x00"
-
-    OpenStruct.new(
-      uuid: "24b36430-6105-4646-a343-2272078cd90e",
-      user_uuid: "b5797a84-7ef5-44a7-ac90-0aad7284f0b7",
-      correlation_id: "de2c778f-0db5-4cfb-acbf-fc759c967d44",
-      encoded_protobuf: encoded_protobuf || default_encoded_protobuf
-    )
+RSpec.describe RailwayIpc::ConsumedMessage, '#update_with_lock', type: :model do
+  let(:job) do
+    instance_double(RailwayIpc::ProcessIncomingMessage::NormalMessageJob,
+                    status: 'success')
   end
+
+  let(:consumed_message) do
+    described_class.new(uuid: RailwayIpc::SpecHelpers::DEAD_BEEF_UUID)
+  end
+
+  before(:each) do
+    expect(job).to receive(:run)
+    consumed_message.update_with_lock(job)
+  end
+
+  it { expect(consumed_message.status).to eq('success') }
+  it { expect(consumed_message).to be_persisted }
 end

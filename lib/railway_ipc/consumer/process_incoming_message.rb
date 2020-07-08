@@ -53,7 +53,7 @@ module RailwayIpc
 
       def run
         result = handler.handle(incoming_message.decoded)
-        @status = result.success? ? 'success' : 'failed_to_process'
+        @status = result.success? ? RailwayIpc::ConsumedMessage::STATUS_SUCCESS : RailwayIpc::ConsumedMessage::STATUS_FAILED_TO_PROCESS
       end
     end
 

@@ -1,10 +1,10 @@
 RSpec.describe RailwayIpc::Publisher do
   let(:publisher) { RailwayIpc::TestPublisher.instance }
-  let(:message)   { LearnIpc::Commands::TestMessage.new(
+  let(:message)   { RailwayIpc::Messages::TestMessage.new(
     uuid: SecureRandom.uuid,
     correlation_id: SecureRandom.uuid
   ) }
-  let(:encoded_message) { Base64.encode64(LearnIpc::Commands::TestMessage.encode(message)) }
+  let(:encoded_message) { Base64.encode64(RailwayIpc::Messages::TestMessage.encode(message)) }
 
   it "knows its exchange" do
     expect(publisher.class.exchange_name).to eq("test:events")

@@ -1,6 +1,6 @@
 RSpec.describe RailwayIpc::Handler do
   let(:handler) { RailwayIpc::TestHandler.new }
-  let(:message) { LearnIpc::Commands::TestMessage.new }
+  let(:message) { RailwayIpc::Messages::TestMessage.new }
 
   context "when the message is handled successfully" do
     it "logs the message was successful" do

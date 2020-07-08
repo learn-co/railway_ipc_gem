@@ -7,6 +7,8 @@ require_relative "./error_message_pb"
 
 module RailwayIpc
   class TestClient < RailwayIpc::Client
+    ONE_SECOND = 1
+
     publish_to exchange: "ipc:test:requests"
     handle_response LearnIpc::Documents::TestDocument
     rpc_error_adapter RailwayIpc::RpcAdapter
@@ -29,7 +31,7 @@ module RailwayIpc
       message = LearnIpc::Requests::TimeoutRequest.new(
         user_uuid: user_uuid,
         correlation_id: "56789")
-      request(message)
+      new(message).request(ONE_SECOND)
     end
   end
 end

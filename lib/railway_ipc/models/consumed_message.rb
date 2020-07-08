@@ -1,56 +1,55 @@
 module RailwayIpc
   class ConsumedMessage < ActiveRecord::Base
-    STATUSES = {
-      success: 'success',
-      processing: 'processing',
-      unknown_message_type: 'unknown_message_type',
-      failed_to_process: 'failed_to_process'
-    }
+    STATUS_SUCCESS = 'success'
+    STATUS_PROCESSING = 'processing'
+    STATUS_IGNORED = 'ignored'
+    STATUS_UNKNOWN_MESSAGE_TYPE = 'unknown_message_type'
+    STATUS_FAILED_TO_PROCESS = 'failed_to_process'
+
+    VALID_STATUSES = [
+      STATUS_SUCCESS,
+      STATUS_PROCESSING,
+      STATUS_IGNORED,
+      STATUS_UNKNOWN_MESSAGE_TYPE,
+      STATUS_FAILED_TO_PROCESS
+    ]
 
     attr_reader :decoded_message
     self.table_name = 'railway_ipc_consumed_messages'
     self.primary_key = 'uuid'
 
     validates :uuid, :status, presence: true
-    validates :status, inclusion: { in: STATUSES.values }
+    validates :status, inclusion: { in: VALID_STATUSES }
 
-    def self.response_to_status(response)
-      if response.success?
-        STATUSES[:success]
-      else
-        STATUSES[:failed_to_process]
+    def self.create_processing(consumer, incoming_message)
+      self.create!(
+        uuid: incoming_message.uuid,
+        status: STATUS_PROCESSING,
+        message_type: incoming_message.type,
+        user_uuid: incoming_message.user_uuid,
+        correlation_id: incoming_message.correlation_id,
+        queue: consumer.queue_name,
+        exchange: consumer.exchange_name,
+        encoded_message: incoming_message.payload
+      )
+    end
+
+    def update_with_lock(job)
+      with_lock('FOR UPDATE NOWAIT') do
+        job.run
+        self.status = job.status
+        save
       end
     end
 
     def processed?
-      self.status == STATUSES[:success]
-    end
-
-    def encoded_protobuf=(encoded_protobuf)
-      self.encoded_message = Base64.encode64(encoded_protobuf)
-    end
-
-    def decoded_message
-      @decoded_message ||= decode_message
+      self.status == STATUS_SUCCESS
     end
 
     private
 
     def timestamp_attributes_for_create
       super << :inserted_at
-    end
-
-    def decode_message
-      begin
-        message_class = Kernel.const_get(self.message_type)
-      rescue NameError
-        message_class = RailwayIpc::BaseMessage
-      end
-      message_class.decode(decoded_protobuf)
-    end
-
-    def decoded_protobuf
-      Base64.decode64(self.encoded_message)
     end
   end
 end
