@@ -4,9 +4,9 @@ RSpec.describe RailwayIpc::Consumer, '.listen_to' do
   it 'specifies the queue and exchange' do
     expect(RailwayIpc::TestConsumer).to receive(:from_queue).with('test_queue', {
                                                                     exchange: 'test_exchange',
-      durable: true,
-      exchange_type: :fanout,
-      connection: RailwayIpc.bunny_connection
+                                                                    durable: true,
+                                                                    exchange_type: :fanout,
+                                                                    connection: RailwayIpc.bunny_connection
                                                                   })
     RailwayIpc::TestConsumer.listen_to(queue: 'test_queue', exchange: 'test_exchange')
   end

@@ -23,12 +23,12 @@ module RailwayIpc
         vhost = settings[:vhost] || '/'
         @connection = Bunny.new({
           host: settings[:host],
-                                    user: settings[:user],
-                                    pass: settings[:pass],
-                                    port: settings[:port],
-                                    vhost: vhost,
-                                    automatic_recovery: false,
-                                    logger: RailwayIpc.bunny_logger
+          user: settings[:user],
+          pass: settings[:pass],
+          port: settings[:port],
+          vhost: vhost,
+          automatic_recovery: false,
+          logger: RailwayIpc.bunny_logger
         }.merge(options))
       end
 
