@@ -68,7 +68,7 @@ module RailwayIpc
         self
       end
 
-      def create_exchange(strategy: :fanout, options: {durable: true})
+      def create_exchange(strategy: :fanout, options: { durable: true })
         @exchange = Bunny::Exchange.new(connection.channel, :fanout, exchange_name, options)
         self
       end
@@ -78,7 +78,7 @@ module RailwayIpc
         self
       end
 
-      def create_queue(options = {durable: true})
+      def create_queue(options = { durable: true })
         @queue = @channel.queue(queue_name, options)
         self
       end

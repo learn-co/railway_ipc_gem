@@ -14,7 +14,7 @@ RSpec.describe RailwayIpc::Handler do
 
   context 'when the message is not handled successfully' do
     before do
-      response = double('response', {success?: false})
+      response = double('response', { success?: false })
       block = double('block', call: response)
       allow(RailwayIpc::TestHandler).to receive(:block).and_return(block)
     end

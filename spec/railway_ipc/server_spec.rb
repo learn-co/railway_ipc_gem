@@ -3,8 +3,8 @@
 RSpec.describe RailwayIpc::Server do
   describe '#work' do
     let(:exchange)   { double('exchange') }
-    let(:channel)    { double('channel', {default_exchange: exchange}) }
-    let(:connection) { double('connection', {start: true, create_channel: channel}) }
+    let(:channel)    { double('channel', { default_exchange: exchange }) }
+    let(:connection) { double('connection', { start: true, create_channel: channel }) }
 
     before do
       @server = RailwayIpc::TestServer.new

@@ -19,7 +19,7 @@ RSpec.describe RailwayIpc::Rabbitmq::Adapter do
       expect(connection.automatically_recover?).to be_falsey
     end
     it 'accepts options' do
-      diff_connection = RailwayIpc::Rabbitmq::Adapter.new(queue_name: 'test_queue', exchange_name: 'test_exchange', options: {automatic_recovery: true})
+      diff_connection = RailwayIpc::Rabbitmq::Adapter.new(queue_name: 'test_queue', exchange_name: 'test_exchange', options: { automatic_recovery: true })
       expect(diff_connection).to be_automatically_recover
     end
   end
@@ -38,7 +38,7 @@ RSpec.describe RailwayIpc::Rabbitmq::Adapter do
     it 'accepts options' do
       connection
           .connect
-          .create_exchange(options: {auto_delete: true})
+          .create_exchange(options: { auto_delete: true })
       expect(connection.exchange).to_not be_durable
       expect(connection.exchange).to be_auto_delete
     end
