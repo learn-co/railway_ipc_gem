@@ -82,8 +82,10 @@ end
 
 RSpec.describe RailwayIpc::IncomingMessage, 'decoded message delegations' do
   let (:incoming_message) { described_class.new(stubbed_payload) }
+  let (:encoded_protobuf) { stubbed_encoded_protobuf }
 
   it { expect(incoming_message.uuid).to eq(RailwayIpc::SpecHelpers::DEAD_BEEF_UUID) }
   it { expect(incoming_message.user_uuid).to eq(RailwayIpc::SpecHelpers::BAAD_FOOD_UUID) }
   it { expect(incoming_message.correlation_id).to eq(RailwayIpc::SpecHelpers::CAFE_FOOD_UUID) }
+  it { expect(incoming_message.encoded_protobuf).to eq(encoded_protobuf) }
 end

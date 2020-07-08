@@ -20,6 +20,10 @@ module RailwayIpc
       }.to_json
     end
 
+    def stubbed_encoded_protobuf(**kwargs)
+      RailwayIpc::Messages::TestMessage.encode(stubbed_protobuf(**kwargs))
+    end
+
     class FakeLogger
       attr_reader :messages
 

@@ -67,10 +67,6 @@ module RailwayIpc
 
     attr_reader :rabbit_connection
 
-    def get_message_class(type)
-      RailwayIpc::RPC::ServerResponseHandlers.instance.get(type).message
-    end
-
     def get_responder(type)
       RailwayIpc::RPC::ServerResponseHandlers.instance.get(type).handler.new
     end

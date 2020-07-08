@@ -36,14 +36,14 @@ module RailwayIpc
     end
 
     def process_payload(response)
-      decoded_payload = decode_payload(response)
-      case decoded_payload.type
+      incoming_message = RailwayIpc::IncomingMessage.new(response)
+      case incoming_message.type
       when *registered_handlers
-        @message = get_message_class(decoded_payload).decode(decoded_payload.message)
+        @message = incoming_message.decoded
         RailwayIpc.logger.info(message, "Handling response")
         RailwayIpc::Response.new(message, success: true)
       else
-        @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
+        @message = LearnIpc::ErrorMessage.decode(incoming_message.encoded_protobuf)
         raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
       end
     end
@@ -77,14 +77,6 @@ module RailwayIpc
         error_message: e.message,
         payload: decode_for_error(e, payload),
       )
-    end
-
-    def get_message_class(decoded_payload)
-      RailwayIpc::RPC::ClientResponseHandlers.instance.get(decoded_payload.type)
-    end
-
-    def decode_payload(response)
-      RailwayIpc::Rabbitmq::Payload.decode(response)
     end
 
     def attach_reply_queue_to_message
