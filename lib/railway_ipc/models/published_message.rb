@@ -17,7 +17,7 @@ module RailwayIpc
         encoded_message: encoded_message,
         status: 'sent',
         exchange: exchange_name
-        )
+      )
     end
 
     private
