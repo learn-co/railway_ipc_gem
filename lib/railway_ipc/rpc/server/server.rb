@@ -30,15 +30,15 @@ module RailwayIpc
     end
 
     def work(payload)
-      decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
-      case decoded_payload.type
+      incoming_message = RailwayIpc::IncomingMessage.new(payload)
+      case incoming_message.type
       when *registered_handlers
-        responder = get_responder(decoded_payload)
-        @message = get_message_class(decoded_payload).decode(decoded_payload.message)
+        responder = get_responder(incoming_message.type)
+        @message = incoming_message.decoded
         responder.respond(message)
       else
-        @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
-        raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
+        @message = LearnIpc::ErrorMessage.decode(incoming_message.encoded_protobuf)
+        raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{incoming_message.type}"
       end
     rescue StandardError => e
       RailwayIpc.logger.log_exception(
@@ -67,12 +67,12 @@ module RailwayIpc
 
     attr_reader :rabbit_connection
 
-    def get_message_class(decoded_payload)
-      RailwayIpc::RPC::ServerResponseHandlers.instance.get(decoded_payload.type).message
+    def get_message_class(type)
+      RailwayIpc::RPC::ServerResponseHandlers.instance.get(type).message
     end
 
-    def get_responder(decoded_payload)
-      RailwayIpc::RPC::ServerResponseHandlers.instance.get(decoded_payload.type).handler.new
+    def get_responder(type)
+      RailwayIpc::RPC::ServerResponseHandlers.instance.get(type).handler.new
     end
 
     def registered_handlers

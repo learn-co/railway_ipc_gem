@@ -32,14 +32,17 @@ module RailwayIpc
     def decoded
       @decoded ||=
         begin
-          protobuf_msg = Base64.decode64(parsed_payload['encoded_message'])
           decoder = Kernel.const_get(type)
-          decoder.decode(protobuf_msg)
+          decoder.decode(encoded_protobuf)
         rescue Google::Protobuf::ParseError => e
           raise RailwayIpc::IncomingMessage::ParserError.new(e)
         rescue NameError
-          RailwayIpc::Messages::Unknown.decode(protobuf_msg)
+          RailwayIpc::Messages::Unknown.decode(encoded_protobuf)
         end
+    end
+
+    def encoded_protobuf
+      Base64.decode64(parsed_payload['encoded_message'])
     end
 
     def stringify_errors
