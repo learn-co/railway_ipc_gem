@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class Logger
-
     attr_reader :logger
 
     def initialize(logger)

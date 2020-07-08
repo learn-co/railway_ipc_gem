@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class ConsumedMessage < ActiveRecord::Base
     STATUS_SUCCESS = 'success'
@@ -12,7 +14,7 @@ module RailwayIpc
       STATUS_IGNORED,
       STATUS_UNKNOWN_MESSAGE_TYPE,
       STATUS_FAILED_TO_PROCESS
-    ]
+    ].freeze
 
     attr_reader :decoded_message
     self.table_name = 'railway_ipc_consumed_messages'
@@ -22,7 +24,7 @@ module RailwayIpc
     validates :status, inclusion: { in: VALID_STATUSES }
 
     def self.create_processing(consumer, incoming_message)
-      self.create!(
+      create!(
         uuid: incoming_message.uuid,
         status: STATUS_PROCESSING,
         message_type: incoming_message.type,
@@ -43,7 +45,7 @@ module RailwayIpc
     end
 
     def processed?
-      self.status == STATUS_SUCCESS
+      status == STATUS_SUCCESS
     end
 
     private

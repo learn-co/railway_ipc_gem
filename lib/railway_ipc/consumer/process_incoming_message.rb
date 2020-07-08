@@ -80,9 +80,9 @@ module RailwayIpc
     private
 
     def raise_message_invalid_error
-      error =  "Message is invalid: #{incoming_message.stringify_errors}."
+      error = "Message is invalid: #{incoming_message.stringify_errors}."
       logger.error(incoming_message.decoded, error)
-      raise RailwayIpc::IncomingMessage::InvalidMessage.new(error)
+      raise RailwayIpc::IncomingMessage::InvalidMessage, error
     end
 
     def find_or_create_consumed_message

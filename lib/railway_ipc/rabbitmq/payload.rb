@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   module Rabbitmq
     class Payload
@@ -8,15 +10,15 @@ module RailwayIpc
         begin
           message = Base64.encode64(message.class.encode(message))
         rescue NoMethodError
-          raise RailwayIpc::InvalidProtobuf.new("Message #{message} is not a valid protobuf")
+          raise RailwayIpc::InvalidProtobuf, "Message #{message} is not a valid protobuf"
         end
         new(type, message).to_json
       end
 
       def self.decode(message)
         message = JSON.parse(message)
-        type = message["type"]
-        message = Base64.decode64(message["encoded_message"])
+        type = message['type']
+        message = Base64.decode64(message['encoded_message'])
         new(type, message)
       end
 
@@ -25,10 +27,10 @@ module RailwayIpc
         @message = message
       end
 
-      def to_json
+      def to_json(*_args)
         {
-            type: type,
-            encoded_message: message
+          type: type,
+          encoded_message: message
         }.to_json
       end
     end

@@ -1,7 +1,9 @@
-require "bundler/setup"
-require "railway_ipc"
+# frozen_string_literal: true
 
-Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f }
+require 'bundler/setup'
+require 'railway_ipc'
+
+Dir[File.dirname(__FILE__) + '/support/**/*.rb'].sort.each { |f| require f }
 
 logger = Logger.new(STDOUT)
 logger.level = :fatal

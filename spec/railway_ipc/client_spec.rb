@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc::Client do
   let(:rabbit_adapter) do
     double = class_double(RailwayIpc::Rabbitmq::Adapter)
     expect(double)
-        .to receive(:new)
-                .with({:exchange_name => 'ipc:test:requests', :options => {:automatic_recovery => false}})
-                .and_return(adapter_instance)
+      .to receive(:new)
+      .with({ exchange_name: 'ipc:test:requests', options: { automatic_recovery: false } })
+      .and_return(adapter_instance)
     double
   end
 

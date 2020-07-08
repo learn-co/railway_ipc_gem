@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class RailsTestDB
     GEM_PATH = Gem.loaded_specs['railway-ipc'].full_gem_path
@@ -31,10 +33,10 @@ module RailwayIpc
 
       def set_correct_migration_version
         rails_version = `rails version`.scan(/Rails\s(\d+\.\d+)\..*/).flatten.first
-        system(%Q{
+        system(%(
           grep -rl "ActiveRecord::Migration$" db | \
           xargs -I % sh -c 'sed -i "s/ActiveRecord::Migration/ActiveRecord::Migration[#{rails_version}]/g" %'
-        }, out: File::NULL)
+        ), out: File::NULL)
       end
 
       def run_migrations
@@ -55,11 +57,11 @@ module RailwayIpc
       end
 
       def drop_db
-        system("bundle exec rails db:drop RAILS_ENV=test", out: File::NULL)
+        system('bundle exec rails db:drop RAILS_ENV=test', out: File::NULL)
       end
 
       def generate_migrations
-        system("bundle exec rails railway_ipc:generate:migrations RAILS_ENV=test", out: File::NULL)
+        system('bundle exec rails railway_ipc:generate:migrations RAILS_ENV=test', out: File::NULL)
       end
 
       def remove_migration_files
@@ -70,8 +72,8 @@ module RailwayIpc
         File.truncate('db/schema.rb', 0)
       end
 
-      def migration_timestamp(seconds = 0)
-        (Time.now + seconds).utc.strftime("%Y%m%d%H%M%S") % "%.14d"
+      def migration_timestamp(seconds=0)
+        (Time.now + seconds).utc.strftime('%Y%m%d%H%M%S') % '%.14d'
       end
     end
   end

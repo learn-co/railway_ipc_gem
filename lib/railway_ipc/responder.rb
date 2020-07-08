@@ -1,17 +1,22 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class Responder
     def self.respond(&block)
       @block = block
     end
 
-    def self.block
-      @block
+    class << self
+      attr_reader :block
     end
 
     def respond(request)
-      RailwayIpc.logger.info(request, "Responding to request")
+      RailwayIpc.logger.info(request, 'Responding to request')
       response = self.class.block.call(request)
-      raise ResponseTypeError.new(response.class) unless response.is_a?(Google::Protobuf::MessageExts)
+      unless response.is_a?(Google::Protobuf::MessageExts)
+        raise ResponseTypeError, response.class
+      end
+
       response
     end
 

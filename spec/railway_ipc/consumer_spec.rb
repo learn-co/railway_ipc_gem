@@ -1,18 +1,19 @@
-RSpec.describe RailwayIpc::Consumer, '.listen_to' do
-  it "specifies the queue and exchange" do
-    expect(RailwayIpc::TestConsumer).to receive(:from_queue).with('test_queue', {
-      exchange: 'test_exchange',
-      durable: true,
-      exchange_type: :fanout,
-      connection: RailwayIpc.bunny_connection
-    })
-    RailwayIpc::TestConsumer.listen_to(queue: "test_queue", exchange: "test_exchange")
-  end
+# frozen_string_literal: true
 
+RSpec.describe RailwayIpc::Consumer, '.listen_to' do
+  it 'specifies the queue and exchange' do
+    expect(RailwayIpc::TestConsumer).to receive(:from_queue).with('test_queue', {
+                                                                    exchange: 'test_exchange',
+                                                                    durable: true,
+                                                                    exchange_type: :fanout,
+                                                                    connection: RailwayIpc.bunny_connection
+                                                                  })
+    RailwayIpc::TestConsumer.listen_to(queue: 'test_queue', exchange: 'test_exchange')
+  end
 end
 
 RSpec.describe RailwayIpc::Consumer, '.handle' do
-  it "registers the handler for the message" do
+  it 'registers the handler for the message' do
     RailwayIpc::Consumer.handle(RailwayIpc::Messages::TestMessage, with: RailwayIpc::TestHandler)
     expect(RailwayIpc::ConsumerResponseHandlers.instance.registered).to \
       include('RailwayIpc::Messages::TestMessage')

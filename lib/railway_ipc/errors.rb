@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RailwayIpc::Error < StandardError; end
 class RailwayIpc::InvalidProtobuf < RailwayIpc::Error; end
 class RailwayIpc::IncomingMessage::ParserError < RailwayIpc::Error; end

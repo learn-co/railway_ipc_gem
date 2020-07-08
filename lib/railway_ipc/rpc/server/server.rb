@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'railway_ipc/rpc/server/server_response_handlers'
 require 'railway_ipc/rpc/concerns/error_adapter_configurable'
 require 'railway_ipc/rpc/concerns/message_observation_configurable'
@@ -12,7 +14,7 @@ module RailwayIpc
       RailwayIpc::RPC::ServerResponseHandlers.instance.register(handler: with, message: message_type)
     end
 
-    def initialize(opts = {automatic_recovery: true}, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
+    def initialize(opts={ automatic_recovery: true }, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
       @rabbit_connection = rabbit_adapter.new(
         queue_name: self.class.queue_name,
         exchange_name: self.class.exchange_name,
@@ -84,6 +86,5 @@ module RailwayIpc
         handle_request(payload)
       end
     end
-
   end
 end

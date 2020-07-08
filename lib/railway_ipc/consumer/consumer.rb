@@ -1,4 +1,6 @@
-require "railway_ipc/consumer/consumer_response_handlers"
+# frozen_string_literal: true
+
+require 'railway_ipc/consumer/consumer_response_handlers'
 
 module RailwayIpc
   class Consumer
@@ -34,7 +36,7 @@ module RailwayIpc
       ack!
     rescue StandardError => e
       RailwayIpc.logger.log_exception(
-        feature: "railway_consumer",
+        feature: 'railway_consumer',
         error: e.class,
         error_message: e.message,
         payload: payload

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'singleton'
 
 module RailwayIpc
@@ -10,6 +12,7 @@ module RailwayIpc
 
     def self.exchange_name
       raise 'Subclass must set the exchange' unless @exchange_name
+
       @exchange_name
     end
 
