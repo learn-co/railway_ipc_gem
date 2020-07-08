@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "railway_ipc/rpc/client/client_response_handlers"
-require "railway_ipc/rpc/concerns/publish_location_configurable"
-require "railway_ipc/rpc/concerns/error_adapter_configurable"
-require "railway_ipc/rpc/client/errors/timeout_error"
+require 'railway_ipc/rpc/client/client_response_handlers'
+require 'railway_ipc/rpc/concerns/publish_location_configurable'
+require 'railway_ipc/rpc/concerns/error_adapter_configurable'
+require 'railway_ipc/rpc/client/errors/timeout_error'
 
 module RailwayIpc
   class Client
@@ -42,7 +42,7 @@ module RailwayIpc
       case decoded_payload.type
       when *registered_handlers
         @message = get_message_class(decoded_payload).decode(decoded_payload.message)
-        RailwayIpc.logger.info(message, "Handling response")
+        RailwayIpc.logger.info(message, 'Handling response')
         RailwayIpc::Response.new(message, success: true)
       else
         @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
@@ -74,7 +74,7 @@ module RailwayIpc
 
     def log_exception(e, payload)
       RailwayIpc.logger.log_exception(
-        feature: "railway_consumer",
+        feature: 'railway_consumer',
         error: e.class,
         error_message: e.message,
         payload: decode_for_error(e, payload),
@@ -94,8 +94,8 @@ module RailwayIpc
     end
 
     def publish_message
-      RailwayIpc.logger.info(request_message, "Sending request")
-      rabbit_connection.publish(RailwayIpc::Rabbitmq::Payload.encode(request_message), routing_key: "")
+      RailwayIpc.logger.info(request_message, 'Sending request')
+      rabbit_connection.publish(RailwayIpc::Rabbitmq::Payload.encode(request_message), routing_key: '')
     end
 
     def decode_for_error(e, payload)

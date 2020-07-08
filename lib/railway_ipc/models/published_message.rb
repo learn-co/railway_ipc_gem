@@ -3,7 +3,7 @@
 module RailwayIpc
   class PublishedMessage < ActiveRecord::Base
     self.table_name = 'railway_ipc_published_messages'
-    self.primary_key = "uuid"
+    self.primary_key = 'uuid'
 
     validates :uuid, :status, presence: true
 
@@ -15,7 +15,7 @@ module RailwayIpc
           user_uuid: message.user_uuid,
           correlation_id: message.correlation_id,
           encoded_message: encoded_message,
-          status: "sent",
+          status: 'sent',
           exchange: exchange_name
       )
     end

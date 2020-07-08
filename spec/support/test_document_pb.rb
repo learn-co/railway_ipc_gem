@@ -6,14 +6,14 @@
 require 'google/protobuf'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
-  add_message "learn_ipc.documents.TestDocument" do
+  add_message 'learn_ipc.documents.TestDocument' do
     optional :user_uuid, :string, 1
     optional :correlation_id, :string, 2
     optional :uuid, :string, 3
-    repeated :data, :message, 5, "learn_ipc.documents.TestDocument.Data"
+    repeated :data, :message, 5, 'learn_ipc.documents.TestDocument.Data'
     map :context, :string, :string, 6
   end
-  add_message "learn_ipc.documents.TestDocument.Data" do
+  add_message 'learn_ipc.documents.TestDocument.Data' do
     optional :iteration, :string, 1
     optional :batch_uuid, :string, 2
     optional :organization_uuid, :string, 3
@@ -22,7 +22,7 @@ end
 
 module LearnIpc
   module Documents
-    TestDocument = Google::Protobuf::DescriptorPool.generated_pool.lookup("learn_ipc.documents.TestDocument").msgclass
-    TestDocument::Data = Google::Protobuf::DescriptorPool.generated_pool.lookup("learn_ipc.documents.TestDocument.Data").msgclass
+    TestDocument = Google::Protobuf::DescriptorPool.generated_pool.lookup('learn_ipc.documents.TestDocument').msgclass
+    TestDocument::Data = Google::Protobuf::DescriptorPool.generated_pool.lookup('learn_ipc.documents.TestDocument.Data').msgclass
   end
 end

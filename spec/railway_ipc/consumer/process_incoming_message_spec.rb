@@ -170,7 +170,7 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
 
       payload = {
         type: 'RailwayIpc::Messages::TestMessage',
-        encoded_message: Base64.encode64(RailwayIpc::Messages::TestMessage.encode(stubbed_protobuf(correlation_id: "")))
+        encoded_message: Base64.encode64(RailwayIpc::Messages::TestMessage.encode(stubbed_protobuf(correlation_id: '')))
       }.to_json
 
       incoming_message = RailwayIpc::IncomingMessage.new(payload)

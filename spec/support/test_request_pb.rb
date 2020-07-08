@@ -6,7 +6,7 @@
 require 'google/protobuf'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
-  add_message "learn_ipc.requests.TestRequest" do
+  add_message 'learn_ipc.requests.TestRequest' do
     optional :user_uuid, :string, 1
     optional :correlation_id, :string, 2
     optional :uuid, :string, 3
@@ -17,6 +17,6 @@ end
 
 module LearnIpc
   module Requests
-    TestRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("learn_ipc.requests.TestRequest").msgclass
+    TestRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup('learn_ipc.requests.TestRequest').msgclass
   end
 end

@@ -17,8 +17,8 @@ module RailwayIpc
 
       def self.decode(message)
         message = JSON.parse(message)
-        type = message["type"]
-        message = Base64.decode64(message["encoded_message"])
+        type = message['type']
+        message = Base64.decode64(message['encoded_message'])
         new(type, message)
       end
 

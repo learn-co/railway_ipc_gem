@@ -45,7 +45,7 @@ module RailwayIpc
     end
 
     def stringify_errors
-      errors.values.join(", ")
+      errors.values.join(', ')
     end
   end
 end

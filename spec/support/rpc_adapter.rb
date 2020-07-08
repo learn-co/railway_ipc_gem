@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "./error_message_pb.rb"
+require_relative './error_message_pb.rb'
 module RailwayIpc
   class RpcAdapter
     def self.error_message(error, message)

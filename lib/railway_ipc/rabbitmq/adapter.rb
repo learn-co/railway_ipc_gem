@@ -16,7 +16,7 @@ module RailwayIpc
                      :port,
                      :user
 
-      def initialize(amqp_url: ENV["RAILWAY_RABBITMQ_CONNECTION_URL"], exchange_name:, queue_name: '', options: {})
+      def initialize(amqp_url: ENV['RAILWAY_RABBITMQ_CONNECTION_URL'], exchange_name:, queue_name: '', options: {})
         @queue_name = queue_name
         @exchange_name = exchange_name
         settings = AMQ::Settings.parse_amqp_url(amqp_url)

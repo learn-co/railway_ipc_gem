@@ -11,7 +11,7 @@ module RailwayIpc
     end
 
     def respond(request)
-      RailwayIpc.logger.info(request, "Responding to request")
+      RailwayIpc.logger.info(request, 'Responding to request')
       response = self.class.block.call(request)
       raise ResponseTypeError.new(response.class) unless response.is_a?(Google::Protobuf::MessageExts)
       response

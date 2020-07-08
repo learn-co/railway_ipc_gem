@@ -57,11 +57,11 @@ module RailwayIpc
       end
 
       def drop_db
-        system("bundle exec rails db:drop RAILS_ENV=test", out: File::NULL)
+        system('bundle exec rails db:drop RAILS_ENV=test', out: File::NULL)
       end
 
       def generate_migrations
-        system("bundle exec rails railway_ipc:generate:migrations RAILS_ENV=test", out: File::NULL)
+        system('bundle exec rails railway_ipc:generate:migrations RAILS_ENV=test', out: File::NULL)
       end
 
       def remove_migration_files
@@ -73,7 +73,7 @@ module RailwayIpc
       end
 
       def migration_timestamp(seconds = 0)
-        (Time.now + seconds).utc.strftime("%Y%m%d%H%M%S") % "%.14d"
+        (Time.now + seconds).utc.strftime('%Y%m%d%H%M%S') % '%.14d'
       end
     end
   end

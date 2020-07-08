@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "./test_document_pb.rb"
+require_relative './test_document_pb.rb'
 module RailwayIpc
   class TimeoutResponder < RailwayIpc::Responder
     respond do |message|
