@@ -1,3 +1,9 @@
+AllCops:
+    Exclude:
+        - 'bin/*'
+        - 'spec/support/rails_app/**/*'
+        - '**/*_pb.rb'
+
 Layout/SpaceAroundEqualsInParameterDefault:
     EnforcedStyle: no_space
 
