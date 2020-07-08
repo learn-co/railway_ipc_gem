@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class Railtie < Rails::Railtie
     railtie_name :railway_ipc

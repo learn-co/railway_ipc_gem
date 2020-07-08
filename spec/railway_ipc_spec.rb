@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc do
   it "has a version number" do
     expect(RailwayIpc::VERSION).not_to be nil

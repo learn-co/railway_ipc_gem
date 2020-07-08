@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "railway_ipc/rpc/client/client_response_handlers"
 require "railway_ipc/rpc/concerns/publish_location_configurable"
 require "railway_ipc/rpc/concerns/error_adapter_configurable"

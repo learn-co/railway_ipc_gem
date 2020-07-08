@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc::Publisher do
   let(:publisher) { RailwayIpc::TestPublisher.instance }
   let(:message)   { RailwayIpc::Messages::TestMessage.new(

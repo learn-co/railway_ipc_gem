@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc::Rabbitmq::Adapter do
 
   let(:connection) do

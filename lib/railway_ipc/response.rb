@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class Response
     attr_reader :body, :success

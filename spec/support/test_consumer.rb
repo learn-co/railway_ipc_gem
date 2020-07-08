@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./test_message_pb.rb"
 require_relative "./test_handler.rb"
 module RailwayIpc

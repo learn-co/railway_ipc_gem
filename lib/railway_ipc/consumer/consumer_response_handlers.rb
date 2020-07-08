@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'railway_ipc/handler_store'
 module RailwayIpc
   class ConsumerResponseHandlers

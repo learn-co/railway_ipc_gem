@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc::Consumer, '.listen_to' do
   it "specifies the queue and exchange" do
     expect(RailwayIpc::TestConsumer).to receive(:from_queue).with('test_queue', {

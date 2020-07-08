@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./test_request_pb.rb"
 require_relative "./unhandled_request_pb.rb"
 require_relative "./test_document_pb.rb"

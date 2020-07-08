@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class RailsTestDB
     GEM_PATH = Gem.loaded_specs['railway-ipc'].full_gem_path

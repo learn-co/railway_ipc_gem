@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class ConsumedMessage < ActiveRecord::Base
     STATUS_SUCCESS = 'success'

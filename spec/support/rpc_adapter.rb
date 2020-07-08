@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./error_message_pb.rb"
 module RailwayIpc
   class RpcAdapter

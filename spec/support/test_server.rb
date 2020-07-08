@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./test_request_pb.rb"
 require_relative "./test_responder.rb"
 require_relative "./rpc_adapter.rb"

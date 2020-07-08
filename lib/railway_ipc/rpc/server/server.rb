@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'railway_ipc/rpc/server/server_response_handlers'
 require 'railway_ipc/rpc/concerns/error_adapter_configurable'
 require 'railway_ipc/rpc/concerns/message_observation_configurable'

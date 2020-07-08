@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc::HandlerStore do
   it "registeres handlers" do
     store = RailwayIpc::HandlerStore.new

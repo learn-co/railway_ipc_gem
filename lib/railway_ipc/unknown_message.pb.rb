@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'google/protobuf'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do

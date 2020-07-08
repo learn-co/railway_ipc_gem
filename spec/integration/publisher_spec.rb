@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./i_spec.rb"
 
 RSpec.describe "Publishing a message" do

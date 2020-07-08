@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc::Client do
   let(:rabbit_adapter) do
     double = class_double(RailwayIpc::Rabbitmq::Adapter)

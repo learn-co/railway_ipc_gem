@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc::Server do
   describe "#work" do
     let(:exchange)   { double('exchange') }

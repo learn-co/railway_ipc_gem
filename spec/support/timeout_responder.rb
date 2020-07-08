@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "./test_document_pb.rb"
 module RailwayIpc
   class TimeoutResponder < RailwayIpc::Responder

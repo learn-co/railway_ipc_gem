@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   class IncomingMessage
     attr_reader :type, :payload, :parsed_payload, :errors

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   module SpecHelpers
     DEAD_BEEF_UUID = 'deadbeef-dead-dead-dead-deaddeafbeef'

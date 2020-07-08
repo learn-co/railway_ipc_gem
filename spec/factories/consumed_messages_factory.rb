@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :consumed_message, class: RailwayIpc::ConsumedMessage do
     uuid { SecureRandom.uuid }

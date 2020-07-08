@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RailwayIpc::Handler do
   let(:handler) { RailwayIpc::TestHandler.new }
   let(:message) { RailwayIpc::Messages::TestMessage.new }

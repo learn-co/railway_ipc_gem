@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddRailwayIpcPublishedMessages < ActiveRecord::Migration
   def change
     create_table :railway_ipc_published_messages, id: false do | t |

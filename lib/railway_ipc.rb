@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'railway_ipc/version'
 require 'sneakers'
 require 'bunny'
