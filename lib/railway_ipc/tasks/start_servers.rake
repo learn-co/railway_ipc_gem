@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :railway_ipc do
   namespace :servers do
     task :start do
