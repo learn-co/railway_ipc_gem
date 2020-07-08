@@ -20,10 +20,13 @@ Metrics/MethodLength:
     Max: 15
 
 Metrics/LineLength:
-    Max: 90
+    Max: 200
 
 Style/BlockDelimiters:
     EnforcedStyle: braces_for_chaining
+
+Style/Documentation:
+    Exclude: ['**/*']
 
 Style/YodaCondition:
     EnforcedStyle: require_for_equality_operators_only
