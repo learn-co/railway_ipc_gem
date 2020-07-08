@@ -30,5 +30,8 @@ Style/BlockDelimiters:
 Style/Documentation:
     Exclude: ['**/*']
 
+Style/RaiseArgs:
+    EnforcedStyle: compact
+
 Style/YodaCondition:
     EnforcedStyle: require_for_equality_operators_only
