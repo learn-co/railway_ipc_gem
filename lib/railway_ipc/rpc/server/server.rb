@@ -8,8 +8,16 @@ module RailwayIpc
     extend RailwayIpc::RPC::MessageObservationConfigurable
     attr_reader :message, :responder
 
+    def self.inherited(base)
+      base.instance_eval do
+        def responders
+          @responders ||= RailwayIpc::HandlerStore.new
+        end
+      end
+      
+    end
     def self.respond_to(message_type, with:)
-      RailwayIpc::RPC::ServerResponseHandlers.instance.register(handler: with, message: message_type)
+      responders.register(message: message_type, handler: with)
     end
 
     def initialize(opts = {automatic_recovery: true}, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
@@ -33,8 +41,8 @@ module RailwayIpc
       decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
       case decoded_payload.type
       when *registered_handlers
-        responder = get_responder(decoded_payload)
-        @message = get_message_class(decoded_payload).decode(decoded_payload.message)
+        responder = get_responder(decoded_payload.type)
+        @message = get_message_class(decoded_payload.type).decode(decoded_payload.message)
         responder.respond(message)
       else
         @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
@@ -63,21 +71,21 @@ module RailwayIpc
       end
     end
 
-    private
-
-    attr_reader :rabbit_connection
-
-    def get_message_class(decoded_payload)
-      RailwayIpc::RPC::ServerResponseHandlers.instance.get(decoded_payload.type).message
+    def get_message_class(type)
+      self.class.responders.get(type).message
     end
 
-    def get_responder(decoded_payload)
-      RailwayIpc::RPC::ServerResponseHandlers.instance.get(decoded_payload.type).handler.new
+    def get_responder(type)
+      self.class.responders.get(type).handler.new
     end
 
     def registered_handlers
-      RailwayIpc::RPC::ServerResponseHandlers.instance.registered
+      self.class.responders.registered
     end
+
+    private
+
+    attr_reader :rabbit_connection
 
     def subscribe_to_queue
       rabbit_connection.subscribe do |_delivery_info, _metadata, payload|

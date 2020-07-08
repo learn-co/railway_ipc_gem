@@ -13,9 +13,12 @@ end
 
 RSpec.describe RailwayIpc::Consumer, '.handle' do
   it "registers the handler for the message" do
-    RailwayIpc::Consumer.handle(RailwayIpc::Messages::TestMessage, with: RailwayIpc::TestHandler)
-    expect(RailwayIpc::ConsumerResponseHandlers.instance.registered).to \
-      include('RailwayIpc::Messages::TestMessage')
+    consumer = RailwayIpc::TestConsumer.new
+    expect(consumer.get_handler('RailwayIpc::Messages::TestMessage')).to \
+      be_an_instance_of(RailwayIpc::TestHandler)
+    second_consumer = RailwayIpc::SecondTestConsumer.new
+    expect(second_consumer.get_handler('RailwayIpc::Messages::TestMessage')).to \
+      be_an_instance_of(RailwayIpc::SecondTestHandler)
   end
 end
 

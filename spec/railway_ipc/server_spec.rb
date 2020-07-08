@@ -27,5 +27,23 @@ RSpec.describe RailwayIpc::Server do
         expect(response).to be_a(LearnIpc::Documents::TestDocument)
       end
     end
+
+  end
+end
+RSpec.describe RailwayIpc::Server, 'registering responders' do
+  it 'scopes responders by server' do
+    server = RailwayIpc::TestServer.new
+    expect(server.get_responder('LearnIpc::Requests::TestRequest')).to \
+    be_an_instance_of(RailwayIpc::TestResponder)
+
+    server = RailwayIpc::SecondTestServer.new
+    expect(server.get_responder('LearnIpc::Requests::TestRequest')).to \
+    be_an_instance_of(RailwayIpc::SecondTestResponder)
+  end
+
+  it 'returns the message class' do
+    server = RailwayIpc::TestServer.new
+    expect(server.get_message_class('LearnIpc::Requests::TestRequest')).to \
+    eq(LearnIpc::Requests::TestRequest)
   end
 end

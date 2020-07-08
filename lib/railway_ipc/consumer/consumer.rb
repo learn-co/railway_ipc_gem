@@ -4,6 +4,13 @@ module RailwayIpc
   class Consumer
     include Sneakers::Worker
 
+    def self.inherited(base)
+      base.instance_eval do
+        def handlers
+          @handlers ||= RailwayIpc::HandlerStore.new
+        end
+      end
+    end
     def self.listen_to(queue:, exchange:)
       from_queue queue,
                  exchange: exchange,
@@ -13,11 +20,15 @@ module RailwayIpc
     end
 
     def self.handle(message_type, with:)
-      ConsumerResponseHandlers.instance.register(message: message_type, handler: with)
+      handlers.register(message: message_type, handler: with)
+    end
+
+    def handlers
+      self.class.handlers
     end
 
     def registered_handlers
-      ConsumerResponseHandlers.instance.registered
+      handlers.registered
     end
 
     def queue_name
@@ -43,7 +54,7 @@ module RailwayIpc
     end
 
     def get_handler(type)
-      manifest = ConsumerResponseHandlers.instance.get(type)
+      manifest = handlers.get(type)
       manifest ? manifest.handler.new : nil
     end
   end
