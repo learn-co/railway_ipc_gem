@@ -15,13 +15,4 @@ RSpec.describe RailwayIpc::Rabbitmq::Payload do
       end.to raise_exception(RailwayIpc::InvalidProtobuf)
     end
   end
-
-  describe '.decode' do
-    it 'decodes the message' do
-      payload = RailwayIpc::Rabbitmq::Payload.encode(message)
-      decoded = RailwayIpc::Rabbitmq::Payload.decode(payload)
-      expect(decoded.type).to eq('RailwayIpc::Messages::TestMessage')
-      expect(decoded.message).to eq("\n\x041234")
-    end
-  end
 end

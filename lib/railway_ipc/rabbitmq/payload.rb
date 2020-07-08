@@ -13,13 +13,6 @@ module RailwayIpc
         new(type, message).to_json
       end
 
-      def self.decode(message)
-        message = JSON.parse(message)
-        type = message["type"]
-        message = Base64.decode64(message["encoded_message"])
-        new(type, message)
-      end
-
       def initialize(type, message)
         @type = type
         @message = message
