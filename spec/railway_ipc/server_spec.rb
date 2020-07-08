@@ -15,7 +15,7 @@ RSpec.describe RailwayIpc::Server do
         @payload = RailwayIpc::Rabbitmq::Payload.encode(message)
       end
       it 'raises an error' do
-        expect{@server.work(@payload)}.to raise_error(RailwayIpc::UnhandledMessageError)
+        expect {@server.work(@payload)}.to raise_error(RailwayIpc::UnhandledMessageError)
       end
     end
 
