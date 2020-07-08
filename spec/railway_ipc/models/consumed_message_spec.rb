@@ -10,12 +10,12 @@ RSpec.describe RailwayIpc::ConsumedMessage, type: :model do
     it do
       should validate_inclusion_of(:status)
         .in_array([
-          'success',
+                    'success',
           'processing',
           'ignored',
           'unknown_message_type',
           'failed_to_process'
-      ])
+                  ])
     end
   end
 

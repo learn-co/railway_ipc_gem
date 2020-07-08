@@ -9,7 +9,6 @@ require 'factory_bot'
 
 ENV['RAILWAY_RABBITMQ_CONNECTION_URL'] = 'amqp://guest:guest@localhost:5672'
 
-
 Dir[File.dirname(__FILE__) + '/support/**/*.rb'].each do |file|
   next if file.include?('support/rails_app')
 
@@ -25,7 +24,6 @@ Shoulda::Matchers.configure do |config|
 end
 
 RSpec.configure do |config|
-
   # Setup Test DB to use with support Rails app
   config.before(:suite) do
     FactoryBot.find_definitions
@@ -43,7 +41,6 @@ RSpec.configure do |config|
   config.after(:each) do
     DatabaseCleaner.clean
   end
-
 
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = '.rspec_status'

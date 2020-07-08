@@ -18,8 +18,8 @@ RSpec.describe RailwayIpc::IncomingMessage, 'initialization' do
       expect {
         incoming_message = described_class.new('invalid-json')
       }.to raise_error(RailwayIpc::IncomingMessage::ParserError)
+    end
   end
-end
 end
 
 RSpec.describe RailwayIpc::IncomingMessage, '#decoded' do

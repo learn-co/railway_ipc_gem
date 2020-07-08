@@ -6,7 +6,8 @@ module RailwayIpc
     def self.error_message(error, message)
       data = LearnIpc::ErrorMessage::Data.new(
         error: error.class.to_s,
-        error_message: error.message)
+        error_message: error.message
+      )
 
       LearnIpc::ErrorMessage.new(
         correlation_id: message.correlation_id,

@@ -10,7 +10,6 @@ RSpec.describe RailwayIpc::Consumer, '.listen_to' do
                                                                   })
     RailwayIpc::TestConsumer.listen_to(queue: 'test_queue', exchange: 'test_exchange')
   end
-
 end
 
 RSpec.describe RailwayIpc::Consumer, '.handle' do

@@ -86,6 +86,5 @@ module RailwayIpc
         handle_request(payload)
       end
     end
-
   end
 end

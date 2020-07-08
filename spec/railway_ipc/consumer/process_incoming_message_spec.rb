@@ -97,7 +97,7 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
         process = described_class.new(consumer, incoming_message)
         expect {
           process.call
-        }.not_to change {RailwayIpc::ConsumedMessage.count}
+        }.not_to change { RailwayIpc::ConsumedMessage.count }
         expect(fake_handler.called?).to eq(false)
       end
     end
@@ -124,7 +124,7 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
   context 'when the message is for a unknown protobuf' do
     it 'saves the consumed message with a status of `unknown`' do
       consumer = instance_double(
-        RailwayIpc::Consumer ,
+        RailwayIpc::Consumer,
         queue_name: 'my-queue',
         exchange_name: 'my-exchange',
         get_handler: fake_handler
@@ -145,7 +145,7 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
 
     it 'logs an warning' do
       consumer = instance_double(
-        RailwayIpc::Consumer ,
+        RailwayIpc::Consumer,
         queue_name: 'my-queue',
         exchange_name: 'my-exchange',
         get_handler: fake_handler

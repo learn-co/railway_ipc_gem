@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe RailwayIpc::Rabbitmq::Adapter do
-
   let(:connection) do
     RailwayIpc::Rabbitmq::Adapter.new(queue_name: 'test_queue', exchange_name: 'test_exchange')
   end

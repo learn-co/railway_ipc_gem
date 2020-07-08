@@ -100,6 +100,7 @@ module RailwayIpc
 
     def decode_for_error(e, payload)
       return e.message unless payload
+
       self.class.rpc_error_adapter_class.error_message(payload, self.request_message)
     end
   end

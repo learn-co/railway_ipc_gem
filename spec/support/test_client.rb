@@ -18,21 +18,24 @@ module RailwayIpc
     def self.request_documents(user_uuid)
       message = LearnIpc::Requests::TestRequest.new(
         user_uuid: user_uuid,
-        correlation_id: '56789')
+        correlation_id: '56789'
+      )
       request(message)
     end
 
     def self.unhandled_message(user_uuid)
       message = LearnIpc::Requests::UnhandledRequest.new(
         user_uuid: user_uuid,
-        correlation_id: '56789')
+        correlation_id: '56789'
+      )
       request(message)
     end
 
     def self.timeout_message(user_uuid)
       message = LearnIpc::Requests::TimeoutRequest.new(
         user_uuid: user_uuid,
-        correlation_id: '56789')
+        correlation_id: '56789'
+      )
       new(message).request(ONE_SECOND)
     end
   end

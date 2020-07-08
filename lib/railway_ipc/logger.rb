@@ -2,7 +2,6 @@
 
 module RailwayIpc
   class Logger
-
     attr_reader :logger
 
     def initialize(logger)

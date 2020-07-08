@@ -9,9 +9,9 @@ RSpec.describe 'Publishing a message' do
 
   # TODO: add testing once Sneakers GEM is updated
   xit 'persists the requested document' do
-    user_uuid =  SecureRandom.uuid
-    correlation_id =  SecureRandom.uuid
-    uuid =  SecureRandom.uuid
+    user_uuid = SecureRandom.uuid
+    correlation_id = SecureRandom.uuid
+    uuid = SecureRandom.uuid
     message.user_uuid = user_uuid
     message.correlation_id = correlation_id
     message.uuid = uuid

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rails/all'
 require 'rspec/rails'
 require 'support/rails_app/config/environment'

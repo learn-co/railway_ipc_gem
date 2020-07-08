@@ -3,7 +3,7 @@
 require 'bundler/setup'
 require 'railway_ipc'
 
-Dir[File.dirname(__FILE__) + '/support/**/*.rb'].each {|f| require f }
+Dir[File.dirname(__FILE__) + '/support/**/*.rb'].each { |f| require f }
 
 logger = Logger.new(STDOUT)
 logger.level = :fatal

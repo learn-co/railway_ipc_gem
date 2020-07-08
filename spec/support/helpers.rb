@@ -56,6 +56,5 @@ module RailwayIpc
         !handled_message.nil?
       end
     end
-
   end
 end
