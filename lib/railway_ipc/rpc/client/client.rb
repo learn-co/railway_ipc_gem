@@ -62,7 +62,7 @@ module RailwayIpc
         self.response_message = process_payload(payload)
       end
     rescue RailwayIpc::Rabbitmq::Adapter::TimeoutError
-      error = self.class.rpc_error_adapter_class.error_message(TimeoutError.new, self.request_message)
+      error = class.rpc_error_adapter_class.error_message(TimeoutError.new, self.request_message)
       self.response_message = RailwayIpc::Response.new(error, success: false)
     rescue StandardError
       self.response_message = RailwayIpc::Response.new(message, success: false)
@@ -101,7 +101,7 @@ module RailwayIpc
     def decode_for_error(e, payload)
       return e.message unless payload
 
-      self.class.rpc_error_adapter_class.error_message(payload, self.request_message)
+      class.rpc_error_adapter_class.error_message(payload, self.request_message)
     end
   end
 end

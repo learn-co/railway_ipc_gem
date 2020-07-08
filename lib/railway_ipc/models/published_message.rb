@@ -9,6 +9,7 @@ module RailwayIpc
 
     def self.store_message(exchange_name, message)
       encoded_message = RailwayIpc::Rabbitmq::Payload.encode(message)
+      # rubocop:disable Style/RedundantSelf
       self.create(
         uuid: message.uuid,
         message_type: message.class.to_s,
@@ -18,6 +19,7 @@ module RailwayIpc
         status: 'sent',
         exchange: exchange_name
       )
+      # rubocop:enable Style/RedundantSelf
     end
 
     private

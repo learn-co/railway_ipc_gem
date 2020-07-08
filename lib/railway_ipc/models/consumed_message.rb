@@ -24,6 +24,7 @@ module RailwayIpc
     validates :status, inclusion: { in: VALID_STATUSES }
 
     def self.create_processing(consumer, incoming_message)
+      # rubocop:disable Style/RedundantSelf
       self.create!(
         uuid: incoming_message.uuid,
         status: STATUS_PROCESSING,
@@ -34,6 +35,7 @@ module RailwayIpc
         exchange: consumer.exchange_name,
         encoded_message: incoming_message.payload
       )
+      # rubocop:enable Style/RedundantSelf
     end
 
     def update_with_lock(job)
@@ -45,7 +47,9 @@ module RailwayIpc
     end
 
     def processed?
+      # rubocop:disable Style/RedundantSelf
       self.status == STATUS_SUCCESS
+      # rubocop:enable Style/RedundantSelf
     end
 
     private
