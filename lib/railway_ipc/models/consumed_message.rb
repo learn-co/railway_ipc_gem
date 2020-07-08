@@ -14,7 +14,7 @@ module RailwayIpc
       STATUS_IGNORED,
       STATUS_UNKNOWN_MESSAGE_TYPE,
       STATUS_FAILED_TO_PROCESS
-    ]
+    ].freeze
 
     attr_reader :decoded_message
     self.table_name = 'railway_ipc_consumed_messages'
