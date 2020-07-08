@@ -1,5 +1,7 @@
 AllCops:
     Exclude:
+        - 'Gemfile'
+        - 'Rakefile'
         - 'bin/*'
         - 'spec/support/rails_app/**/*'
         - '**/*_pb.rb'
