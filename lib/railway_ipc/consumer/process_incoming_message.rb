@@ -94,7 +94,7 @@ module RailwayIpc
     def classify_message
       if incoming_message.decoded.is_a?(RailwayIpc::Messages::Unknown)
         UnknownMessageJob.new(incoming_message, logger)
-      elsif handler = consumer.get_handler(incoming_message.type)
+      elsif (handler = consumer.get_handler(incoming_message.type))
         NormalMessageJob.new(incoming_message, handler)
       else
         IgnoredMessageJob.new(incoming_message, logger)
