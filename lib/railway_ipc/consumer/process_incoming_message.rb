@@ -90,6 +90,7 @@ module RailwayIpc
         RailwayIpc::ConsumedMessage.create_processing(consumer, incoming_message)
     end
 
+    # rubocop:disable Metrics/AbcSize
     def classify_message
       if incoming_message.decoded.is_a?(RailwayIpc::Messages::Unknown)
         UnknownMessageJob.new(incoming_message, logger)
@@ -99,5 +100,6 @@ module RailwayIpc
         IgnoredMessageJob.new(incoming_message, logger)
       end
     end
+    # rubocop:enable Metrics/AbcSize
   end
 end

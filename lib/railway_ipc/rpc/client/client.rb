@@ -37,6 +37,7 @@ module RailwayIpc
       RailwayIpc::RPC::ClientResponseHandlers.instance.registered
     end
 
+    # rubocop:disable Metrics/AbcSize
     def process_payload(response)
       decoded_payload = decode_payload(response)
       case decoded_payload.type
@@ -49,6 +50,7 @@ module RailwayIpc
         raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     def setup_rabbit_connection
       rabbit_connection
