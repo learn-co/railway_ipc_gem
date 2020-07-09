@@ -3,8 +3,7 @@
 module RailwayIpc
   module Rabbitmq
     class Adapter
-      class TimeoutError < StandardError;
-      end
+      class TimeoutError < StandardError; end
       extend Forwardable
       attr_reader :connection, :exchange, :exchange_name, :queue, :queue_name, :channel
       def_delegators :connection,
