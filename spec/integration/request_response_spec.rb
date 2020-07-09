@@ -18,14 +18,14 @@ RSpec.describe 'Request Response Cycle' do
   context 'when the server receives and unhandled message' do
     it 'returns the unhandled message error message' do
       response = RailwayIpc::TestClient.unhandled_message('1234')
-      response.body.is_a?(LearnIpc::ErrorMessage) && response.body.data.error == 'RailwayIpc::UnhandledMessageError'
+      response.body.is_a?(LearnIpc::ErrorMessage) && 'RailwayIpc::UnhandledMessageError' == response.body.data.error
     end
   end
 
   context 'when the server times out' do
     it 'returns the timeout error message' do
       response = RailwayIpc::TestClient.timeout_message('1234')
-      response.body.is_a?(LearnIpc::ErrorMessage) && response.body.data.error == 'RailwayIpc::Client::TimeoutError'
+      response.body.is_a?(LearnIpc::ErrorMessage) && 'RailwayIpc::Client::TimeoutError' == response.body.data.error
     end
   end
 end
