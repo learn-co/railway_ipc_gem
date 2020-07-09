@@ -116,7 +116,7 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
         consumed_message = RailwayIpc::ConsumedMessage.find_by(uuid: incoming_message.uuid)
         expect(consumed_message.status).to eq('ignored')
         expect(fake_logger.messages[:warn].first).to \
-          include(%q(Ignoring message, no registered handler for 'RailwayIpc::Messages::TestMessage'))
+          include("Ignoring message, no registered handler for 'RailwayIpc::Messages::TestMessage'")
       end
     end
   end

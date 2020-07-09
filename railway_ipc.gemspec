@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ''
   spec.email = ''
 
-  spec.summary = %q(IPC components for Rails)
-  spec.description = %q(IPC components for Rails)
+  spec.summary = 'IPC components for Rails'
+  spec.description = 'IPC components for Rails'
   spec.homepage = 'http://learn.co'
   spec.license = 'MIT'
 
