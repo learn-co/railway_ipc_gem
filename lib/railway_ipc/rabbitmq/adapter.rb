@@ -6,6 +6,7 @@ module RailwayIpc
       class TimeoutError < StandardError; end
       extend Forwardable
       attr_reader :connection, :exchange, :exchange_name, :queue, :queue_name, :channel
+
       def_delegators :connection,
                      :automatically_recover?,
                      :connected?,

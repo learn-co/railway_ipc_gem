@@ -4,6 +4,7 @@ require 'railway_ipc/handler_manifest'
 module RailwayIpc
   class HandlerStore
     attr_reader :handler_map
+
     def initialize
       @handler_map = {}
     end

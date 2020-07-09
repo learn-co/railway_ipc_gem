@@ -9,6 +9,7 @@ module RailwayIpc
   class Client
     attr_accessor :response_message, :request_message
     attr_reader :rabbit_connection, :message
+
     extend RailwayIpc::RPC::PublishLocationConfigurable
     extend RailwayIpc::RPC::ErrorAdapterConfigurable
 
