@@ -27,7 +27,7 @@ RSpec.describe RailwayIpc::Publisher do
     message_with_uuid.uuid = uuid
 
     allow(SecureRandom).to receive(:uuid).and_return(uuid)
-    allow_any_instance_of(Sneakers::Publisher).to receive(:publish).with(anything())
+    allow_any_instance_of(Sneakers::Publisher).to receive(:publish).with(anything)
     expect(RailwayIpc::Rabbitmq::Payload).to receive(:encode).at_least(1).times.with(message_with_uuid).and_call_original
     publisher.publish(message)
   end
@@ -40,7 +40,7 @@ RSpec.describe RailwayIpc::Publisher do
     message_with_correlation_id.correlation_id = correlation_id
 
     allow(SecureRandom).to receive(:uuid).and_return(correlation_id)
-    allow_any_instance_of(Sneakers::Publisher).to receive(:publish).with(anything())
+    allow_any_instance_of(Sneakers::Publisher).to receive(:publish).with(anything)
     expect(RailwayIpc::Rabbitmq::Payload).to receive(:encode).at_least(1).times.with(message_with_correlation_id).and_call_original
     publisher.publish(message)
   end
