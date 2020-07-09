@@ -21,7 +21,7 @@ Metrics/ClassLength:
 Metrics/MethodLength:
     Max: 15
 
-Metrics/LineLength:
+Layout/LineLength:
     Max: 200
 
 Style/BlockDelimiters:
@@ -35,3 +35,45 @@ Style/RaiseArgs:
 
 Style/YodaCondition:
     EnforcedStyle: require_for_equality_operators_only
+
+Layout/EmptyLinesAroundAttributeAccessor:
+    Enabled: True
+
+Layout/SpaceAroundMethodCallOperator:
+    Enabled: True
+
+Lint/DeprecatedOpenSSLConstant:
+    Enabled: True
+
+Lint/MixedRegexpCaptureTypes:
+    Enabled: True
+
+Lint/RaiseException:
+    Enabled: True
+
+Lint/StructNewOverride:
+    Enabled: True
+
+Style/ExponentialNotation:
+    Enabled: True
+
+Style/HashEachMethods:
+    Enabled: True
+
+Style/HashTransformKeys:
+    Enabled: True
+
+Style/HashTransformValues:
+    Enabled: True
+
+Style/RedundantFetchBlock:
+    Enabled: True
+
+Style/RedundantRegexpCharacterClass:
+    Enabled: True
+
+Style/RedundantRegexpEscape:
+    Enabled: True
+
+Style/SlicingWithRange:
+    Enabled: True
