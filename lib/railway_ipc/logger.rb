@@ -24,8 +24,8 @@ module RailwayIpc
       logger.error("[#{message_header(message)}] #{statement}")
     end
 
-    def log_exception(e)
-      logger.error(e)
+    def log_exception(exception)
+      logger.error(exception)
     end
 
     def message_header(message)

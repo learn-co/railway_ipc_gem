@@ -74,12 +74,12 @@ module RailwayIpc
 
     private
 
-    def log_exception(e, payload)
+    def log_exception(exception, payload)
       RailwayIpc.logger.log_exception(
         feature: 'railway_consumer',
-        error: e.class,
-        error_message: e.message,
-        payload: decode_for_error(e, payload),
+        error: exception.class,
+        error_message: exception.message,
+        payload: decode_for_error(exception, payload),
       )
     end
 
@@ -100,8 +100,8 @@ module RailwayIpc
       rabbit_connection.publish(RailwayIpc::Rabbitmq::Payload.encode(request_message), routing_key: '')
     end
 
-    def decode_for_error(e, payload)
-      return e.message unless payload
+    def decode_for_error(exception, payload)
+      return exception.message unless payload
 
       # rubocop:disable Style/RedundantSelf
       self.class.rpc_error_adapter_class.error_message(payload, self.request_message)
