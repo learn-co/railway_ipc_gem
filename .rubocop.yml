@@ -5,6 +5,7 @@ AllCops:
         - 'bin/*'
         - 'spec/support/rails_app/**/*'
         - '**/*_pb.rb'
+        - 'vendor/bundle/**/*'
 
 Layout/SpaceAroundEqualsInParameterDefault:
     EnforcedStyle: no_space
