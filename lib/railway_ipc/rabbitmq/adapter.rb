@@ -70,7 +70,7 @@ module RailwayIpc
       end
 
       def create_exchange(strategy: :fanout, options: { durable: true })
-        @exchange = Bunny::Exchange.new(connection.channel, :fanout, exchange_name, options)
+        @exchange = Bunny::Exchange.new(connection.channel, strategy, exchange_name, options)
         self
       end
 
