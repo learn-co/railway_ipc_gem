@@ -16,7 +16,7 @@ RSpec.describe RailwayIpc::IncomingMessage, 'initialization' do
   context 'when the message is invalid JSON' do
     it 'raises an error?' do
       expect {
-        incoming_message = described_class.new('invalid-json')
+        described_class.new('invalid-json')
       }.to raise_error(RailwayIpc::IncomingMessage::ParserError)
     end
   end
