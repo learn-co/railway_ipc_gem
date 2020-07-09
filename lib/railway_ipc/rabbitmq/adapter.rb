@@ -33,7 +33,9 @@ module RailwayIpc
       end
 
       def publish(message, options={})
+        # rubocop:disable Style/SafeNavigation
         exchange.publish(message, options) if exchange
+        # rubocop:enable Style/SafeNavigation
       end
 
       def reply(message, from)
@@ -74,7 +76,9 @@ module RailwayIpc
       end
 
       def delete_exchange
+        # rubocop:disable Style/SafeNavigation
         exchange.delete if exchange
+        # rubocop:enable Style/SafeNavigation
         self
       end
 
@@ -89,7 +93,9 @@ module RailwayIpc
       end
 
       def delete_queue
+        # rubocop:disable Style/SafeNavigation
         queue.delete if queue
+        # rubocop:enable Style/SafeNavigation
         self
       end
     end
