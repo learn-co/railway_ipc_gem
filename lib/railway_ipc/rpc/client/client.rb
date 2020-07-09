@@ -81,7 +81,7 @@ module RailwayIpc
         feature: 'railway_consumer',
         error: exception.class,
         error_message: exception.message,
-        payload: decode_for_error(exception, payload),
+        payload: decode_for_error(exception, payload)
       )
     end
 
