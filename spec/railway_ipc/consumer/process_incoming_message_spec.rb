@@ -97,7 +97,7 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
         process = described_class.new(consumer, incoming_message)
         expect {
           process.call
-        }.not_to change { RailwayIpc::ConsumedMessage.count }
+        }.not_to(change { RailwayIpc::ConsumedMessage.count })
         expect(fake_handler.called?).to eq(false)
       end
     end
