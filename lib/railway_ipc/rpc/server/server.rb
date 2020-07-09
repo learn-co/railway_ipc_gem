@@ -32,6 +32,7 @@ module RailwayIpc
     end
 
     # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
     def work(payload)
       decoded_payload = RailwayIpc::Rabbitmq::Payload.decode(payload)
       case decoded_payload.type
@@ -53,6 +54,7 @@ module RailwayIpc
       raise e
     end
     # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/MethodLength
 
     # rubocop:disable Metrics/AbcSize
     def handle_request(payload)
