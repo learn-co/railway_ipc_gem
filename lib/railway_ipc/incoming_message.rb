@@ -28,7 +28,7 @@ module RailwayIpc
     def valid?
       errors[:uuid] = 'uuid is required' unless uuid.present?
       errors[:correlation_id] = 'correlation_id is required' unless correlation_id.present?
-      !errors.any?
+      errors.none?
     end
 
     def decoded
