@@ -38,19 +38,15 @@ module RailwayIpc
     def ensure_message_uuid(message)
       if message.uuid.blank?
         message.uuid = SecureRandom.uuid
-        message
-      else
-        message
       end
+      message
     end
 
     def ensure_correlation_id(message)
       if message.correlation_id.blank?
         message.correlation_id = SecureRandom.uuid
-        message
-      else
-        message
       end
+      message
     end
   end
 end
