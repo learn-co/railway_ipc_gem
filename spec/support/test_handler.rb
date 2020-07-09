@@ -3,7 +3,7 @@
 require 'ostruct'
 module RailwayIpc
   class TestHandler < RailwayIpc::Handler
-    handle do |message|
+    handle do |_message|
       OpenStruct.new({ success?: true })
     end
   end
