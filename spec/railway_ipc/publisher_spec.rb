@@ -2,12 +2,12 @@
 
 RSpec.describe RailwayIpc::Publisher do
   let(:publisher) { RailwayIpc::TestPublisher.instance }
-  let(:message)   {
+  let(:message)   do
     RailwayIpc::Messages::TestMessage.new(
       uuid: SecureRandom.uuid,
       correlation_id: SecureRandom.uuid
     )
-  }
+  end
   let(:encoded_message) { Base64.encode64(RailwayIpc::Messages::TestMessage.encode(message)) }
 
   it 'knows its exchange' do

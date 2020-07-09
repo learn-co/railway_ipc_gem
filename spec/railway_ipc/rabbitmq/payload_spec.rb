@@ -10,9 +10,9 @@ RSpec.describe RailwayIpc::Rabbitmq::Payload do
     end
 
     it 'raises an execption if it failes to encode message' do
-      expect do
+      expect {
         RailwayIpc::Rabbitmq::Payload.encode('something bogus')
-      end.to raise_exception(RailwayIpc::InvalidProtobuf)
+      }.to raise_exception(RailwayIpc::InvalidProtobuf)
     end
   end
 
