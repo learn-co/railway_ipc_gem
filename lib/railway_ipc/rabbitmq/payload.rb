@@ -27,12 +27,14 @@ module RailwayIpc
         @message = message
       end
 
+      # rubocop:disable Lint/ToJSON
       def to_json
         {
           type: type,
           encoded_message: message
         }.to_json
       end
+      # rubocop:enable Lint/ToJSON
     end
   end
 end
