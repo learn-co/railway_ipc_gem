@@ -6,8 +6,8 @@ module RailwayIpc
       @block = block
     end
 
-    def self.block
-      @block
+    class << self
+      attr_reader :block
     end
 
     def respond(request)
