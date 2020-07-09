@@ -33,7 +33,7 @@ module RailwayIpc
 
       def set_correct_migration_version
         rails_version = `rails version`.scan(/Rails\s(\d+\.\d+)\..*/).flatten.first
-        system(%Q(
+        system(%(
           grep -rl "ActiveRecord::Migration$" db | \
           xargs -I % sh -c 'sed -i "s/ActiveRecord::Migration/ActiveRecord::Migration[#{rails_version}]/g" %'
         ), out: File::NULL)
