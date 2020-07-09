@@ -41,7 +41,7 @@ module RailwayIpc
         responder.respond(message)
       else
         @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
-        raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
+        raise RailwayIpc::UnhandledMessageError.new("#{self.class} does not know how to handle #{decoded_payload.type}")
       end
     rescue StandardError => e
       RailwayIpc.logger.log_exception(

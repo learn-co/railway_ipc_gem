@@ -47,7 +47,7 @@ module RailwayIpc
         RailwayIpc::Response.new(message, success: true)
       else
         @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
-        raise RailwayIpc::UnhandledMessageError, "#{self.class} does not know how to handle #{decoded_payload.type}"
+        raise RailwayIpc::UnhandledMessageError.new("#{self.class} does not know how to handle #{decoded_payload.type}")
       end
     end
     # rubocop:enable Metrics/AbcSize
