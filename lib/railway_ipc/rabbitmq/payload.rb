@@ -9,6 +9,7 @@ module RailwayIpc
         type = message.class.to_s
         begin
           message = Base64.encode64(message.class.encode(message))
+        # TODO: also need to rescue Google::Protobuf::TypeError
         rescue NoMethodError
           raise RailwayIpc::InvalidProtobuf.new("Message #{message} is not a valid protobuf")
         end
