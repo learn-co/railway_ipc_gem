@@ -26,7 +26,7 @@ end
 RSpec::Matchers.define_negated_matcher :not_change, :change
 
 RailwayIpc.configure(logger: Logger.new(IO::NULL))
-Sneakers::logger = Logger.new(IO::NULL)
+Sneakers.logger = Logger.new(IO::NULL)
 
 RSpec.configure do |config|
   # This allows you to limit a spec run to individual examples or groups
