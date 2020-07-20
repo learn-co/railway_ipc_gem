@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RailwayIpc
-  class TestPublisher < RailwayIpc::Publisher
+  class TestPublisher < RailwayIpc::SingletonPublisher
     exchange 'test:events'
   end
 end

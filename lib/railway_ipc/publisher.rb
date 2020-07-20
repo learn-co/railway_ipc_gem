@@ -3,7 +3,7 @@
 require 'singleton'
 
 module RailwayIpc
-  class Publisher < Sneakers::Publisher
+  class SingletonPublisher < Sneakers::Publisher
     include ::Singleton
 
     def self.exchange(exchange)
@@ -21,6 +21,7 @@ module RailwayIpc
     end
 
     def publish(message, published_message_store=RailwayIpc::PublishedMessage)
+      RailwayIpc.logger.logger.warn('DEPRECATED: Use new PublisherInstance class')
       ensure_message_uuid(message)
       ensure_correlation_id(message)
       RailwayIpc.logger.info(message, 'Publishing message')
@@ -48,7 +49,7 @@ module RailwayIpc
 end
 
 module RailwayIpc
-  class PublisherInstance < Sneakers::Publisher
+  class Publisher < Sneakers::Publisher
     attr_reader :exchange_name, :message_store
 
     def initialize(exchange_name:, connection: nil, message_store: RailwayIpc::PublishedMessage)

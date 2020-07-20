@@ -2,7 +2,7 @@
 
 require 'timeout'
 
-RSpec.describe RailwayIpc::Publisher do
+RSpec.describe RailwayIpc::SingletonPublisher do
   let(:publisher) { RailwayIpc::TestPublisher.instance }
   let(:message)   do
     RailwayIpc::Messages::TestMessage.new(
@@ -46,9 +46,27 @@ RSpec.describe RailwayIpc::Publisher do
     expect(RailwayIpc::Rabbitmq::Payload).to receive(:encode).at_least(1).times.with(message_with_correlation_id).and_call_original
     publisher.publish(message)
   end
+
+  context 'with alternate logger' do
+    around do |example|
+      original_logger = RailwayIpc.logger.logger
+      example.run
+      RailwayIpc.configure(logger: original_logger)
+    end
+
+    it 'warns of call to old #publish method' do
+      logger_spy = instance_double(Logger, info: nil)
+      expect(logger_spy).to \
+        receive(:warn).with('DEPRECATED: Use new PublisherInstance class')
+
+      RailwayIpc.configure(logger: logger_spy)
+      allow_any_instance_of(Sneakers::Publisher).to receive(:publish).with(anything)
+      publisher.publish(message)
+    end
+  end
 end
 
-RSpec.describe RailwayIpc::PublisherInstance, '#initialize' do
+RSpec.describe RailwayIpc::Publisher, '#initialize' do
   let(:connection) { Bunny.new }
 
   after { cleanup! }
@@ -76,7 +94,7 @@ RSpec.describe RailwayIpc::PublisherInstance, '#initialize' do
   end
 end
 
-RSpec.describe RailwayIpc::PublisherInstance, '#publish' do
+RSpec.describe RailwayIpc::Publisher, '#publish' do
   let(:connection) { Bunny.new }
   let!(:queue) do
     connection.start
