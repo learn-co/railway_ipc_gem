@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
+## [1.0.1] - 2020-07-23
+### Fixed
+* Fix publisher connection by using default connection if one isn't provided
+
 ## [1.0.0] - 2020-07-20
 ### Added
 * CircleCI build that runs the specs
