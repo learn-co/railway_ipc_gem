@@ -52,10 +52,16 @@ module RailwayIpc
   class Publisher < Sneakers::Publisher
     attr_reader :exchange_name, :message_store
 
-    def initialize(exchange_name:, connection: nil, message_store: RailwayIpc::PublishedMessage)
-      @exchange_name = exchange_name
-      @message_store = message_store
-      super(exchange: exchange_name, connection: connection, exchange_type: :fanout)
+    def initialize(opts={})
+      @exchange_name = opts.fetch(:exchange_name)
+      @message_store = opts.fetch(:message_store, RailwayIpc::PublishedMessage)
+      connection = opts.fetch(:connection, nil)
+      options = {
+        exchange: exchange_name,
+        connection: connection,
+        exchange_type: :fanout
+      }.compact
+      super(options)
     end
 
     # rubocop:disable Metrics/AbcSize

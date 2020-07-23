@@ -94,6 +94,19 @@ RSpec.describe RailwayIpc::Publisher, '#initialize' do
   end
 end
 
+RSpec.describe RailwayIpc::Publisher, 'passing options to sneakers' do
+  it 'uses default connection if one is not provided' do
+    expect_any_instance_of(Sneakers::Publisher).to \
+      receive(:initialize).with(
+        {
+          exchange: 'test-exchange',
+          exchange_type: :fanout
+        }
+      )
+    described_class.new(exchange_name: 'test-exchange')
+  end
+end
+
 RSpec.describe RailwayIpc::Publisher, '#publish' do
   let(:connection) { Bunny.new }
   let!(:queue) do
