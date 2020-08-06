@@ -16,6 +16,6 @@ class AddRailwayIpcConsumedMessages < ActiveRecord::Migration
       t.datetime :inserted_at
     end
 
-    add_index :railway_ipc_consumed_messages, :uuid, unique: true
+    add_index :railway_ipc_consumed_messages, %i[uuid queue], unique: true
   end
 end

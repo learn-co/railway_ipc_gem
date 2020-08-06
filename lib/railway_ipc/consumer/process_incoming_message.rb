@@ -86,7 +86,7 @@ module RailwayIpc
     end
 
     def find_or_create_consumed_message
-      RailwayIpc::ConsumedMessage.find_by(uuid: incoming_message.uuid) ||
+      RailwayIpc::ConsumedMessage.find_by(uuid: incoming_message.uuid, queue: consumer.queue_name) ||
         RailwayIpc::ConsumedMessage.create_processing(consumer, incoming_message)
     end
 

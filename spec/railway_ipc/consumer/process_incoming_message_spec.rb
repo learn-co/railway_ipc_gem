@@ -100,6 +100,31 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
         }.not_to(change { RailwayIpc::ConsumedMessage.count })
         expect(fake_handler.called?).to eq(false)
       end
+
+      it 'does call the handler if the message is for a different queue' do
+        consumer = instance_double(
+          RailwayIpc::Consumer,
+          queue_name: 'my-queue',
+          exchange_name: 'my-exchange',
+          get_handler: fake_handler
+        )
+        RailwayIpc::ConsumedMessage.create!(
+          uuid: incoming_message.uuid,
+          status: 'success',
+          message_type: incoming_message.type,
+          user_uuid: incoming_message.user_uuid,
+          correlation_id: incoming_message.correlation_id,
+          queue: 'some totally different queue',
+          exchange: consumer.exchange_name,
+          encoded_message: incoming_message.payload
+        )
+
+        process = described_class.new(consumer, incoming_message)
+        expect {
+          process.call
+        }.to(change { RailwayIpc::ConsumedMessage.count })
+        expect(fake_handler.called?).to eq(true)
+      end
     end
 
     context 'and the consumer does not provide a handler' do
