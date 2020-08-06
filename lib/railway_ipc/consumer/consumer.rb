@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'railway_ipc/consumer/consumer_response_handlers'
-
 module RailwayIpc
   class Consumer
     include Sneakers::Worker

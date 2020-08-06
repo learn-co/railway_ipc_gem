@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RailwayIpc
   HandlerManifest = Struct.new(:message, :handler)
   class HandlerStore

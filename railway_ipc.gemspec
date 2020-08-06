@@ -9,6 +9,7 @@ Gem::Specification.new do |spec|
   spec.version = RailwayIpc::VERSION
   spec.authors = ''
   spec.email = ''
+  spec.required_ruby_version = '>= 2.5'
 
   spec.summary = 'IPC components for Rails'
   spec.description = 'IPC components for Rails'

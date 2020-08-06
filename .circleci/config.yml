@@ -20,7 +20,7 @@ jobs:
           - v3-dependencies-{{ checksum "railway_ipc.gemspec" }}
           - v3-dependencies-
       - run:
-          name: install dependencies
+          name: Install Dependencies
           command: |
             gem install bundler:2.0.1
             bundle install --jobs=4 --retry=3 --path vendor/bundle
@@ -34,17 +34,21 @@ jobs:
           name: Wait for postgresql
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
-          name: create database
+          name: Create Database
           command: |
             cd spec/support/rails_app/
             BUNDLE_IGNORE_CONFIG=true bundle install
             BUNDLE_IGNORE_CONFIG=true bundle exec rake db:create
             cd ~/repo
       - run:
-          name: run tests
+          name: Run RSpec
           command: |
             mkdir /tmp/test-results
-            bundle exec rake
+            ./bin/rspec --exclude-pattern "spec/support/rails_app/**/*_spec.rb"
+      - run:
+          name: Run Rubocop
+          command: |
+            ./bin/rubocop .
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:

@@ -56,7 +56,6 @@ module RailwayIpc
     # rubocop:enable Metrics/AbcSize
     # rubocop:enable Metrics/MethodLength
 
-    # rubocop:disable Metrics/AbcSize
     def handle_request(payload)
       response = work(payload)
     rescue StandardError => e
@@ -69,7 +68,6 @@ module RailwayIpc
         )
       end
     end
-    # rubocop:enable Metrics/AbcSize
 
     private
 

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
+* allow multiple consumers to handle the same message
+
 ### Removed
 ### Fixed
 
@@ -39,5 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
 [Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v1.0.0...HEAD
+[1.0.1]: https://github.com/learn-co/railway_ipc_gem/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v0.1.7...v1.0.0
 [0.1.7]: https://github.com/learn-co/railway_ipc_gem/releases/tag/v0.1.7

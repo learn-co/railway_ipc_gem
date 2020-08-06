@@ -6,6 +6,7 @@ AllCops:
         - 'spec/support/rails_app/**/*'
         - '**/*_pb.rb'
         - 'vendor/bundle/**/*'
+    TargetRubyVersion: 2.5
 
 Layout/SpaceAroundEqualsInParameterDefault:
     EnforcedStyle: no_space
