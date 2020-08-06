@@ -1,7 +1,5 @@
-# frozen_string_literal: true
-
-require 'railway_ipc/handler_manifest'
 module RailwayIpc
+  HandlerManifest = Struct.new(:message, :handler)
   class HandlerStore
     attr_reader :handler_map
 
@@ -14,7 +12,7 @@ module RailwayIpc
     end
 
     def register(message:, handler:)
-      handler_map[message.to_s] = HandlerManifest.new(message: message, handler: handler)
+      handler_map[message.to_s] = HandlerManifest.new(message, handler)
     end
 
     def get(response_message)
