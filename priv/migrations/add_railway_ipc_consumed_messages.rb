@@ -2,14 +2,14 @@
 
 class AddRailwayIpcConsumedMessages < ActiveRecord::Migration
   def change
-    create_table :railway_ipc_consumed_messages, id: false do |t|
+    create_table :railway_ipc_consumed_messages do |t|
       t.uuid :uuid, null: false
       t.string :message_type
       t.uuid :user_uuid
       t.uuid :correlation_id
       t.text :encoded_message
       t.string :status, null: false
-      t.string :queue
+      t.string :queue, null: false
       t.string :exchange
 
       t.datetime :updated_at

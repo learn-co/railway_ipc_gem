@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
-## [1.1.0] - 2020-08-06
+## [1.1.0] - 2020-08-07
 ### Changed
 * allow multiple consumers to handle the same message
+* consumed messages table requires its own primary key due to ActiveRecord not having support for composite primary keys
 
 ## [1.0.1] - 2020-07-23
 ### Fixed
@@ -42,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
-[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v1.1.0...HEAD
 [1.1.0]: https://github.com/learn-co/railway_ipc_gem/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/learn-co/railway_ipc_gem/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v0.1.7...v1.0.0
