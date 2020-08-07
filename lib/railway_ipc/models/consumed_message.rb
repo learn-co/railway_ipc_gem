@@ -40,10 +40,16 @@ module RailwayIpc
     end
 
     def update_with_lock(job)
-      with_lock('FOR UPDATE NOWAIT') do
+      transaction do
+        # We're using the .lock instead of #lock since #lock reloads the recording using the primary
+        # to find it. Our primary key is a composite key, which older versions of ActiveRecord
+        # don't support without a gem.
+
+        message = self.class.lock('FOR UPDATE NOWAIT').find_by(uuid: uuid, queue: queue)
         job.run
-        self.status = job.status
-        save
+        message.status = job.status
+        message.save
+        reload
       end
     end
 

@@ -104,7 +104,7 @@ RSpec.describe RailwayIpc::ConsumedMessage, '#update_with_lock', type: :model do
   end
 
   let(:consumed_message) do
-    described_class.new(uuid: RailwayIpc::SpecHelpers::DEAD_BEEF_UUID)
+    described_class.create!(uuid: RailwayIpc::SpecHelpers::DEAD_BEEF_UUID, queue: 'some_queue', status: 'processing')
   end
 
   before(:each) do
