@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
-## [1.1.0] - 2020-08-06
+## [1.1.0] - 2020-08-07
 ### Changed
 * allow multiple consumers to handle the same message
+* consumed and published tables require their own primary key due to ActiveRecord not having support for composite primary keys
 
 ## [1.0.1] - 2020-07-23
 ### Fixed

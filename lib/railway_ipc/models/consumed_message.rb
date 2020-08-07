@@ -19,7 +19,6 @@ module RailwayIpc
     attr_reader :decoded_message
 
     self.table_name = 'railway_ipc_consumed_messages'
-    self.primary_key = 'uuid'
 
     validates :uuid, :status, presence: true
     validates :status, inclusion: { in: VALID_STATUSES }
