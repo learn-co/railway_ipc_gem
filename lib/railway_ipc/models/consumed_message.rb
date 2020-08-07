@@ -45,10 +45,9 @@ module RailwayIpc
         # to find it. Our primary key is a composite key, which older versions of ActiveRecord
         # don't support without a gem.
 
-        message = self.class.lock('FOR UPDATE NOWAIT').find_by(uuid: uuid, queue: queue)
+        _message = self.class.lock('FOR UPDATE NOWAIT').find_by(uuid: uuid, queue: queue)
         job.run
-        message.status = job.status
-        message.save
+        self.class.where(uuid: uuid, queue: queue).update(status: job.status)
         reload
       end
     end
