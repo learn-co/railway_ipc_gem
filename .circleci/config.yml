@@ -58,6 +58,16 @@ workflows:
   test:
     jobs:
       - test
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - test
 experimental:
   notify:
     branches:
