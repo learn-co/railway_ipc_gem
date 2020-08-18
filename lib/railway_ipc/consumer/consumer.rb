@@ -44,10 +44,10 @@ module RailwayIpc
       RailwayIpc::ProcessIncomingMessage.call(self, message)
       ack!
     rescue StandardError => e
-      RailwayIpc.logger.log_exception(
+      RailwayIpc.logger.error(
+        e.message,
         feature: 'railway_consumer',
         error: e.class,
-        error_message: e.message,
         payload: payload
       )
       raise e

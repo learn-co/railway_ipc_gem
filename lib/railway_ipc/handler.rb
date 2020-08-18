@@ -11,12 +11,12 @@ module RailwayIpc
     end
 
     def handle(message)
-      RailwayIpc.logger.info(message, 'Handling message')
+      RailwayIpc.logger.info('Handling message', protobuf: message)
       response = self.class.block.call(message)
       if response.success?
-        RailwayIpc.logger.info(message, 'Successfully handled message')
+        RailwayIpc.logger.info('Successfully handled message', protobuf: message)
       else
-        RailwayIpc.logger.error(message, 'Failed to handle message')
+        RailwayIpc.logger.error('Failed to handle message', protobuf: message)
       end
 
       response

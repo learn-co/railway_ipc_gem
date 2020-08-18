@@ -6,8 +6,12 @@ RSpec.describe RailwayIpc::Handler do
 
   context 'when the message is handled successfully' do
     it 'logs the message was successful' do
-      expect(RailwayIpc.logger).to receive(:info).with(message, 'Handling message')
-      expect(RailwayIpc.logger).to receive(:info).with(message, 'Successfully handled message')
+      expect(RailwayIpc.logger).to \
+        receive(:info).with('Handling message', protobuf: message)
+
+      expect(RailwayIpc.logger).to \
+        receive(:info).with('Successfully handled message', protobuf: message)
+
       handler.handle(message)
     end
   end
@@ -20,8 +24,12 @@ RSpec.describe RailwayIpc::Handler do
     end
 
     it 'logs the message failed' do
-      expect(RailwayIpc.logger).to receive(:info).with(message, 'Handling message')
-      expect(RailwayIpc.logger).to receive(:error).with(message, 'Failed to handle message')
+      expect(RailwayIpc.logger).to \
+        receive(:info).with('Handling message', protobuf: message)
+
+      expect(RailwayIpc.logger).to \
+        receive(:error).with('Failed to handle message', protobuf: message)
+
       handler.handle(message)
     end
   end

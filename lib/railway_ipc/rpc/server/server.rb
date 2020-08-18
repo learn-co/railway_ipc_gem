@@ -45,10 +45,10 @@ module RailwayIpc
         raise RailwayIpc::UnhandledMessageError.new("#{self.class} does not know how to handle #{decoded_payload.type}")
       end
     rescue StandardError => e
-      RailwayIpc.logger.log_exception(
+      RailwayIpc.logger.error(
+        e.message,
         feature: 'railway_consumer',
         error: e.class,
-        error_message: e.message,
         payload: payload
       )
       raise e
@@ -59,7 +59,7 @@ module RailwayIpc
     def handle_request(payload)
       response = work(payload)
     rescue StandardError => e
-      RailwayIpc.logger.error(message, "Error responding to message. Error: #{e.class}, #{e.message}")
+      RailwayIpc.logger.error("Error responding to message. Error: #{e.class}, #{e.message}", protobuf: message)
       response = self.class.rpc_error_adapter_class.error_message(e, message)
     ensure
       if response

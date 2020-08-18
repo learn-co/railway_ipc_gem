@@ -1,15 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
-  let(:fake_logger) { RailwayIpc::SpecHelpers::FakeLogger.new }
   let(:fake_handler) { RailwayIpc::SpecHelpers::FakeHandler.new }
-
-  around(:each) do |example|
-    original_logger = RailwayIpc.logger.logger
-    RailwayIpc.configure(logger: fake_logger)
-    example.run
-    RailwayIpc.configure(logger: original_logger)
-  end
 
   context 'when the message is valid' do
     let(:protobuf) { stubbed_protobuf }
@@ -136,12 +128,13 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
           get_handler: nil
         )
 
+        expect(RailwayIpc.logger).to \
+          receive(:warn).with("Ignoring message, no registered handler for 'RailwayIpc::Messages::TestMessage'", protobuf: incoming_message.decoded)
+
         process = described_class.new(consumer, incoming_message)
         process.call
         consumed_message = RailwayIpc::ConsumedMessage.find_by(uuid: incoming_message.uuid)
         expect(consumed_message.status).to eq('ignored')
-        expect(fake_logger.messages[:warn].first).to \
-          include("Ignoring message, no registered handler for 'RailwayIpc::Messages::TestMessage'")
       end
     end
   end
@@ -182,15 +175,16 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
       }.to_json
 
       incoming_message = RailwayIpc::IncomingMessage.new(payload)
+      expect(RailwayIpc.logger).to \
+        receive(:warn).with("Ignoring unknown message of type 'Foo'", protobuf: incoming_message.decoded)
+
       process = described_class.new(consumer, incoming_message)
       process.call
-      expect(fake_logger.messages[:warn].first).to \
-        include("Ignoring unknown message of type 'Foo'")
     end
   end
 
   context 'when the incoming message is invalid (ie. missing correlation ID)' do
-    it 'raises an error, logs a message, and does not store message' do
+    it 'raises an error and does not store message' do
       consumer = instance_double(RailwayIpc::Consumer)
 
       payload = {
@@ -199,12 +193,11 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
       }.to_json
 
       incoming_message = RailwayIpc::IncomingMessage.new(payload)
+
       process = described_class.new(consumer, incoming_message)
       expect {
         process.call
       }.to(raise_error(RailwayIpc::IncomingMessage::InvalidMessage))
-      expect(fake_logger.messages[:error].first).to \
-        include('Message is invalid: correlation_id is required.')
 
       expect(RailwayIpc::ConsumedMessage.count).to be_zero
     end

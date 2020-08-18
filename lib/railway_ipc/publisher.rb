@@ -21,16 +21,16 @@ module RailwayIpc
     end
 
     def publish(message, published_message_store=RailwayIpc::PublishedMessage)
-      RailwayIpc.logger.logger.warn('DEPRECATED: Use new PublisherInstance class')
+      RailwayIpc.logger.warn('DEPRECATED: Use new PublisherInstance class')
       ensure_message_uuid(message)
       ensure_correlation_id(message)
-      RailwayIpc.logger.info(message, 'Publishing message')
+      RailwayIpc.logger.info('Publishing message', protobuf: message)
 
       result = super(RailwayIpc::Rabbitmq::Payload.encode(message))
       published_message_store.store_message(self.class.exchange_name, message)
       result
     rescue RailwayIpc::InvalidProtobuf => e
-      RailwayIpc.logger.error(message, 'Invalid protobuf')
+      RailwayIpc.logger.error('Invalid protobuf', protobuf: message)
       raise e
     end
 
@@ -68,15 +68,15 @@ module RailwayIpc
     def publish(message)
       message.uuid = SecureRandom.uuid if message.uuid.blank?
       message.correlation_id = SecureRandom.uuid if message.correlation_id.blank?
-      RailwayIpc.logger.info(message, 'Publishing message')
+      RailwayIpc.logger.info('Publishing message', protobuf: message)
 
       stored_message = message_store.store_message(exchange_name, message)
       super(RailwayIpc::Rabbitmq::Payload.encode(message))
     rescue RailwayIpc::InvalidProtobuf => e
-      RailwayIpc.logger.error(message, 'Invalid protobuf')
+      RailwayIpc.logger.error('Invalid protobuf', protobuf: message)
       raise e
     rescue ActiveRecord::RecordInvalid => e
-      RailwayIpc.logger.error(message, 'Failed to store outgoing message')
+      RailwayIpc.logger.error('Failed to store outgoing message', protobuf: message)
       raise RailwayIpc::FailedToStoreOutgoingMessage.new(e)
     rescue StandardError => e
       stored_message&.destroy

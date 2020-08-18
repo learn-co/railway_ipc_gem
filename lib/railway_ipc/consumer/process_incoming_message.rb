@@ -16,8 +16,8 @@ module RailwayIpc
 
       def run
         logger.warn(
-          incoming_message.decoded,
-          "Ignoring unknown message of type '#{incoming_message.type}'"
+          "Ignoring unknown message of type '#{incoming_message.type}'",
+          protobuf: incoming_message.decoded
         )
       end
     end
@@ -36,8 +36,8 @@ module RailwayIpc
 
       def run
         logger.warn(
-          incoming_message.decoded,
-          "Ignoring message, no registered handler for '#{incoming_message.type}'"
+          "Ignoring message, no registered handler for '#{incoming_message.type}'",
+          protobuf: incoming_message.decoded
         )
       end
     end
@@ -81,7 +81,7 @@ module RailwayIpc
 
     def raise_message_invalid_error
       error = "Message is invalid: #{incoming_message.stringify_errors}."
-      logger.error(incoming_message.decoded, error)
+      logger.error(error, protobuf: incoming_message.decoded)
       raise RailwayIpc::IncomingMessage::InvalidMessage.new(error)
     end
 

@@ -37,29 +37,25 @@ RSpec.describe RailwayIpc::Consumer, '#work' do
   end
 
   context 'when an error occurs' do
-    let(:fake_logger) { RailwayIpc::SpecHelpers::FakeLogger.new }
     let(:consumer) { RailwayIpc::TestConsumer.new }
-
-    around(:each) do |example|
-      original_logger = RailwayIpc.logger.logger
-      RailwayIpc.configure(logger: fake_logger)
-      example.run
-      RailwayIpc.configure(logger: original_logger)
-    end
 
     it 're-raises and logs any errors' do
       allow(RailwayIpc::ProcessIncomingMessage).to \
         receive(:call).and_raise(StandardError)
 
+      expect(RailwayIpc.logger).to \
+        receive(:error).with(
+          'StandardError',
+          {
+            feature: 'railway_consumer',
+            error: StandardError,
+            payload: stubbed_payload
+          }
+        )
+
       expect {
         consumer.work(stubbed_payload)
       }.to raise_error(StandardError)
-
-      error_msg = fake_logger.messages[:error].first
-      expect(error_msg[:feature]).to eq('railway_consumer')
-      expect(error_msg[:error]).to eq(StandardError)
-      expect(error_msg[:error_message]).to eq('StandardError')
-      expect(error_msg[:payload]).to eq(stubbed_payload)
     end
   end
 end

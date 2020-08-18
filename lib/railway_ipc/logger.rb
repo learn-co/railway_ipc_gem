@@ -1,36 +1,40 @@
 # frozen_string_literal: true
 
 module RailwayIpc
+  # Custom logger that accepts a `device`, `level`, and `formatter`.
+  # `formatter` can be any object that responds to `call`; a
+  # `Logger::Formatter` is used if the argument is not provided.
+  #
+  # Here is an example formatter that uses `Oj` to format structured log
+  # messages:
+  #
+  # require 'oj'
+  # OjFormatter = proc do |severity, datetime, progname, data|
+  #   data.merge!(
+  #     name: progname,
+  #     timestamp: datetime,
+  #     severity: severity
+  #   )
+  #   Oj.dump(data, { mode: :compat, time_format: :xmlschema })
+  # end
+  #
+  # logger = RailwayIpc::Logger.new(STDOUT, Logger::INFO, OjFormatter)
+  #
   class Logger
+    def initialize(device=STDOUT, level=::Logger::INFO, formatter=nil)
+      @logger = ::Logger.new(device)
+      @logger.level = level
+      @logger.formatter = formatter if formatter
+    end
+
+    %w[fatal error warn info debug].each do |level|
+      define_method(level) do |message, data={}|
+        logger.send(level, data.merge(message: message))
+      end
+    end
+
+    private
+
     attr_reader :logger
-
-    def initialize(logger)
-      @logger = logger
-    end
-
-    def info(message, statement)
-      logger.info("[#{message_header(message)}] #{statement}")
-    end
-
-    def warn(message, statement)
-      logger.warn("[#{message_header(message)}] #{statement}")
-    end
-
-    def debug(message, statement)
-      logger.debug("[#{message_header(message)}] #{statement}")
-    end
-
-    def error(message, statement)
-      logger.error("[#{message_header(message)}] #{statement}")
-    end
-
-    def log_exception(exception)
-      logger.error(exception)
-    end
-
-    def message_header(message)
-      log_statement = "message type: #{message.class}, uuid: #{message.uuid}, correlation_id: #{message.correlation_id}"
-      message.respond_to?(:user_uuid) ? "#{log_statement}, user_uuid: #{message.user_uuid}" : log_statement
-    end
   end
 end

@@ -29,16 +29,16 @@ module RailwayIpc
     Rake::Task['sneakers:run'].invoke
   end
 
-  def self.configure(logger: ::Logger.new(STDOUT))
-    @logger = RailwayIpc::Logger.new(logger)
+  def self.configure(log_device=STDOUT, level=::Logger::INFO, log_formatter=nil)
+    @logger = RailwayIpc::Logger.new(log_device, level, log_formatter)
   end
 
   def self.logger
-    @logger || RailwayIpc::Logger.new(::Logger.new(STDOUT))
+    @logger || RailwayIpc::Logger.new(STDOUT)
   end
 
   def self.bunny_logger
-    logger.logger
+    logger
   end
 
   def self.bunny_connection

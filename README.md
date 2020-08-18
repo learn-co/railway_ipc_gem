@@ -19,7 +19,7 @@ And then execute:
 ```ruby
 # config/initializers/railway_ipc.rb
 
-RailwayIpc.configure(logger: Rails.logger)
+RailwayIpc.configure(STDOUT, Logger::INFO, MyFormatter)
 ```
 
 * Load the rake tasks in your Rakefile

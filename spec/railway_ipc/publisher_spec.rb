@@ -47,22 +47,12 @@ RSpec.describe RailwayIpc::SingletonPublisher do
     publisher.publish(message)
   end
 
-  context 'with alternate logger' do
-    around do |example|
-      original_logger = RailwayIpc.logger.logger
-      example.run
-      RailwayIpc.configure(logger: original_logger)
-    end
+  it 'warns of call to old #publish method' do
+    expect(RailwayIpc.logger).to \
+      receive(:warn).with('DEPRECATED: Use new PublisherInstance class')
 
-    it 'warns of call to old #publish method' do
-      logger_spy = instance_double(Logger, info: nil)
-      expect(logger_spy).to \
-        receive(:warn).with('DEPRECATED: Use new PublisherInstance class')
-
-      RailwayIpc.configure(logger: logger_spy)
-      allow_any_instance_of(Sneakers::Publisher).to receive(:publish).with(anything)
-      publisher.publish(message)
-    end
+    allow_any_instance_of(Sneakers::Publisher).to receive(:publish).with(anything)
+    publisher.publish(message)
   end
 end
 
