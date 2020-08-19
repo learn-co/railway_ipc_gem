@@ -21,16 +21,15 @@ module RailwayIpc
     end
 
     def publish(message, published_message_store=RailwayIpc::PublishedMessage)
-      RailwayIpc.logger.warn('DEPRECATED: Use new PublisherInstance class')
+      RailwayIpc.logger.warn('DEPRECATED: Use new PublisherInstance class', log_message_options)
       ensure_message_uuid(message)
       ensure_correlation_id(message)
-      RailwayIpc.logger.info('Publishing message', protobuf: message)
-
+      RailwayIpc.logger.info('Publishing message', log_message_options(message))
       result = super(RailwayIpc::Rabbitmq::Payload.encode(message))
       published_message_store.store_message(self.class.exchange_name, message)
       result
     rescue RailwayIpc::InvalidProtobuf => e
-      RailwayIpc.logger.error('Invalid protobuf', protobuf: message)
+      RailwayIpc.logger.error('Invalid protobuf', log_message_options(message))
       raise e
     end
 
@@ -44,6 +43,11 @@ module RailwayIpc
     def ensure_correlation_id(message)
       message.correlation_id = SecureRandom.uuid if message.correlation_id.blank?
       message
+    end
+
+    def log_message_options(message=nil)
+      options = { feature: 'railway_ipc_publisher' }
+      message.nil? ? options : options.merge(protobuf: { type: message.class, data: message })
     end
   end
 end
@@ -68,20 +72,32 @@ module RailwayIpc
     def publish(message)
       message.uuid = SecureRandom.uuid if message.uuid.blank?
       message.correlation_id = SecureRandom.uuid if message.correlation_id.blank?
-      RailwayIpc.logger.info('Publishing message', protobuf: message)
+      RailwayIpc.logger.info('Publishing message', log_message_options(message))
 
       stored_message = message_store.store_message(exchange_name, message)
       super(RailwayIpc::Rabbitmq::Payload.encode(message))
     rescue RailwayIpc::InvalidProtobuf => e
-      RailwayIpc.logger.error('Invalid protobuf', protobuf: message)
+      RailwayIpc.logger.error('Invalid protobuf', log_message_options(message))
       raise e
     rescue ActiveRecord::RecordInvalid => e
-      RailwayIpc.logger.error('Failed to store outgoing message', protobuf: message)
+      RailwayIpc.logger.error('Failed to store outgoing message', log_message_options(message))
       raise RailwayIpc::FailedToStoreOutgoingMessage.new(e)
     rescue StandardError => e
       stored_message&.destroy
       raise e
     end
     # rubocop:enable Metrics/AbcSize
+
+    private
+
+    def log_message_options(message)
+      {
+        feature: 'railway_ipc_publisher',
+        protobuf: {
+          type: message.class,
+          data: message
+        }
+      }
+    end
   end
 end

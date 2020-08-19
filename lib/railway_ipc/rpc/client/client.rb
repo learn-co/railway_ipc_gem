@@ -44,7 +44,11 @@ module RailwayIpc
       case decoded_payload.type
       when *registered_handlers
         @message = get_message_class(decoded_payload).decode(decoded_payload.message)
-        RailwayIpc.logger.info('Handling response', protobuf: message)
+        RailwayIpc.logger.info(
+          'Handling response',
+          feature: 'railway_ipc_consumer',
+          protobuf: { type: message.class, data: message }
+        )
         RailwayIpc::Response.new(message, success: true)
       else
         @message = LearnIpc::ErrorMessage.decode(decoded_payload.message)
@@ -99,7 +103,11 @@ module RailwayIpc
     end
 
     def publish_message
-      RailwayIpc.logger.info('Sending request', request_message: request_message)
+      RailwayIpc.logger.info(
+        'Sending request',
+        feature: 'railway_ipc_publisher',
+        protobuf: { type: request_message.class, data: request_message }
+      )
       rabbit_connection.publish(RailwayIpc::Rabbitmq::Payload.encode(request_message), routing_key: '')
     end
 

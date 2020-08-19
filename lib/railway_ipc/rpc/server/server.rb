@@ -59,7 +59,12 @@ module RailwayIpc
     def handle_request(payload)
       response = work(payload)
     rescue StandardError => e
-      RailwayIpc.logger.error("Error responding to message. Error: #{e.class}, #{e.message}", protobuf: message)
+      RailwayIpc.logger.error(
+        'Error responding to message.',
+        exception: e,
+        feature: 'railway_ipc_consumer',
+        protobuf: { type: message.class, data: message }
+      )
       response = self.class.rpc_error_adapter_class.error_message(e, message)
     ensure
       if response

@@ -11,7 +11,11 @@ module RailwayIpc
     end
 
     def respond(request)
-      RailwayIpc.logger.info('Responding to request', request: request)
+      RailwayIpc.logger.info(
+        'Responding to request',
+        protobuf: { type: request.class, data: request },
+        feature: 'railway_ipc_request'
+      )
       response = self.class.block.call(request)
       raise ResponseTypeError.new(response.class) unless response.is_a?(Google::Protobuf::MessageExts)
 

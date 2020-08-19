@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+* Internal log messages now include a `feature` key. This can be used by logging aggregator tools to group log messages across different systems that use the gem.
+* Internal log messages now log protobufs as a sub-hash which contains both the protobuf type and payload.
+
 ### Changed
 * `RailwayIpc.configure` now takes `device`, `level`, and `formatter` instead of a complete `Logger` instance. The instance is now managed internally by Railway.
 

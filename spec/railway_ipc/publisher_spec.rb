@@ -49,7 +49,10 @@ RSpec.describe RailwayIpc::SingletonPublisher do
 
   it 'warns of call to old #publish method' do
     expect(RailwayIpc.logger).to \
-      receive(:warn).with('DEPRECATED: Use new PublisherInstance class')
+      receive(:warn).with(
+        'DEPRECATED: Use new PublisherInstance class',
+        feature: 'railway_ipc_publisher'
+      )
 
     allow_any_instance_of(Sneakers::Publisher).to receive(:publish).with(anything)
     publisher.publish(message)

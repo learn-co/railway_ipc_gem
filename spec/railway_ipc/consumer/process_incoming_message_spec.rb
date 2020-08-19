@@ -129,7 +129,11 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
         )
 
         expect(RailwayIpc.logger).to \
-          receive(:warn).with("Ignoring message, no registered handler for 'RailwayIpc::Messages::TestMessage'", protobuf: incoming_message.decoded)
+          receive(:warn).with(
+            "Ignoring message, no registered handler for 'RailwayIpc::Messages::TestMessage'",
+            feature: 'railway_ipc_consumer',
+            protobuf: { type: 'RailwayIpc::Messages::TestMessage', data: incoming_message.decoded }
+          )
 
         process = described_class.new(consumer, incoming_message)
         process.call
@@ -161,7 +165,7 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
       expect(consumed_message.encoded_message).to eq(payload)
     end
 
-    it 'logs an warning' do
+    it 'logs a warning' do
       consumer = instance_double(
         RailwayIpc::Consumer,
         queue_name: 'my-queue',
@@ -176,7 +180,11 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
 
       incoming_message = RailwayIpc::IncomingMessage.new(payload)
       expect(RailwayIpc.logger).to \
-        receive(:warn).with("Ignoring unknown message of type 'Foo'", protobuf: incoming_message.decoded)
+        receive(:warn).with(
+          "Ignoring unknown message of type 'Foo'",
+          feature: 'railway_ipc_consumer',
+          protobuf: { type: 'Foo', data: incoming_message.decoded }
+        )
 
       process = described_class.new(consumer, incoming_message)
       process.call
