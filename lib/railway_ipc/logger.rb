@@ -29,6 +29,7 @@ module RailwayIpc
 
     %w[fatal error warn info debug].each do |level|
       define_method(level) do |message, data={}|
+        data.merge!(feature: 'railway_ipc') unless data.key?(:feature)
         logger.send(level, data.merge(message: message))
       end
     end
