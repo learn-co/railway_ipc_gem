@@ -47,6 +47,8 @@ module RailwayIpc
       RailwayIpc.logger.error(
         e.message,
         feature: 'railway_ipc_consumer',
+        exchange: exchange_name,
+        queue: queue_name,
         error: e.class,
         payload: payload
       )

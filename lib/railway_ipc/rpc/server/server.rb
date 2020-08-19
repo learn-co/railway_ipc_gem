@@ -48,6 +48,8 @@ module RailwayIpc
       RailwayIpc.logger.error(
         e.message,
         feature: 'railway_ipc_consumer',
+        exchange: self.class.exchange_name,
+        queue: self.class.queue_name,
         error: e.class,
         payload: payload
       )
@@ -56,6 +58,8 @@ module RailwayIpc
     # rubocop:enable Metrics/AbcSize
     # rubocop:enable Metrics/MethodLength
 
+    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
     def handle_request(payload)
       response = work(payload)
     rescue StandardError => e
@@ -63,6 +67,8 @@ module RailwayIpc
         'Error responding to message.',
         exception: e,
         feature: 'railway_ipc_consumer',
+        exchange: self.class.exchange_name,
+        queue: self.class.queue_name,
         protobuf: { type: message.class, data: message }
       )
       response = self.class.rpc_error_adapter_class.error_message(e, message)
@@ -73,6 +79,8 @@ module RailwayIpc
         )
       end
     end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/MethodLength
 
     private
 

@@ -49,6 +49,8 @@ RSpec.describe RailwayIpc::Consumer, '#work' do
           {
             feature: 'railway_ipc_consumer',
             error: StandardError,
+            exchange: 'test:events',
+            queue: 'ironboard:test:commands',
             payload: stubbed_payload
           }
         )

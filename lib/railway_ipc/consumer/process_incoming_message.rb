@@ -86,6 +86,8 @@ module RailwayIpc
       logger.error(
         error,
         feature: 'railway_ipc_consumer',
+        exchange: consumer.exchange_name,
+        queue: consumer.queue_name,
         protobuf: { type: incoming_message.class, data: incoming_message.decoded }
       )
       raise RailwayIpc::IncomingMessage::InvalidMessage.new(error)

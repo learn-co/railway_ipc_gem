@@ -193,7 +193,11 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
 
   context 'when the incoming message is invalid (ie. missing correlation ID)' do
     it 'raises an error and does not store message' do
-      consumer = instance_double(RailwayIpc::Consumer)
+      consumer = instance_double(
+        RailwayIpc::Consumer,
+        queue_name: 'my-queue',
+        exchange_name: 'my-exchange'
+      )
 
       payload = {
         type: 'RailwayIpc::Messages::TestMessage',

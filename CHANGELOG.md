@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-* Internal log messages now include a `feature` key. This can be used by logging aggregator tools to group log messages across different systems that use the gem.
-* Internal log messages now log protobufs as a sub-hash which contains both the protobuf type and payload.
+* Several additions to internal logging:
+  - Log messages now include a `feature` key. This can be used by logging aggregator tools to group log messages across different systems that use the gem. If one isn't provided a default value of `railway_ipc` is used.
+  - Protobufs are logged as a sub-hash which contains both the protobuf type and payload.
+  - Exchange and queue names are logged where applicable.
+  - The internal Bunny connection now uses the `RailwayIpc::Logger` instead of a generic `Logger`.
 
 ### Changed
 * `RailwayIpc.configure` now takes `device`, `level`, and `formatter` instead of a complete `Logger` instance. The instance is now managed internally by Railway.

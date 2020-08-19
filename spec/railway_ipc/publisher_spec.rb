@@ -51,6 +51,7 @@ RSpec.describe RailwayIpc::SingletonPublisher do
     expect(RailwayIpc.logger).to \
       receive(:warn).with(
         'DEPRECATED: Use new PublisherInstance class',
+        exchange: 'test:events',
         feature: 'railway_ipc_publisher'
       )
 

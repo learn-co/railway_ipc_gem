@@ -39,6 +39,7 @@ module RailwayIpc
     end
 
     # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
     def process_payload(response)
       decoded_payload = decode_payload(response)
       case decoded_payload.type
@@ -47,6 +48,8 @@ module RailwayIpc
         RailwayIpc.logger.info(
           'Handling response',
           feature: 'railway_ipc_consumer',
+          exchange: self.class.exchange_name,
+          queue: self.class.queue_name,
           protobuf: { type: message.class, data: message }
         )
         RailwayIpc::Response.new(message, success: true)
@@ -55,6 +58,7 @@ module RailwayIpc
         raise RailwayIpc::UnhandledMessageError.new("#{self.class} does not know how to handle #{decoded_payload.type}")
       end
     end
+    # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
 
     def setup_rabbit_connection
@@ -85,6 +89,8 @@ module RailwayIpc
       RailwayIpc.logger.error(
         exception.message,
         feature: 'railway_ipc_consumer',
+        exchange: self.class.exchange_name,
+        queue: self.class.queue_name,
         error: exception.class,
         payload: decode_for_error(exception, payload)
       )
@@ -106,6 +112,7 @@ module RailwayIpc
       RailwayIpc.logger.info(
         'Sending request',
         feature: 'railway_ipc_publisher',
+        exchange: self.class.exchange_name,
         protobuf: { type: request_message.class, data: request_message }
       )
       rabbit_connection.publish(RailwayIpc::Rabbitmq::Payload.encode(request_message), routing_key: '')

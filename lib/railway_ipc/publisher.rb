@@ -46,7 +46,7 @@ module RailwayIpc
     end
 
     def log_message_options(message=nil)
-      options = { feature: 'railway_ipc_publisher' }
+      options = { feature: 'railway_ipc_publisher', exchange: self.class.exchange_name }
       message.nil? ? options : options.merge(protobuf: { type: message.class, data: message })
     end
   end
@@ -93,6 +93,7 @@ module RailwayIpc
     def log_message_options(message)
       {
         feature: 'railway_ipc_publisher',
+        exchange: exchange_name,
         protobuf: {
           type: message.class,
           data: message
