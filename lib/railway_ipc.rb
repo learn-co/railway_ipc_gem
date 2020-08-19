@@ -37,10 +37,6 @@ module RailwayIpc
     @logger || RailwayIpc::Logger.new(STDOUT)
   end
 
-  def self.bunny_logger
-    logger
-  end
-
   def self.bunny_connection
     @bunny_connection ||= RailwayIpc::Rabbitmq::Adapter.new(
       exchange_name: 'default',

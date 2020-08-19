@@ -28,7 +28,7 @@ module RailwayIpc
           port: settings[:port],
           vhost: vhost,
           automatic_recovery: false,
-          logger: RailwayIpc.bunny_logger
+          logger: RailwayIpc.logger
         }.merge(options))
       end
 
