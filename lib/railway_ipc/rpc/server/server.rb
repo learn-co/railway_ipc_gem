@@ -47,7 +47,7 @@ module RailwayIpc
     rescue StandardError => e
       RailwayIpc.logger.error(
         e.message,
-        feature: 'railway_consumer',
+        feature: 'railway_ipc_consumer',
         error: e.class,
         payload: payload
       )

@@ -80,7 +80,7 @@ module RailwayIpc
     def log_exception(exception, payload)
       RailwayIpc.logger.error(
         exception.message,
-        feature: 'railway_consumer',
+        feature: 'railway_ipc_consumer',
         error: exception.class,
         payload: decode_for_error(exception, payload)
       )

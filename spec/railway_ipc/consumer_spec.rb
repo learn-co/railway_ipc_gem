@@ -47,7 +47,7 @@ RSpec.describe RailwayIpc::Consumer, '#work' do
         receive(:error).with(
           'StandardError',
           {
-            feature: 'railway_consumer',
+            feature: 'railway_ipc_consumer',
             error: StandardError,
             payload: stubbed_payload
           }
