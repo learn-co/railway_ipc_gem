@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 ### Fixed
+* `RailwayIpc::Logger` now handles block syntax (i.e. `logger.info { 'my message' }`) correctly.
 
 ## [2.0.0] - 2020-08-20
 ### Added

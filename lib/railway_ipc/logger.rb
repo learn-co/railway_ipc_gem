@@ -28,9 +28,21 @@ module RailwayIpc
     end
 
     %w[fatal error warn info debug].each do |level|
-      define_method(level) do |message, data={}|
+      define_method(level) do |message=nil, data={}, &block|
         data.merge!(feature: 'railway_ipc') unless data.key?(:feature)
-        logger.send(level, data.merge(message: message))
+        return logger.send(level, data.merge(message: message)) unless block
+
+        data = message.merge(data) if message&.is_a?(Hash)
+        data.merge!(message: block.call)
+
+        # This is for compatability w/ Ruby's Logger. Ruby's Logger class
+        # assumes that if both a `message` argument and a block are given,
+        # that the block contains the actual message. The `message` argument
+        # is assumed to be the `progname`.
+        #
+        # https://github.com/ruby/logger/blob/master/lib/logger.rb#L471
+        data.merge!(progname: message) if message&.is_a?(String)
+        logger.send(level, data)
       end
     end
 
