@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 ### Fixed
+
+## [2.0.1] - 2020-08-24
+### Fixed
 * `RailwayIpc::Logger` now handles block syntax (i.e. `logger.info { 'my message' }`) correctly.
 
 ## [2.0.0] - 2020-08-20
@@ -55,7 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
-[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/learn-co/railway_ipc_gem/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/learn-co/railway_ipc_gem/compare/v1.0.0...v1.0.1
