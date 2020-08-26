@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
+* RPC `RailwayIpc::Client` does not need to log the queue name.
 ### Removed
 ### Fixed
 
