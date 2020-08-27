@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
-* RPC `RailwayIpc::Client` does not need to log the queue name.
 ### Removed
 ### Fixed
+
+## [2.0.2] - 2020-08-27
+### Changed
+* RPC `RailwayIpc::Client` does not need to log the queue name.
 
 ## [2.0.1] - 2020-08-24
 ### Fixed
@@ -59,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
-[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/learn-co/railway_ipc_gem/compare/v1.0.1...v1.1.0
