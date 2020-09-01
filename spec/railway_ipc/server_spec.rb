@@ -7,7 +7,7 @@ RSpec.describe RailwayIpc::Server do
     let(:connection) { double('connection', { start: true, create_channel: channel }) }
 
     before do
-      @server = RailwayIpc::TestServer.new
+      @server = RailwayIpc::TestServer.new(nil, nil)
     end
     context 'when the server does not know how to handle the message' do
       let(:message)   { LearnIpc::Requests::UnhandledRequest.new(user_uuid: '1234', correlation_id: '1234', reply_to: 'queue_name') }

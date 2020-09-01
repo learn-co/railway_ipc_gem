@@ -4,7 +4,7 @@ require_relative './i_spec.rb'
 
 RSpec.describe 'Request Response Cycle' do
   before do
-    server = RailwayIpc::TestServer.new
+    server = RailwayIpc::TestServer.new(nil, nil)
     server.run
   end
 

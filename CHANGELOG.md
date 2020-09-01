@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 ### Fixed
+* Fix RPC server. RPC servers need to conform to the Sneaker worker API (i.e. their initializers need to be able to accept queue name / pool and they require a `stop` method.
 
 ## [2.0.2] - 2020-08-27
 ### Changed

@@ -14,7 +14,7 @@ module RailwayIpc
       RailwayIpc::RPC::ServerResponseHandlers.instance.register(handler: with, message: message_type)
     end
 
-    def initialize(opts={ automatic_recovery: true }, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
+    def initialize(_queue, _pool, opts={ automatic_recovery: true }, rabbit_adapter: RailwayIpc::Rabbitmq::Adapter)
       @rabbit_connection = rabbit_adapter.new(
         queue_name: self.class.queue_name,
         exchange_name: self.class.exchange_name,
@@ -29,6 +29,10 @@ module RailwayIpc
         .create_queue(durable: true)
         .bind_queue_to_exchange
       subscribe_to_queue
+    end
+
+    def stop
+      rabbit_connection.disconnect
     end
 
     # rubocop:disable Metrics/AbcSize
