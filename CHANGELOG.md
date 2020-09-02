@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 ### Fixed
+
+## [2.0.3] - 2020-09-02
+### Fixed
 * Fix RPC server. RPC servers need to conform to the Sneaker worker API (i.e. their initializers need to be able to accept queue name / pool and they require a `stop` method.
 
 ## [2.0.2] - 2020-08-27
@@ -63,7 +66,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
-[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.2...HEAD
+[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.3...HEAD
+[2.0.3]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v1.1.0...v2.0.0
