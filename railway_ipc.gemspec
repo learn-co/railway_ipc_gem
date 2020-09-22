@@ -41,8 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rubocop', '~> 0.86'
 
-  spec.add_dependency 'bunny', '~> 2.2.0'
-  spec.add_dependency 'sneakers', '~> 2.3.5'
+  spec.add_dependency 'sneakers', '~> 2.3'
 
   # Setup for testing Rails type code within mock Rails app
   spec.add_development_dependency 'database_cleaner', '~> 1.7'
