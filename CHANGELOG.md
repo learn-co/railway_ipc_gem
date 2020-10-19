@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
+## [2.1.0] - 2020-10-19
+### Added
+* :options parameter to `listen_to` which passes keys along to Sneaker's `from_queue` method.
+
 ## [2.0.3] - 2020-09-02
 ### Fixed
 * Fix RPC server. RPC servers need to conform to the Sneaker worker API (i.e. their initializers need to be able to accept queue name / pool and they require a `stop` method.
