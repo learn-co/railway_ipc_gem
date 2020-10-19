@@ -3,7 +3,7 @@
 module RailwayIpc
   module RPC
     module MessageObservationConfigurable
-      def listen_to(exchange:, queue:)
+      def listen_to(queue:, exchange:)
         @exchange_name = exchange
         @queue_name = queue
       end
