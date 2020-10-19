@@ -1,14 +1,40 @@
 # frozen_string_literal: true
 
 RSpec.describe RailwayIpc::Consumer, '.listen_to' do
-  it 'specifies the queue and exchange' do
-    expect(RailwayIpc::TestConsumer).to receive(:from_queue).with('test_queue', {
-                                                                    exchange: 'test_exchange',
-                                                                    durable: true,
-                                                                    exchange_type: :fanout,
-                                                                    connection: RailwayIpc.bunny_connection
-                                                                  })
-    RailwayIpc::TestConsumer.listen_to(queue: 'test_queue', exchange: 'test_exchange')
+  context 'default options' do
+    it 'specifies the queue and exchange' do
+      expect(RailwayIpc::TestConsumer)
+        .to receive(:from_queue)
+        .with('test_queue', {
+                              exchange: 'test_exchange',
+                              durable: true,
+                              exchange_type: :fanout,
+                              connection: RailwayIpc.bunny_connection
+                            })
+
+      RailwayIpc::TestConsumer.listen_to(queue: 'test_queue', exchange: 'test_exchange')
+    end
+  end
+
+  context 'custom options' do
+    it 'merges additional options for .from_queue' do
+      expect(RailwayIpc::TestConsumer)
+        .to receive(:from_queue)
+        .with('test_queue', {
+                              exchange: 'test_exchange',
+                              durable: false,
+                              exchange_type: :fanout,
+                              connection: RailwayIpc.bunny_connection
+                            })
+
+      RailwayIpc::TestConsumer.listen_to(
+        queue: 'test_queue',
+        exchange: 'test_exchange',
+        options: {
+          durable: false
+        }
+      )
+    end
   end
 end
 

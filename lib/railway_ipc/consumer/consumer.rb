@@ -3,6 +3,7 @@
 module RailwayIpc
   class Consumer
     include Sneakers::Worker
+
     def self.inherited(base)
       base.instance_eval do
         def handlers
@@ -11,12 +12,13 @@ module RailwayIpc
       end
     end
 
-    def self.listen_to(queue:, exchange:)
-      from_queue queue,
-                 exchange: exchange,
-                 durable: true,
-                 exchange_type: :fanout,
-                 connection: RailwayIpc.bunny_connection
+    def self.listen_to(queue:, exchange:, options: {})
+      from_queue queue, {
+        exchange: exchange,
+        durable: true,
+        exchange_type: :fanout,
+        connection: RailwayIpc.bunny_connection
+      }.merge(options)
     end
 
     def self.handle(message_type, with:)
