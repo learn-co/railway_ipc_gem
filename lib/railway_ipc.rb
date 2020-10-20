@@ -2,6 +2,7 @@
 
 require 'railway_ipc/version'
 require 'sneakers'
+require 'sneakers/spawner'
 require 'bunny'
 require 'active_record'
 require 'railway_ipc/version'
@@ -27,6 +28,10 @@ require 'railway_ipc/errors'
 module RailwayIpc
   def self.start
     Rake::Task['sneakers:run'].invoke
+  end
+
+  def self.spawn
+    Sneakers::Spawner.spawn
   end
 
   def self.configure(log_device=STDOUT, level=::Logger::INFO, log_formatter=nil)

@@ -11,4 +11,9 @@ RSpec.describe RailwayIpc do
     expect(rake_task).to receive(:invoke)
     RailwayIpc.start
   end
+
+  it 'starts the consumers running via config files' do
+    expect(Sneakers::Spawner).to receive(:spawn)
+    RailwayIpc.spawn
+  end
 end
