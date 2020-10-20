@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
+## [2.2.0] - 2020-10-20
+### Added
+* The ability to configure workers to handle different workloads via `rake railway_ipc::consumers:spawn`
+
 ## [2.1.0] - 2020-10-19
 ### Added
 * :options parameter to `listen_to` which passes keys along to Sneaker's `from_queue` method.
