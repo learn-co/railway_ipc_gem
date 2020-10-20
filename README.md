@@ -52,6 +52,26 @@ Then, run your consumers
 bundle exec rake railway_ipc:consumers:start CONSUMERS=YourConsumer,YourOtherConsumer
 ```
 
+You may also configure your consumers more granularly using:
+
+`./config/sneaker_worker_groups.yml`
+```yaml
+HighPriority:
+    classes: YourConsumer,YourOtherConsumer
+    workers: 5
+LowPriority:
+    classes: YourThirdConsumer
+    workers: 1
+```
+
+```bash
+bundle exec rake railway_ipc:consumers:spawn
+```
+
+By default, `spawn` will map to `./config/sneaker_worker_groups.yml` but you can override it by using `WORKER_GROUP_CONFIG`.
+
+See the [Sneaker Documentation](https://github.com/jondot/sneakers/wiki/Handling-different-workloads) for more information.
+
 # Request/Response
 
 Define your server, client and responder. Docs coming soon.
