@@ -12,6 +12,8 @@ RSpec.describe RailwayIpc::Consumer, '.listen_to' do
                 connection: RailwayIpc.bunny_connection
               })
 
+      expect(RailwayIpc.logger).to_not receive(:info)
+
       RailwayIpc::TestConsumer.listen_to(queue: 'test_queue', exchange: 'test_exchange')
     end
   end
@@ -24,14 +26,29 @@ RSpec.describe RailwayIpc::Consumer, '.listen_to' do
                 exchange: 'test_exchange',
                 durable: false,
                 exchange_type: :fanout,
-                connection: RailwayIpc.bunny_connection
+                connection: RailwayIpc.bunny_connection,
+                threads: 1,
+                prefetch: 2
               })
+
+      expect(RailwayIpc.logger)
+        .to receive(:info).with(
+          'Overriding configuration for test_queue with new options',
+          feature: 'railway_ipc_consumer',
+          options: {
+            durable: false,
+            prefetch: 2,
+            threads: 1
+          }
+        )
 
       RailwayIpc::TestConsumer.listen_to(
         queue: 'test_queue',
         exchange: 'test_exchange',
         options: {
-          durable: false
+          durable: false,
+          threads: 1,
+          prefetch: 2
         }
       )
     end

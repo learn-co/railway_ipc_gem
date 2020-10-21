@@ -13,6 +13,14 @@ module RailwayIpc
     end
 
     def self.listen_to(queue:, exchange:, options: {})
+      unless options.empty?
+        RailwayIpc.logger.info(
+          "Overriding configuration for #{queue} with new options",
+          feature: 'railway_ipc_consumer',
+          options: options
+        )
+      end
+
       from_queue queue, {
         exchange: exchange,
         durable: true,
