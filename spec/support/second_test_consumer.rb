@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative './test_message_pb.rb'
-require_relative './second_test_handler.rb'
+require_relative './test_message_pb'
+require_relative './second_test_handler'
 
 module RailwayIpc
   class SecondTestConsumer < RailwayIpc::Consumer

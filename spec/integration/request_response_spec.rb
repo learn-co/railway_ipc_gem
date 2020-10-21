@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './i_spec.rb'
+require_relative './i_spec'
 
 RSpec.describe 'Request Response Cycle' do
   before do
