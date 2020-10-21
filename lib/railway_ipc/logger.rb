@@ -21,7 +21,7 @@ module RailwayIpc
   # logger = RailwayIpc::Logger.new(STDOUT, Logger::INFO, OjFormatter)
   #
   class Logger
-    def initialize(device=STDOUT, level=::Logger::INFO, formatter=nil)
+    def initialize(device=$stdout, level=::Logger::INFO, formatter=nil)
       @logger = ::Logger.new(device)
       @logger.level = level
       @logger.formatter = formatter if formatter
@@ -32,7 +32,7 @@ module RailwayIpc
         data.merge!(feature: 'railway_ipc') unless data.key?(:feature)
         return logger.send(level, data.merge(message: message)) unless block
 
-        data = message.merge(data) if message&.is_a?(Hash)
+        data = message.merge(data) if message.is_a?(Hash)
         data.merge!(message: block.call)
 
         # This is for compatability w/ Ruby's Logger. Ruby's Logger class
@@ -41,7 +41,7 @@ module RailwayIpc
         # is assumed to be the `progname`.
         #
         # https://github.com/ruby/logger/blob/master/lib/logger.rb#L471
-        data.merge!(progname: message) if message&.is_a?(String)
+        data.merge!(progname: message) if message.is_a?(String)
         logger.send(level, data)
       end
     end

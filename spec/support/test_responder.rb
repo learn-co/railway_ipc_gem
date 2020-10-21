@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './test_document_pb.rb'
+require_relative './test_document_pb'
 module RailwayIpc
   class TestResponder < RailwayIpc::Responder
     respond do |message|

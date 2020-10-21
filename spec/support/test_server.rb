@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative './test_request_pb.rb'
-require_relative './test_responder.rb'
-require_relative './rpc_adapter.rb'
-require_relative './timeout_request_pb.rb'
-require_relative './timeout_responder.rb'
-require_relative './error_message_pb.rb'
+require_relative './test_request_pb'
+require_relative './test_responder'
+require_relative './rpc_adapter'
+require_relative './timeout_request_pb'
+require_relative './timeout_responder'
+require_relative './error_message_pb'
 
 module RailwayIpc
   class TestServer < RailwayIpc::Server

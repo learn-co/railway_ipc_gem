@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './i_spec.rb'
+require_relative './i_spec'
 
 RSpec.describe 'Publishing a message' do
   let(:publisher) { RailwayIpc::TestPublisher.instance }

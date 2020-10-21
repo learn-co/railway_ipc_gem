@@ -5,6 +5,8 @@ module RailwayIpc
     include Sneakers::Worker
 
     def self.inherited(base)
+      super
+
       base.instance_eval do
         def handlers
           @handlers ||= RailwayIpc::HandlerStore.new

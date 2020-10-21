@@ -9,7 +9,7 @@ require 'factory_bot'
 
 ENV['RAILWAY_RABBITMQ_CONNECTION_URL'] = 'amqp://guest:guest@localhost:5672'
 
-Dir[File.dirname(__FILE__) + '/support/**/*.rb'].sort.each do |file|
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].sort.each do |file|
   next if file.include?('support/rails_app')
 
   require file

@@ -5,7 +5,6 @@ require 'sneakers'
 require 'sneakers/spawner'
 require 'bunny'
 require 'active_record'
-require 'railway_ipc/version'
 require 'railway_ipc/logger'
 require 'railway_ipc/unhandled_message_error'
 require 'railway_ipc/response'
@@ -34,12 +33,12 @@ module RailwayIpc
     Sneakers::Spawner.spawn
   end
 
-  def self.configure(log_device=STDOUT, level=::Logger::INFO, log_formatter=nil)
+  def self.configure(log_device=$stdout, level=::Logger::INFO, log_formatter=nil)
     @logger = RailwayIpc::Logger.new(log_device, level, log_formatter)
   end
 
   def self.logger
-    @logger || RailwayIpc::Logger.new(STDOUT)
+    @logger || RailwayIpc::Logger.new($stdout)
   end
 
   def self.bunny_connection

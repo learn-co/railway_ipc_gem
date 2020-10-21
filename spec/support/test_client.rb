@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative './test_request_pb.rb'
-require_relative './unhandled_request_pb.rb'
-require_relative './test_document_pb.rb'
-require_relative './rpc_adapter.rb'
-require_relative './timeout_request_pb.rb'
+require_relative './test_request_pb'
+require_relative './unhandled_request_pb'
+require_relative './test_document_pb'
+require_relative './rpc_adapter'
+require_relative './timeout_request_pb'
 require_relative './error_message_pb'
 
 module RailwayIpc
