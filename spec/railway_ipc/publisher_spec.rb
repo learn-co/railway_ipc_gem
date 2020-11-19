@@ -60,44 +60,21 @@ RSpec.describe RailwayIpc::SingletonPublisher do
   end
 end
 
-RSpec.describe RailwayIpc::Publisher, '#initialize' do
-  let(:connection) { Bunny.new }
-
+RSpec.describe RailwayIpc::Publisher, '#exchange' do
   after { cleanup! }
 
-  it 'takes an exchange name' do
-    publisher = described_class.new(
-      connection: connection,
-      exchange_name: 'test-exchange'
-    )
-
+  it 'uses the exchange name' do
+    publisher = described_class.new(exchange_name: 'test-exchange')
     message = RailwayIpc::Messages::TestMessage.new
     publisher.publish(message)
     expect(publisher.exchange.name).to eq('test-exchange')
   end
 
   it 'creates a fanout exchange' do
-    publisher = described_class.new(
-      connection: connection,
-      exchange_name: 'test-exchange'
-    )
-
+    publisher = described_class.new(exchange_name: 'test-exchange')
     message = RailwayIpc::Messages::TestMessage.new
     publisher.publish(message)
     expect(publisher.exchange.type).to eq(:fanout)
-  end
-end
-
-RSpec.describe RailwayIpc::Publisher, 'passing options to sneakers' do
-  it 'uses default connection if one is not provided' do
-    expect_any_instance_of(Sneakers::Publisher).to \
-      receive(:initialize).with(
-        {
-          exchange: 'test-exchange',
-          exchange_type: :fanout
-        }
-      )
-    described_class.new(exchange_name: 'test-exchange')
   end
 end
 
@@ -112,12 +89,7 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
     end
   end
 
-  let(:publisher) do
-    described_class.new(
-      connection: connection,
-      exchange_name: 'test-exchange'
-    )
-  end
+  let(:publisher) { described_class.new(exchange_name: 'test-exchange') }
 
   after { cleanup! }
 
@@ -242,10 +214,7 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
   context 'when the publish fails' do
     let(:message) { RailwayIpc::Messages::TestMessage.new }
 
-    before do
-      allow_any_instance_of(Sneakers::Publisher).to \
-        receive(:publish).and_raise(RuntimeError)
-    end
+    before { allow(publisher).to receive(:exchange).and_raise(RuntimeError) }
 
     it 'raises an error' do
       expect {
@@ -263,10 +232,7 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
 end
 
 def cleanup!
-  # We need to delete the exchange using the connection's channel; we don't
-  # care about which channel because they all point to the same RabbitMQ
-  # instance.
-  channel = connection.create_channel
+  channel = RailwayIpc::ConnectionManager.instance.channel
   channel.exchange_delete('test-exchange')
   channel.queue_delete('test-queue')
 end

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'singleton'
-
 module RailwayIpc
   class SingletonPublisher < Sneakers::Publisher
     include ::Singleton
@@ -53,19 +51,12 @@ module RailwayIpc
 end
 
 module RailwayIpc
-  class Publisher < Sneakers::Publisher
+  class Publisher
     attr_reader :exchange_name, :message_store
 
     def initialize(opts={})
       @exchange_name = opts.fetch(:exchange_name)
       @message_store = opts.fetch(:message_store, RailwayIpc::PublishedMessage)
-      connection = opts.fetch(:connection, nil)
-      options = {
-        exchange: exchange_name,
-        connection: connection,
-        exchange_type: :fanout
-      }.compact
-      super(options)
     end
 
     # rubocop:disable Metrics/AbcSize
@@ -75,7 +66,7 @@ module RailwayIpc
       RailwayIpc.logger.info('Publishing message', log_message_options(message))
 
       stored_message = message_store.store_message(exchange_name, message)
-      super(RailwayIpc::Rabbitmq::Payload.encode(message))
+      exchange.publish(RailwayIpc::Rabbitmq::Payload.encode(message))
     rescue RailwayIpc::InvalidProtobuf => e
       RailwayIpc.logger.error('Invalid protobuf', log_message_options(message))
       raise e
@@ -88,7 +79,15 @@ module RailwayIpc
     end
     # rubocop:enable Metrics/AbcSize
 
+    def exchange
+      @exchange ||= channel.exchange(exchange_name, type: :fanout, durable: true, auto_delete: false, arguments: {})
+    end
+
     private
+
+    def channel
+      RailwayIpc::ConnectionManager.instance.channel
+    end
 
     def log_message_options(message)
       {
