@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
+## [2.2.2] - 2020-11-20
+### Fixed
+* Fixed Publisher class channel leak. Channels were being created on each
+  instantiation of a Publisher instead of being re-used.
+
 ## [2.2.1] - 2020-10-20
 ### Added
 * Logging to indicate when options passed via `listen_to`/`from_queue` are overriding the defaults.
@@ -78,7 +83,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
-[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.3...HEAD
+[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.2...HEAD
+[2.2.2]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/learn-co/railway_ipc_gem/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/learn-co/railway_ipc_gem/compare/v2.0.3...v2.1.0
