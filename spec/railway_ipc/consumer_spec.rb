@@ -9,6 +9,9 @@ RSpec.describe RailwayIpc::Consumer, '.listen_to' do
                 exchange: 'test_exchange',
                 durable: true,
                 exchange_type: :fanout,
+                arguments: {
+                  'x-dead-letter-exchange' => 'ipc:errors'
+                },
                 connection: RailwayIpc.bunny_connection
               })
 
@@ -28,7 +31,10 @@ RSpec.describe RailwayIpc::Consumer, '.listen_to' do
                 exchange_type: :fanout,
                 connection: RailwayIpc.bunny_connection,
                 threads: 1,
-                prefetch: 2
+                prefetch: 2,
+                arguments: {
+                  'x-dead-letter-exchange' => 'custom_dlx'
+                }
               })
 
       expect(RailwayIpc.logger)
@@ -38,7 +44,10 @@ RSpec.describe RailwayIpc::Consumer, '.listen_to' do
           options: {
             durable: false,
             prefetch: 2,
-            threads: 1
+            threads: 1,
+            arguments: {
+              'x-dead-letter-exchange' => 'custom_dlx'
+            }
           }
         )
 
@@ -48,7 +57,10 @@ RSpec.describe RailwayIpc::Consumer, '.listen_to' do
         options: {
           durable: false,
           threads: 1,
-          prefetch: 2
+          prefetch: 2,
+          arguments: {
+            'x-dead-letter-exchange' => 'custom_dlx'
+          }
         }
       )
     end
@@ -82,10 +94,12 @@ RSpec.describe RailwayIpc::Consumer, '#work' do
   context 'when an error occurs' do
     let(:consumer) { RailwayIpc::TestConsumer.new }
 
-    it 're-raises and logs any errors' do
+    before(:each) do
       allow(RailwayIpc::ProcessIncomingMessage).to \
         receive(:call).and_raise(StandardError)
+    end
 
+    it 'logs any errors' do
       expect(RailwayIpc.logger).to \
         receive(:error).with(
           'StandardError',
@@ -98,9 +112,11 @@ RSpec.describe RailwayIpc::Consumer, '#work' do
           }
         )
 
-      expect {
-        consumer.work(stubbed_payload)
-      }.to raise_error(StandardError)
+      consumer.work(stubbed_payload)
+    end
+
+    it 'rejects the message' do
+      expect(consumer.work(stubbed_payload)).to eq(:reject)
     end
   end
 end

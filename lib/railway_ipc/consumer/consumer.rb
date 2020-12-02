@@ -14,6 +14,7 @@ module RailwayIpc
       end
     end
 
+    # rubocop:disable Metrics/MethodLength
     def self.listen_to(queue:, exchange:, options: {})
       unless options.empty?
         RailwayIpc.logger.info(
@@ -27,9 +28,13 @@ module RailwayIpc
         exchange: exchange,
         durable: true,
         exchange_type: :fanout,
+        arguments: {
+          'x-dead-letter-exchange' => 'ipc:errors'
+        },
         connection: RailwayIpc.bunny_connection
       }.merge(options)
     end
+    # rubocop:enable Metrics/MethodLength
 
     def self.handle(message_type, with:)
       handlers.register(message: message_type, handler: with)
@@ -64,7 +69,7 @@ module RailwayIpc
         error: e.class,
         payload: payload
       )
-      raise e
+      reject!
     end
 
     def get_handler(type)
