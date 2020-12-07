@@ -10,10 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 ### Fixed
 
+## [3.0.0] - 2020-12-07
+### Changed
+* Consumers _will no longer crash_ when an exception is raised. Instead, consumers will move the message that caused the exception to a single dead-letter exchange called 'ipc:errors'. Railway will configure the dead-letter exchange automatically.
+
 ## [2.2.2] - 2020-11-20
 ### Fixed
-* Fixed Publisher class channel leak. Channels were being created on each
-  instantiation of a Publisher instead of being re-used.
+* Fixed Publisher class channel leak. Channels were being created on each instantiation of a Publisher instead of being re-used.
 
 ## [2.2.1] - 2020-10-20
 ### Added
@@ -83,7 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
-[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.2...HEAD
+[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v30.0.0...HEAD
+[3.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.2...v3.0.0
 [2.2.2]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/learn-co/railway_ipc_gem/compare/v2.1.0...v2.2.0
