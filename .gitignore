@@ -4,6 +4,7 @@
 /coverage/
 /doc/
 /pkg/
+/rake
 /spec/reports/
 /tmp/
 Gemfile.lock
