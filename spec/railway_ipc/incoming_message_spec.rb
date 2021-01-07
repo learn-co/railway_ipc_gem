@@ -2,14 +2,14 @@
 
 RSpec.describe RailwayIpc::IncomingMessage, 'initialization' do
   context 'when the message is valid JSON' do
-    let(:incoming_message) { described_class.new(stubbed_payload) }
+    let(:incoming_message) { described_class.new(stubbed_pb_binary_payload) }
 
     it 'extracts the message type' do
       expect(incoming_message.type).to eq('RailwayIpc::Messages::TestMessage')
     end
 
     it 'stores the raw JSON payload' do
-      expect(incoming_message.payload).to eq(stubbed_payload)
+      expect(incoming_message.payload).to eq(stubbed_pb_binary_payload)
     end
   end
 
@@ -24,7 +24,7 @@ end
 
 RSpec.describe RailwayIpc::IncomingMessage, '#decoded' do
   it 'decodes the message' do
-    incoming_message = described_class.new(stubbed_payload)
+    incoming_message = described_class.new(stubbed_pb_binary_payload)
     expect(incoming_message.decoded).to eq(stubbed_protobuf)
   end
 
@@ -61,27 +61,27 @@ end
 
 RSpec.describe RailwayIpc::IncomingMessage, '#valid?' do
   it 'returns true if everything is ok' do
-    incoming_message = described_class.new(stubbed_payload)
+    incoming_message = described_class.new(stubbed_pb_binary_payload)
     expect(incoming_message.valid?).to eq(true)
   end
 
   it 'requires a message UUID' do
     protobuf = stubbed_protobuf(uuid: nil)
-    incoming_message = described_class.new(stubbed_payload(protobuf: protobuf))
+    incoming_message = described_class.new(stubbed_pb_binary_payload(protobuf: protobuf))
     expect(incoming_message.valid?).to eq(false)
     expect(incoming_message.errors[:uuid]).to eq('uuid is required')
   end
 
   it 'requires a correlation UUID' do
     protobuf = stubbed_protobuf(correlation_id: nil)
-    incoming_message = described_class.new(stubbed_payload(protobuf: protobuf))
+    incoming_message = described_class.new(stubbed_pb_binary_payload(protobuf: protobuf))
     expect(incoming_message.valid?).to eq(false)
     expect(incoming_message.errors[:correlation_id]).to eq('correlation_id is required')
   end
 end
 
 RSpec.describe RailwayIpc::IncomingMessage, 'decoded message delegations' do
-  let(:incoming_message) { described_class.new(stubbed_payload) }
+  let(:incoming_message) { described_class.new(stubbed_pb_binary_payload) }
 
   it { expect(incoming_message.uuid).to eq(RailwayIpc::SpecHelpers::DEAD_BEEF_UUID) }
   it { expect(incoming_message.user_uuid).to eq(RailwayIpc::SpecHelpers::BAAD_FOOD_UUID) }

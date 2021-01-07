@@ -5,7 +5,7 @@ RSpec.describe RailwayIpc::ProcessIncomingMessage, '#call' do
 
   context 'when the message is valid' do
     let(:protobuf) { stubbed_protobuf }
-    let(:payload) { stubbed_payload }
+    let(:payload) { stubbed_pb_binary_payload }
     let(:incoming_message) { RailwayIpc::IncomingMessage.new(payload) }
     let(:fake_handler) { RailwayIpc::SpecHelpers::FakeHandler.new }
 
