@@ -1,11 +1,12 @@
 AllCops:
     NewCops: enable
     Exclude:
+        - '**/*_pb.rb'
         - 'Gemfile'
         - 'Rakefile'
         - 'bin/*'
+        - 'rake/*'
         - 'spec/support/rails_app/**/*'
-        - '**/*_pb.rb'
         - 'vendor/bundle/**/*'
     TargetRubyVersion: 2.5
 
