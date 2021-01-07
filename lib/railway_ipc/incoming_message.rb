@@ -2,9 +2,10 @@
 
 module RailwayIpc
   class IncomingMessage
-    attr_reader :type, :payload, :parsed_payload, :errors
+    attr_reader :type, :message_format, :payload, :parsed_payload, :errors
 
-    def initialize(payload)
+    def initialize(payload, message_format: nil)
+      @message_format = message_format
       @parsed_payload = JSON.parse(payload)
       @type = parsed_payload['type']
       @payload = payload
@@ -32,11 +33,22 @@ module RailwayIpc
     end
 
     def decoded
-      @decoded ||= RailwayIpc::MessageDecoders::ProtobufBinaryDecoder.call(type, parsed_payload['encoded_message'])
+      @decoded ||= \
+        get_decoder(message_format).call(type, parsed_payload['encoded_message'])
     end
 
     def stringify_errors
       errors.values.join(', ')
+    end
+
+    private
+
+    DEFAULT_DECODER = RailwayIpc::MessageDecoders::ProtobufBinaryDecoder
+
+    def get_decoder(name)
+      {
+        'protobuf_binary' => RailwayIpc::MessageDecoders::ProtobufBinaryDecoder
+      }.fetch(name, DEFAULT_DECODER)
     end
   end
 end

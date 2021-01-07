@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
+* (Breaking Change) Rename `Consumer#work` to `Consumer#work_with_params`. This
+  was necessary so that we can support specifying different message encodings via metadata in the future. If the message encoding cannot be determined from the message matadata fall back to a default decoder (binary protobufs).
+
 ### Removed
 ### Fixed
 

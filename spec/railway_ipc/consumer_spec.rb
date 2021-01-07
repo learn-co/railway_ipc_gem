@@ -78,17 +78,23 @@ RSpec.describe RailwayIpc::Consumer, '.handle' do
   end
 end
 
-RSpec.describe RailwayIpc::Consumer, '#work' do
+RSpec.describe RailwayIpc::Consumer, '#work_with_params' do
+  let(:delivery_info) { instance_double(Bunny::DeliveryInfo) }
+  let(:metadata) { {} }
+
   it 'processes the message' do
     consumer = RailwayIpc::TestConsumer.new
     expect {
-      consumer.work(stubbed_pb_binary_payload)
+      consumer.work_with_params(stubbed_pb_binary_payload, delivery_info, metadata)
     }.to change { RailwayIpc::ConsumedMessage.count }.by(1)
   end
 
   it 'acknowledges the message' do
     consumer = RailwayIpc::TestConsumer.new
-    expect(consumer.work(stubbed_pb_binary_payload)).to eq(:ack)
+    result = \
+      consumer.work_with_params(stubbed_pb_binary_payload, delivery_info, metadata)
+
+    expect(result).to eq(:ack)
   end
 
   context 'when an error occurs' do
@@ -112,11 +118,14 @@ RSpec.describe RailwayIpc::Consumer, '#work' do
           }
         )
 
-      consumer.work(stubbed_pb_binary_payload)
+      consumer.work_with_params(stubbed_pb_binary_payload, delivery_info, metadata)
     end
 
     it 'rejects the message' do
-      expect(consumer.work(stubbed_pb_binary_payload)).to eq(:reject)
+      result = \
+        consumer.work_with_params(stubbed_pb_binary_payload, delivery_info, metadata)
+
+      expect(result).to eq(:reject)
     end
   end
 end

@@ -56,8 +56,14 @@ module RailwayIpc
       queue.opts[:exchange]
     end
 
-    def work(payload)
-      message = RailwayIpc::IncomingMessage.new(payload)
+    # REFACTOR: Long term we should think about not leaking Sneakers
+    # methods as part of Railway's public API since clients can (and do)
+    # override them. -BN
+    def work_with_params(payload, _delivery_info, metadata)
+      message_format = metadata.fetch('headers', {})
+                               .fetch('message_format', 'protobuf_binary')
+
+      message = RailwayIpc::IncomingMessage.new(payload, message_format: message_format)
       RailwayIpc::ProcessIncomingMessage.call(self, message)
       ack!
     rescue StandardError => e
