@@ -15,7 +15,7 @@ module RailwayIpc
       )
     end
 
-    def stubbed_payload(type: 'RailwayIpc::Messages::TestMessage', protobuf: stubbed_protobuf)
+    def stubbed_pb_binary_payload(type: 'RailwayIpc::Messages::TestMessage', protobuf: stubbed_protobuf)
       {
         type: type,
         encoded_message: Base64.encode64(RailwayIpc::Messages::TestMessage.encode(protobuf))

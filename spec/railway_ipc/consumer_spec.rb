@@ -82,13 +82,13 @@ RSpec.describe RailwayIpc::Consumer, '#work' do
   it 'processes the message' do
     consumer = RailwayIpc::TestConsumer.new
     expect {
-      consumer.work(stubbed_payload)
+      consumer.work(stubbed_pb_binary_payload)
     }.to change { RailwayIpc::ConsumedMessage.count }.by(1)
   end
 
   it 'acknowledges the message' do
     consumer = RailwayIpc::TestConsumer.new
-    expect(consumer.work(stubbed_payload)).to eq(:ack)
+    expect(consumer.work(stubbed_pb_binary_payload)).to eq(:ack)
   end
 
   context 'when an error occurs' do
@@ -108,15 +108,15 @@ RSpec.describe RailwayIpc::Consumer, '#work' do
             error: StandardError,
             exchange: 'test:events',
             queue: 'ironboard:test:commands',
-            payload: stubbed_payload
+            payload: stubbed_pb_binary_payload
           }
         )
 
-      consumer.work(stubbed_payload)
+      consumer.work(stubbed_pb_binary_payload)
     end
 
     it 'rejects the message' do
-      expect(consumer.work(stubbed_payload)).to eq(:reject)
+      expect(consumer.work(stubbed_pb_binary_payload)).to eq(:reject)
     end
   end
 end
