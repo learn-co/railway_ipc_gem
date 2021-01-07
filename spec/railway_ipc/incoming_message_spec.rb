@@ -23,12 +23,12 @@ RSpec.describe RailwayIpc::IncomingMessage, 'initialization' do
 end
 
 RSpec.describe RailwayIpc::IncomingMessage, '#decoded' do
-  it 'decodes the message' do
+  it 'decodes protobuf binary encoded messages' do
     incoming_message = described_class.new(stubbed_pb_binary_payload)
     expect(incoming_message.decoded).to eq(stubbed_protobuf)
   end
 
-  context "when it can't find a decoder class constant" do
+  context "when it can't find a protobuf class constant" do
     let(:incoming_message) do
       message = {
         type: 'Foo',
@@ -44,18 +44,6 @@ RSpec.describe RailwayIpc::IncomingMessage, '#decoded' do
     it { expect(incoming_message.uuid).to eq(RailwayIpc::SpecHelpers::DEAD_BEEF_UUID) }
     it { expect(incoming_message.user_uuid).to eq(RailwayIpc::SpecHelpers::BAAD_FOOD_UUID) }
     it { expect(incoming_message.correlation_id).to eq(RailwayIpc::SpecHelpers::CAFE_FOOD_UUID) }
-  end
-
-  it "raises an error if it can't decode the protobuf message" do
-    message = {
-      type: 'RailwayIpc::Messages::TestMessage',
-      encoded_message: 'invalid'
-    }.to_json
-
-    incoming_message = described_class.new(message)
-    expect {
-      incoming_message.decoded
-    }.to raise_error(RailwayIpc::IncomingMessage::ParserError)
   end
 end
 
