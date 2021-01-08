@@ -24,26 +24,32 @@ end
 
 RSpec.describe RailwayIpc::IncomingMessage, '#decoded' do
   it 'decodes protobuf binary encoded messages' do
+    incoming_message = described_class.new(
+      stubbed_pb_binary_payload,
+      message_format: 'protobuf_binary'
+    )
+    expect(incoming_message.decoded).to eq(stubbed_protobuf)
+  end
+
+  it 'decodes protobuf json encoded messages' do
+    incoming_message = described_class.new(
+      stubbed_pb_json_payload,
+      message_format: 'protobuf_json'
+    )
+    expect(incoming_message.decoded).to eq(stubbed_protobuf)
+  end
+
+  it "uses the protobuf binary decoder when a message format isn't provided" do
     incoming_message = described_class.new(stubbed_pb_binary_payload)
     expect(incoming_message.decoded).to eq(stubbed_protobuf)
   end
 
-  context "when it can't find a protobuf class constant" do
-    let(:incoming_message) do
-      message = {
-        type: 'Foo',
-        encoded_message: Base64.encode64(RailwayIpc::Messages::TestMessage.encode(stubbed_protobuf))
-      }.to_json
-      described_class.new(message)
-    end
-
-    it 'responds with an `UnknownMessage`' do
-      expect(incoming_message.decoded).to be_a(RailwayIpc::Messages::Unknown)
-    end
-
-    it { expect(incoming_message.uuid).to eq(RailwayIpc::SpecHelpers::DEAD_BEEF_UUID) }
-    it { expect(incoming_message.user_uuid).to eq(RailwayIpc::SpecHelpers::BAAD_FOOD_UUID) }
-    it { expect(incoming_message.correlation_id).to eq(RailwayIpc::SpecHelpers::CAFE_FOOD_UUID) }
+  it "uses the protobuf binary decoder when the message format isn't known" do
+    incoming_message = described_class.new(
+      stubbed_pb_binary_payload,
+      message_format: 'not a real message format'
+    )
+    expect(incoming_message.decoded).to eq(stubbed_protobuf)
   end
 end
 

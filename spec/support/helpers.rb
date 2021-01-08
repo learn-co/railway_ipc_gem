@@ -22,6 +22,13 @@ module RailwayIpc
       }.to_json
     end
 
+    def stubbed_pb_json_payload(type: 'RailwayIpc::Messages::TestMessage', protobuf: stubbed_protobuf)
+      {
+        type: type,
+        encoded_message: protobuf.to_h
+      }.to_json
+    end
+
     class FakeLogger
       attr_reader :messages
 

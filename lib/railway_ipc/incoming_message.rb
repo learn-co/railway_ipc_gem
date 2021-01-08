@@ -47,7 +47,8 @@ module RailwayIpc
 
     def get_decoder(name)
       {
-        'protobuf_binary' => RailwayIpc::MessageDecoders::ProtobufBinaryDecoder
+        'protobuf_binary' => RailwayIpc::MessageDecoders::ProtobufBinaryDecoder,
+        'protobuf_json' => RailwayIpc::MessageDecoders::ProtobufJsonDecoder
       }.fetch(name, DEFAULT_DECODER)
     end
   end
