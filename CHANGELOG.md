@@ -6,14 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-* JSON decoder that can handle JSON encoded Protobufs.
-
 ### Changed
-* (Breaking Change) Rename `Consumer#work` to `Consumer#work_with_params`. This
-  was necessary so that we can support specifying different message encodings via metadata in the future. If the message encoding cannot be determined from the message matadata fall back to a default decoder (binary protobufs).
-
 ### Removed
 ### Fixed
+
+## [4.0.0] - 2021-01-11
+### Added
+* JSON decoder for consumers that can handle JSON encoded Protobufs. Note that the publishers do not (yet) have the option of encoding the messages as JSON.
+
+### Changed
+* (Breaking Change) Rename `Consumer#work` to `Consumer#work_with_params`. This was necessary so that we can support specifying different message encodings via metadata in the future. If the message encoding cannot be determined from the message metadata fall back to a default decoder (binary protobufs).
+
+### Fixed
+* `./bin/console` script was broken because Pry wasn't a dependency; added Pry as a development dependency only.
 
 ## [3.0.0] - 2020-12-07
 ### Changed
@@ -91,7 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
-[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v30.0.0...HEAD
+[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v3.0.0...v4.0.0
 [3.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.2...v3.0.0
 [2.2.2]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.0...v2.2.1
