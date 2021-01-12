@@ -80,7 +80,7 @@ end
 
 RSpec.describe RailwayIpc::Consumer, '#work_with_params' do
   let(:delivery_info) { instance_double(Bunny::DeliveryInfo) }
-  let(:metadata) { {} }
+  let(:metadata) { instance_double(Bunny::MessageProperties, headers: {}) }
 
   it 'processes the message' do
     consumer = RailwayIpc::TestConsumer.new

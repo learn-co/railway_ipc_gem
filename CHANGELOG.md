@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Removed
 ### Fixed
+* Fixed `undefined method fetch for Bunny::MessageProperties` error. `Bunny::MessageProperties` isn't really a Hash, it wraps one (and doesn't provide a `#fetch` method).
 
 ## [4.0.0] - 2021-01-11
 ### Added
