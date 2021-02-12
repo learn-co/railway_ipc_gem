@@ -7,16 +7,15 @@ module RailwayIpc
 
     validates :uuid, :status, presence: true
 
-    def self.store_message(exchange_name, message)
-      encoded_message = RailwayIpc::Rabbitmq::Payload.encode(message)
+    def self.store_message(outgoing_message)
       create!(
-        uuid: message.uuid,
-        message_type: message.class.to_s,
-        user_uuid: message.user_uuid,
-        correlation_id: message.correlation_id,
-        encoded_message: encoded_message,
+        uuid: outgoing_message.uuid,
+        message_type: outgoing_message.type,
+        user_uuid: outgoing_message.user_uuid,
+        correlation_id: outgoing_message.correlation_id,
+        encoded_message: outgoing_message.encoded,
         status: 'sent',
-        exchange: exchange_name
+        exchange: outgoing_message.exchange
       )
     end
 

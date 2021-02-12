@@ -26,7 +26,7 @@ RSpec.describe RailwayIpc::IncomingMessage, '#decoded' do
   it 'decodes protobuf binary encoded messages' do
     incoming_message = described_class.new(
       stubbed_pb_binary_payload,
-      message_format: 'protobuf_binary'
+      message_format: 'binary_protobuf'
     )
     expect(incoming_message.decoded).to eq(stubbed_protobuf)
   end

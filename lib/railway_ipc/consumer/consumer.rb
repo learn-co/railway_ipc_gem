@@ -61,7 +61,7 @@ module RailwayIpc
     # override them. -BN
     def work_with_params(payload, _delivery_info, metadata)
       headers = metadata.headers || {}
-      message_format = headers.fetch('message_format', 'protobuf_binary')
+      message_format = headers.fetch('message_format', 'binary_protobuf')
 
       message = RailwayIpc::IncomingMessage.new(payload, message_format: message_format)
       RailwayIpc::ProcessIncomingMessage.call(self, message)

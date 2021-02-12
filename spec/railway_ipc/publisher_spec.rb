@@ -39,7 +39,7 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
     message = RailwayIpc::Messages::TestMessage.new
     publisher.publish(message)
 
-    payload = wait_for_payload(queue)
+    _, _, payload = wait_for_payload(queue)
     expect(payload['type']).to eq('RailwayIpc::Messages::TestMessage')
   end
 
@@ -49,6 +49,24 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
     expect {
       publisher.publish(message)
     }.to change { RailwayIpc::PublishedMessage.count }.by(1)
+  end
+
+  context 'message formats' do
+    it 'sets a default message format header' do
+      message = RailwayIpc::Messages::TestMessage.new
+      publisher.publish(message)
+
+      _, properties, payload = wait_for_payload(queue)
+      expect(properties.headers['message_format']).to eq('binary_protobuf')
+    end
+
+    it 'allows message format to be specified' do
+      message = RailwayIpc::Messages::TestMessage.new
+      publisher.publish(message, 'json_protobuf')
+
+      _, properties, payload = wait_for_payload(queue)
+      expect(properties.headers['message_format']).to eq('json_protobuf')
+    end
   end
 
   context "when proper ID's are provided" do
@@ -61,14 +79,14 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
 
     it 'preserves a message uuid if one is provided' do
       publisher.publish(message)
-      payload = wait_for_payload(queue)
+      _, _, payload = wait_for_payload(queue)
       decoded = decode_payload(payload, RailwayIpc::Messages::TestMessage)
       expect(decoded['uuid']).to eq(RailwayIpc::SpecHelpers::DEAD_BEEF_UUID)
     end
 
     it 'preserves the correlation ID if one is provided' do
       publisher.publish(message)
-      payload = wait_for_payload(queue)
+      _, _, payload = wait_for_payload(queue)
       decoded = decode_payload(payload, RailwayIpc::Messages::TestMessage)
       expect(decoded['correlation_id']).to eq(RailwayIpc::SpecHelpers::CAFE_FOOD_UUID)
     end
@@ -79,14 +97,14 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
 
     it "assigns a message uuid if one isn't provided" do
       publisher.publish(message)
-      payload = wait_for_payload(queue)
+      _, _, payload = wait_for_payload(queue)
       decoded = decode_payload(payload, RailwayIpc::Messages::TestMessage)
       expect(decoded['uuid']).to_not be_blank
     end
 
     it "assigns a correlation ID if one isn't provided" do
       publisher.publish(message)
-      payload = wait_for_payload(queue)
+      _, _, payload = wait_for_payload(queue)
       decoded = decode_payload(payload, RailwayIpc::Messages::TestMessage)
       expect(decoded['correlation_id']).to_not be_blank
     end
@@ -119,7 +137,7 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
       }.to raise_error(RailwayIpc::InvalidProtobuf)
 
       begin
-        payload = wait_for_payload(queue)
+        _, _, payload = wait_for_payload(queue)
       rescue Timeout::Error
         expect(payload).to be_nil
       end
@@ -146,7 +164,7 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
       }.to raise_error(RailwayIpc::FailedToStoreOutgoingMessage)
 
       begin
-        payload = wait_for_payload(queue)
+        _, _, payload = wait_for_payload(queue)
       rescue Timeout::Error
         expect(payload).to be_nil
       end
@@ -180,12 +198,15 @@ def cleanup!
 end
 
 def wait_for_payload(queue)
+  delivery_info = nil
+  properties = nil
   payload = nil
+
   Timeout.timeout(5) do
-    _, _, payload = queue.pop until payload
+    delivery_info, properties, payload = queue.pop until payload
   end
 
-  JSON.parse(payload)
+  [delivery_info, properties, JSON.parse(payload)]
 end
 
 def decode_payload(payload, message_type)

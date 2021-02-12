@@ -10,13 +10,11 @@ module RailwayIpc
     end
 
     # rubocop:disable Metrics/AbcSize
-    def publish(message)
-      message.uuid = SecureRandom.uuid if message.uuid.blank?
-      message.correlation_id = SecureRandom.uuid if message.correlation_id.blank?
+    def publish(message, format='binary_protobuf')
+      outgoing_message = OutgoingMessage.new(message, exchange_name, format)
+      stored_message = message_store.store_message(outgoing_message)
       RailwayIpc.logger.info('Publishing message', log_message_options(message))
-
-      stored_message = message_store.store_message(exchange_name, message)
-      exchange.publish(RailwayIpc::Rabbitmq::Payload.encode(message))
+      exchange.publish(outgoing_message.encoded, headers: { message_format: format })
     rescue RailwayIpc::InvalidProtobuf => e
       RailwayIpc.logger.error('Invalid protobuf', log_message_options(message))
       raise e
