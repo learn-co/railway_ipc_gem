@@ -34,7 +34,7 @@ RSpec.describe RailwayIpc::IncomingMessage, '#decoded' do
   it 'decodes protobuf json encoded messages' do
     incoming_message = described_class.new(
       stubbed_pb_json_payload,
-      message_format: 'protobuf_json'
+      message_format: 'json_protobuf'
     )
     expect(incoming_message.decoded).to eq(stubbed_protobuf)
   end

@@ -8,7 +8,7 @@ RSpec.describe RailwayIpc::MessageEncoders::ProtobufBinaryEncoder do
                'ZmVmMDBkY2FmZRokZGVhZGJlZWYtZGVh\\nZC1kZWFkLWRlYWQtZGVh' +
                'ZGRlYWZiZWVmKgQKAjQy\\n"}'
 
-    message = RailwayIpc::OutgoingMessage.new(stubbed_protobuf)
+    message = RailwayIpc::OutgoingMessage.new(stubbed_protobuf, 'test:events')
     expect(described_class.call(message)).to eq(expected)
   end
 
@@ -28,7 +28,7 @@ RSpec.describe RailwayIpc::MessageEncoders::ProtobufJsonEncoder do
                '"uuid":"deadbeef-dead-dead-dead-deaddeafbeef",' +
                '"context":{},"data":{"param":"42"}}}'
 
-    message = RailwayIpc::OutgoingMessage.new(stubbed_protobuf)
+    message = RailwayIpc::OutgoingMessage.new(stubbed_protobuf, 'test:events')
     expect(described_class.call(message)).to eq(expected)
   end
 
