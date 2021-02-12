@@ -61,6 +61,7 @@ RSpec.configure do |config|
   config.disable_monkey_patching!
   config.expect_with :rspec do |c|
     c.syntax = :expect
+    c.max_formatted_output_length = 1_000_000
   end
 
   config.include FactoryBot::Syntax::Methods

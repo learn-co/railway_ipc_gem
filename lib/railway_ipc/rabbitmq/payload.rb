@@ -2,6 +2,7 @@
 
 module RailwayIpc
   module Rabbitmq
+    # Why is this class namespaced under Rabbitmq?
     class Payload
       attr_reader :type, :message
 
