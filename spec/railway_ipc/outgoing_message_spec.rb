@@ -48,10 +48,10 @@ RSpec.describe RailwayIpc::OutgoingMessage, '#encoded' do
   it 'encodes a message in binary protobuf format' do
     subject = described_class.new(stubbed_protobuf, 'test:events')
 
-    expected = '{"type":"RailwayIpc::Messages::TestMessage",' +
-               '"encoded_message":"CiRiYWFkZjAwZC1iYWFkLWJhYWQtYmFhZC1i' +
-               'YWFkYmFhZGYwMGQSJGNhZmVm\\nMDBkLWNhZmUtY2FmZS1jYWZlLWNh' +
-               'ZmVmMDBkY2FmZRokZGVhZGJlZWYtZGVh\\nZC1kZWFkLWRlYWQtZGVh' +
+    expected = '{"type":"RailwayIpc::Messages::TestMessage",' \
+               '"encoded_message":"CiRiYWFkZjAwZC1iYWFkLWJhYWQtYmFhZC1i' \
+               'YWFkYmFhZGYwMGQSJGNhZmVm\\nMDBkLWNhZmUtY2FmZS1jYWZlLWNh' \
+               'ZmVmMDBkY2FmZRokZGVhZGJlZWYtZGVh\\nZC1kZWFkLWRlYWQtZGVh' \
                'ZGRlYWZiZWVmKgQKAjQy\\n"}'
 
     expect(subject.encoded).to eq(expected)
@@ -60,11 +60,11 @@ RSpec.describe RailwayIpc::OutgoingMessage, '#encoded' do
   it 'encodes a message in json protobuf format' do
     subject = described_class.new(stubbed_protobuf, 'test:events', 'json_protobuf')
 
-    expected = '{"type":"RailwayIpc::Messages::TestMessage",' +
-               '"encoded_message":{' +
-               '"user_uuid":"baadf00d-baad-baad-baad-baadbaadf00d",' +
-               '"correlation_id":"cafef00d-cafe-cafe-cafe-cafef00dcafe",' +
-               '"uuid":"deadbeef-dead-dead-dead-deaddeafbeef",' +
+    expected = '{"type":"RailwayIpc::Messages::TestMessage",' \
+               '"encoded_message":{' \
+               '"user_uuid":"baadf00d-baad-baad-baad-baadbaadf00d",' \
+               '"correlation_id":"cafef00d-cafe-cafe-cafe-cafef00dcafe",' \
+               '"uuid":"deadbeef-dead-dead-dead-deaddeafbeef",' \
                '"context":{},"data":{"param":"42"}}}'
 
     expect(subject.encoded).to eq(expected)

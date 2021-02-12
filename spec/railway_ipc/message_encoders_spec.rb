@@ -2,10 +2,10 @@
 
 RSpec.describe RailwayIpc::MessageEncoders::ProtobufBinaryEncoder do
   it 'encodes the message' do
-    expected = '{"type":"RailwayIpc::Messages::TestMessage",' +
-               '"encoded_message":"CiRiYWFkZjAwZC1iYWFkLWJhYWQtYmFhZC1i' +
-               'YWFkYmFhZGYwMGQSJGNhZmVm\\nMDBkLWNhZmUtY2FmZS1jYWZlLWNh' +
-               'ZmVmMDBkY2FmZRokZGVhZGJlZWYtZGVh\\nZC1kZWFkLWRlYWQtZGVh' +
+    expected = '{"type":"RailwayIpc::Messages::TestMessage",' \
+               '"encoded_message":"CiRiYWFkZjAwZC1iYWFkLWJhYWQtYmFhZC1i' \
+               'YWFkYmFhZGYwMGQSJGNhZmVm\\nMDBkLWNhZmUtY2FmZS1jYWZlLWNh' \
+               'ZmVmMDBkY2FmZRokZGVhZGJlZWYtZGVh\\nZC1kZWFkLWRlYWQtZGVh' \
                'ZGRlYWZiZWVmKgQKAjQy\\n"}'
 
     message = RailwayIpc::OutgoingMessage.new(stubbed_protobuf, 'test:events')
@@ -21,11 +21,11 @@ end
 
 RSpec.describe RailwayIpc::MessageEncoders::ProtobufJsonEncoder do
   it 'encodes the message' do
-    expected = '{"type":"RailwayIpc::Messages::TestMessage",' +
-               '"encoded_message":{' +
-               '"user_uuid":"baadf00d-baad-baad-baad-baadbaadf00d",' +
-               '"correlation_id":"cafef00d-cafe-cafe-cafe-cafef00dcafe",' +
-               '"uuid":"deadbeef-dead-dead-dead-deaddeafbeef",' +
+    expected = '{"type":"RailwayIpc::Messages::TestMessage",' \
+               '"encoded_message":{' \
+               '"user_uuid":"baadf00d-baad-baad-baad-baadbaadf00d",' \
+               '"correlation_id":"cafef00d-cafe-cafe-cafe-cafef00dcafe",' \
+               '"uuid":"deadbeef-dead-dead-dead-deaddeafbeef",' \
                '"context":{},"data":{"param":"42"}}}'
 
     message = RailwayIpc::OutgoingMessage.new(stubbed_protobuf, 'test:events')

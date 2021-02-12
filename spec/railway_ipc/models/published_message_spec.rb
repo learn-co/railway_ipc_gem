@@ -32,6 +32,6 @@ RSpec.describe RailwayIpc::PublishedMessage, '.store_message', type: :model do
       expect(stored_message.status).to eq('sent')
       expect(stored_message.exchange).to eq('test:events')
       expect(stored_message.inserted_at.utc).to be_within(1.second).of(Time.current)
-    }.to change{ RailwayIpc::PublishedMessage.count }.by(1)
+    }.to change { RailwayIpc::PublishedMessage.count }.by(1)
   end
 end

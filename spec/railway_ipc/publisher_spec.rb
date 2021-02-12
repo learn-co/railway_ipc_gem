@@ -56,7 +56,7 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
       message = RailwayIpc::Messages::TestMessage.new
       publisher.publish(message)
 
-      _, properties, payload = wait_for_payload(queue)
+      _, properties, _payload = wait_for_payload(queue)
       expect(properties.headers['message_format']).to eq('binary_protobuf')
     end
 
@@ -64,7 +64,7 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
       message = RailwayIpc::Messages::TestMessage.new
       publisher.publish(message, 'json_protobuf')
 
-      _, properties, payload = wait_for_payload(queue)
+      _, properties, _payload = wait_for_payload(queue)
       expect(properties.headers['message_format']).to eq('json_protobuf')
     end
   end
