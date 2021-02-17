@@ -15,6 +15,7 @@ module RailwayIpc
       stored_message = message_store.store_message(outgoing_message)
       RailwayIpc.logger.info('Publishing message', log_message_options(message))
       exchange.publish(outgoing_message.encoded, headers: { message_format: format })
+      outgoing_message
     rescue RailwayIpc::InvalidProtobuf => e
       RailwayIpc.logger.error('Invalid protobuf', log_message_options(message))
       raise e

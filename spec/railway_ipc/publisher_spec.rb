@@ -37,7 +37,8 @@ RSpec.describe RailwayIpc::Publisher, '#publish' do
 
   it 'publishes a message' do
     message = RailwayIpc::Messages::TestMessage.new
-    publisher.publish(message)
+    result = publisher.publish(message)
+    expect(result).to be_a(RailwayIpc::OutgoingMessage)
 
     _, _, payload = wait_for_payload(queue)
     expect(payload['type']).to eq('RailwayIpc::Messages::TestMessage')
