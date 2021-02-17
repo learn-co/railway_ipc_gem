@@ -7,9 +7,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 ### Changed
 ### Removed
-* Remove deprecated `SingletonPublisher`
-
 ### Fixed
+
+## [5.0.0] - 2021-02-17
+### Added
+* Message encoders. Messages can now be encoded using either binary protobufs (the default) or JSON protobufs.
+* `RailwayIpc::OutgoingMessage` abstraction that encapsulates everything about a message to be published.
+
+### Changed
+* `Publisher#publish` now takes an optional `format` parameter that specifies how the message should be encoded. It is added to the message header when the message is published. The default format is `binary_protobuf`.
+* (Breaking change) `Publisher#publish` now returns an `OutgoingMessage` instead of a `Bunny::Exchange`.
+* Refactor `PublishedMessage#store_message` to take an `OutgoingMessage`.
+
+### Removed
+* (Breaking change) Remove deprecated `SingletonPublisher`
 
 ## [4.0.1] - 2021-01-12
 ### Fixed
@@ -101,7 +112,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - Correlation ID and message UUID are auto generated for messages for IDs are not passed in [#23](https://github.com/learn-co/railway_ipc_gem/pull/23)
 
-[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v4.0.1...HEAD
+[Unreleased]: https://github.com/learn-co/railway_ipc_gem/compare/v5.0.0...HEAD
+[5.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v4.0.1...v5.0.0
 [4.0.1]: https://github.com/learn-co/railway_ipc_gem/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v3.0.0...v4.0.0
 [3.0.0]: https://github.com/learn-co/railway_ipc_gem/compare/v2.2.2...v3.0.0
