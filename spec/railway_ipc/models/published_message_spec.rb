@@ -19,7 +19,7 @@ RSpec.describe RailwayIpc::PublishedMessage, '.store_message', type: :model do
                          '"user_uuid":"baadf00d-baad-baad-baad-baadbaadf00d",' \
                          '"correlation_id":"cafef00d-cafe-cafe-cafe-cafef00dcafe",' \
                          '"uuid":"deadbeef-dead-dead-dead-deaddeafbeef",' \
-                         '"context":{},"data":{"param":"42"}}}'
+                         '"context":{"some":"value"},"data":{"param":"42"}}}'
 
       expect(stored_message.encoded_message).to eq(expected_encoded)
 

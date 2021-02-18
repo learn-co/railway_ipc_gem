@@ -8,6 +8,7 @@ module RailwayIpc
 
     def stubbed_protobuf(uuid: DEAD_BEEF_UUID, user_uuid: BAAD_FOOD_UUID, correlation_id: CAFE_FOOD_UUID)
       RailwayIpc::Messages::TestMessage.new(
+        context: { 'some' => 'value' },
         uuid: uuid,
         user_uuid: user_uuid,
         correlation_id: correlation_id,
