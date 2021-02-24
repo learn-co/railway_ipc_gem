@@ -6,7 +6,7 @@ RSpec.describe RailwayIpc::MessageEncoders::ProtobufBinaryEncoder do
                '"encoded_message":"CiRiYWFkZjAwZC1iYWFkLWJhYWQtYmFhZC1i' \
                'YWFkYmFhZGYwMGQSJGNhZmVm\\nMDBkLWNhZmUtY2FmZS1jYWZlLWNh' \
                'ZmVmMDBkY2FmZRokZGVhZGJlZWYtZGVh\\nZC1kZWFkLWRlYWQtZGVh' \
-               'ZGRlYWZiZWVmKgQKAjQy\\n"}'
+               'ZGRlYWZiZWVmIg0KBHNvbWUSBXZhbHVlKgQKAjQy\\n"}'
 
     message = RailwayIpc::OutgoingMessage.new(stubbed_protobuf, 'test:events')
     expect(described_class.call(message)).to eq(expected)
@@ -26,7 +26,7 @@ RSpec.describe RailwayIpc::MessageEncoders::ProtobufJsonEncoder do
                '"user_uuid":"baadf00d-baad-baad-baad-baadbaadf00d",' \
                '"correlation_id":"cafef00d-cafe-cafe-cafe-cafef00dcafe",' \
                '"uuid":"deadbeef-dead-dead-dead-deaddeafbeef",' \
-               '"context":{},"data":{"param":"42"}}}'
+               '"context":{"some":"value"},"data":{"param":"42"}}}'
 
     message = RailwayIpc::OutgoingMessage.new(stubbed_protobuf, 'test:events')
     expect(described_class.call(message)).to eq(expected)

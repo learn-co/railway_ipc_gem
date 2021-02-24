@@ -43,6 +43,43 @@ RSpec.describe RailwayIpc::MessageDecoders, 'ProtobufJsonDecoder' do
     expect(decoded_message).to eq(stubbed_protobuf)
   end
 
+  it 'decodes a message with nested data protobuf' do
+    data = LearnIpc::Events::Compliance::DocumentAssignedToStudent::Data.new(
+      student_uuid: RailwayIpc::SpecHelpers::DEAD_BEEF_UUID
+    )
+
+    proto = LearnIpc::Events::Compliance::DocumentAssignedToStudent.new(
+      data: data,
+      uuid: RailwayIpc::SpecHelpers::CAFE_FOOD_UUID
+    )
+
+    decoded_message = RailwayIpc::MessageDecoders::ProtobufJsonDecoder.call(
+      'LearnIpc::Events::Compliance::DocumentAssignedToStudent',
+      proto.to_h
+    )
+
+    expect(decoded_message).to eq(proto)
+  end
+
+  it 'decodes a message with an entity protobuf' do
+    student = LearnIpc::Entities::Student.new(
+      first_name: 'John',
+      last_name: 'Doe'
+    )
+
+    proto = LearnIpc::Events::Student::Registered.new(
+      data: student,
+      uuid: RailwayIpc::SpecHelpers::CAFE_FOOD_UUID
+    )
+
+    decoded_message = RailwayIpc::MessageDecoders::ProtobufJsonDecoder.call(
+      'LearnIpc::Events::Student::Registered',
+      proto.to_h
+    )
+
+    expect(decoded_message).to eq(proto)
+  end
+
   context "when it can't find a protobuf class constant" do
     let(:decoded_message) do
       RailwayIpc::MessageDecoders::ProtobufJsonDecoder.call(
