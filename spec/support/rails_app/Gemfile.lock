@@ -1,7 +1,7 @@
 PATH
   remote: ../../..
   specs:
-    railway-ipc (2.2.1)
+    railway-ipc (5.0.0)
       bunny (~> 2.2.0)
       sneakers (~> 2.3.5)
 
@@ -57,7 +57,7 @@ GEM
     ffi (1.13.1)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
-    google-protobuf (3.12.2)
+    google-protobuf (3.20.1)
     i18n (1.8.4)
       concurrent-ruby (~> 1.0)
     listen (3.0.8)
@@ -140,7 +140,7 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
-  google-protobuf (~> 3.9)
+  google-protobuf (~> 3.20.0)
   listen (~> 3.0.5)
   pg (>= 0.18, < 2.0)
   puma (~> 3.0)
