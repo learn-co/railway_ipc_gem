@@ -3,7 +3,7 @@ jobs:
   test:
     parallelism: 1
     docker:
-      - image: cimg/ruby:2.6.5-node-browsers
+      - image: cimg/ruby:2.7.2-browsers
         environment: &environment
           PGHOST: localhost
           PGUSERNAME: postgres
