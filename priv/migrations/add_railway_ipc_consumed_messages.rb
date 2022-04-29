@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddRailwayIpcConsumedMessages < ActiveRecord::Migration
+class AddRailwayIpcConsumedMessages < ActiveRecord::Migration[4.2]
   def change
     create_table :railway_ipc_consumed_messages do |t|
       t.uuid :uuid, null: false
