@@ -54,8 +54,18 @@ module RailwayIpc
 
     private
 
+    # rails <= 5.1 uses this method to know the name of the created_at/updated_at fields
     def timestamp_attributes_for_create
       super << :inserted_at
+    end
+
+    # rails >= 6.0 moved this to the class level and uses strings instead of symbols
+    class << self
+      private
+
+      def timestamp_attributes_for_create
+        super << 'inserted_at'
+      end
     end
   end
 end
