@@ -196,6 +196,8 @@ def cleanup!
   channel = RailwayIpc::ConnectionManager.instance.channel
   channel.exchange_delete('test-exchange')
   channel.queue_delete('test-queue')
+rescue Bunny::NotFound => e
+  puts "Nothing to cleanup: #{e}"
 end
 
 def wait_for_payload(queue)
